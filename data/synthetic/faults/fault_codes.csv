@@ -1,0 +1,13 @@
+code,description,severity,category,estimated_impact_inr
+P0300,"Random/Multiple Cylinder Misfire Detected",CRITICAL,POWERTRAIN,45000
+P0301,"Cylinder 1 Misfire Detected",CRITICAL,POWERTRAIN,42000
+P0420,"Catalyst System Efficiency Below Threshold",HIGH,EMISSIONS,35000
+P0171,"System Too Lean (Bank 1)",MEDIUM,FUEL_AIR,18000
+P0128,"Coolant Thermostat Below Regulating Temp",MEDIUM,COOLING,12000
+P0562,"System Voltage Low / Battery Degradation",HIGH,ELECTRICAL,32000
+B1800,"Driver Airbag Circuit Open",CRITICAL,SAFETY,50000
+C0035,"Left Front Wheel Speed Sensor Circuit Fault",HIGH,BRAKING,22000
+U0100,"Lost Communication With ECM/PCM",CRITICAL,COMMUNICATION,60000
+BMS_028,"EV High Voltage Battery Cell Imbalance",CRITICAL,BATTERY,75000
+TPMS_LOW,"Tire Pressure Below 28 PSI Threshold",MEDIUM,CHASSIS,4500
+OIL_DUE,"Engine Oil Life Degraded Below 10%",HIGH,MAINTENANCE,9500

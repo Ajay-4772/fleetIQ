@@ -1,0 +1,272 @@
+[
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 0,
+    "batteryState": 91,
+    "mileage": 68100,
+    "timestamp": "2026-09-25T04:00:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 1,
+    "batteryState": 91,
+    "mileage": 68115,
+    "timestamp": "2026-09-25T04:02:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 2,
+    "batteryState": 91,
+    "mileage": 68130,
+    "timestamp": "2026-09-25T04:04:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 3,
+    "batteryState": 91,
+    "mileage": 68145,
+    "timestamp": "2026-09-25T04:06:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 4,
+    "batteryState": 91,
+    "mileage": 68160,
+    "timestamp": "2026-09-25T04:08:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 5,
+    "batteryState": 91,
+    "mileage": 68175,
+    "timestamp": "2026-09-25T04:10:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": "P0420",
+    "idleDuration": 6,
+    "batteryState": 91,
+    "mileage": 68190,
+    "timestamp": "2026-09-25T04:12:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 7,
+    "batteryState": 91,
+    "mileage": 68205,
+    "timestamp": "2026-09-25T04:14:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 8,
+    "batteryState": 91,
+    "mileage": 68220,
+    "timestamp": "2026-09-25T04:16:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 9,
+    "batteryState": 91,
+    "mileage": 68235,
+    "timestamp": "2026-09-25T04:18:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 0,
+    "batteryState": 91,
+    "mileage": 68250,
+    "timestamp": "2026-09-25T04:20:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 95,
+    "batteryState": 91,
+    "mileage": 68265,
+    "timestamp": "2026-09-25T04:22:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 2,
+    "batteryState": 91,
+    "mileage": 68280,
+    "timestamp": "2026-09-25T04:24:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 3,
+    "batteryState": 91,
+    "mileage": 68295,
+    "timestamp": "2026-09-25T04:26:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 4,
+    "batteryState": 91,
+    "mileage": 68310,
+    "timestamp": "2026-09-25T04:28:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 5,
+    "batteryState": 91,
+    "mileage": 68325,
+    "timestamp": "2026-09-25T04:30:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 6,
+    "batteryState": 91,
+    "mileage": 68340,
+    "timestamp": "2026-09-25T04:32:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 7,
+    "batteryState": 91,
+    "mileage": 68355,
+    "timestamp": "2026-09-25T04:34:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": "TPMS_LOW",
+    "idleDuration": 8,
+    "batteryState": 91,
+    "mileage": 68370,
+    "timestamp": "2026-09-25T04:36:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 9,
+    "batteryState": 91,
+    "mileage": 68385,
+    "timestamp": "2026-09-25T04:38:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 0,
+    "batteryState": 91,
+    "mileage": 68400,
+    "timestamp": "2026-09-25T04:40:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 1,
+    "batteryState": 91,
+    "mileage": 68415,
+    "timestamp": "2026-09-25T04:42:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 2,
+    "batteryState": 91,
+    "mileage": 68430,
+    "timestamp": "2026-09-25T04:44:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 3,
+    "batteryState": 91,
+    "mileage": 68445,
+    "timestamp": "2026-09-25T04:46:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 4,
+    "batteryState": 91,
+    "mileage": 68460,
+    "timestamp": "2026-09-25T04:48:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 5,
+    "batteryState": 91,
+    "mileage": 68475,
+    "timestamp": "2026-09-25T04:50:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 6,
+    "batteryState": 91,
+    "mileage": 68490,
+    "timestamp": "2026-09-25T04:52:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 7,
+    "batteryState": 91,
+    "mileage": 68505,
+    "timestamp": "2026-09-25T04:54:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 8,
+    "batteryState": 91,
+    "mileage": 68520,
+    "timestamp": "2026-09-25T04:56:00.000Z"
+  },
+  {
+    "vehicleIdentifier": "VH-1002",
+    "oilLifePercentage": 82,
+    "diagnosticCode": null,
+    "idleDuration": 9,
+    "batteryState": 91,
+    "mileage": 68535,
+    "timestamp": "2026-09-25T04:58:00.000Z"
+  }
+]

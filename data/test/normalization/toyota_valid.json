@@ -1,0 +1,9 @@
+{
+  "vehicle_id": "VH-1001",
+  "oil_life": 18,
+  "fault": "P0301",
+  "idle_minutes": 48,
+  "battery_pct": 92,
+  "odometer": 45000,
+  "timestamp": "2026-09-25T04:10:00Z"
+}

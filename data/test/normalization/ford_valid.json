@@ -1,0 +1,9 @@
+{
+  "vehicleIdentifier": "VH-1002",
+  "oilLifePercentage": 15,
+  "diagnosticCode": "P0301",
+  "idleDuration": 48,
+  "batteryState": 90,
+  "mileage": 62000,
+  "timestamp": "2026-09-25T04:10:00Z"
+}

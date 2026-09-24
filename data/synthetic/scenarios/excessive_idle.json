@@ -1,0 +1,9 @@
+{
+  "scenarioName": "excessive_idle",
+  "description": "Widespread excessive vehicle idling (> 60 mins) incurring significant fuel waste and carbon emissions.",
+  "eventCount": 50,
+  "faultRate": 0.05,
+  "maintenanceRate": 0.1,
+  "idleRate": 0.8,
+  "lowUtilizationRate": 0.2
+}

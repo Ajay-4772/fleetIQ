@@ -1,0 +1,9 @@
+{
+  "scenarioName": "critical_faults",
+  "description": "Surge of powertrain misfires (P0300, P0301) and safety DTCs triggering high-priority action queue items.",
+  "eventCount": 50,
+  "faultRate": 0.7,
+  "maintenanceRate": 0.1,
+  "idleRate": 0.05,
+  "lowUtilizationRate": 0.05
+}

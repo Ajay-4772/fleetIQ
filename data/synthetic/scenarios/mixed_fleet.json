@@ -1,0 +1,9 @@
+{
+  "scenarioName": "mixed_fleet",
+  "description": "Realistic operational distribution combining critical faults, overdue maintenance, battery alerts, and normal ops.",
+  "eventCount": 60,
+  "faultRate": 0.25,
+  "maintenanceRate": 0.25,
+  "idleRate": 0.2,
+  "lowUtilizationRate": 0.15
+}

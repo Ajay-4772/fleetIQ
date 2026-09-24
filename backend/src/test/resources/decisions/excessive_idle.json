@@ -1,0 +1,9 @@
+{
+  "eventId": "EVT-TEST-003",
+  "vehicleId": "VH-1003",
+  "idleMinutes": 94,
+  "eventType": "EXCESSIVE_IDLE",
+  "severity": "MEDIUM",
+  "expectedAction": "Review Operator Idle Protocol",
+  "expectedPriority": "MEDIUM"
+}

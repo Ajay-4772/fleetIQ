@@ -1,0 +1,8 @@
+{
+  "decisionId": "JEV-DEC-882",
+  "recommendedAction": "Uncertain sensor drift detected. Verify harness wiring.",
+  "priority": "MEDIUM",
+  "confidence": 0.62,
+  "estimatedCostImpact": 12000,
+  "requiresHumanReview": true
+}

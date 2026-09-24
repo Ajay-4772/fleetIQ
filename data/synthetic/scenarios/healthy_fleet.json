@@ -1,0 +1,9 @@
+{
+  "scenarioName": "healthy_fleet",
+  "description": "Nominal operational fleet telemetry with low idle times, high oil life, and no critical DTCs.",
+  "eventCount": 40,
+  "faultRate": 0.02,
+  "maintenanceRate": 0.05,
+  "idleRate": 0.05,
+  "lowUtilizationRate": 0.02
+}

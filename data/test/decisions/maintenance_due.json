@@ -1,0 +1,9 @@
+{
+  "eventId": "EVT-TEST-002",
+  "vehicleId": "VH-1002",
+  "oilLifePct": 6,
+  "eventType": "MAINTENANCE_DUE",
+  "severity": "HIGH",
+  "expectedAction": "Schedule Preventative Oil Service",
+  "expectedPriority": "HIGH"
+}

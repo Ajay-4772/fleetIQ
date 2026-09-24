@@ -1,0 +1,9 @@
+{
+  "eventId": "EVT-TEST-001",
+  "vehicleId": "VH-1001",
+  "faultCode": "P0300",
+  "eventType": "ENGINE_FAULT",
+  "severity": "CRITICAL",
+  "expectedAction": "Immediate Powertrain Inspection",
+  "expectedPriority": "CRITICAL"
+}

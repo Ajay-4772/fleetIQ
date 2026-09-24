@@ -1,0 +1,8 @@
+{
+  "decisionId": "JEV-DEC-881",
+  "recommendedAction": "Ground vehicle VH-1001 for urgent catalytic converter inspection",
+  "priority": "CRITICAL",
+  "confidence": 0.96,
+  "estimatedCostImpact": 45000,
+  "requiresHumanReview": false
+}

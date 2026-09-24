@@ -1,0 +1,272 @@
+[
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 75,
+    "fault": null,
+    "idle_minutes": 0,
+    "battery_pct": 94,
+    "odometer": 45200,
+    "timestamp": "2026-09-25T04:00:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 74,
+    "fault": null,
+    "idle_minutes": 1,
+    "battery_pct": 94,
+    "odometer": 45212,
+    "timestamp": "2026-09-25T04:02:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 73,
+    "fault": null,
+    "idle_minutes": 2,
+    "battery_pct": 94,
+    "odometer": 45224,
+    "timestamp": "2026-09-25T04:04:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 72,
+    "fault": "P0301",
+    "idle_minutes": 3,
+    "battery_pct": 94,
+    "odometer": 45236,
+    "timestamp": "2026-09-25T04:06:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 71,
+    "fault": null,
+    "idle_minutes": 4,
+    "battery_pct": 94,
+    "odometer": 45248,
+    "timestamp": "2026-09-25T04:08:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 70,
+    "fault": null,
+    "idle_minutes": 88,
+    "battery_pct": 94,
+    "odometer": 45260,
+    "timestamp": "2026-09-25T04:10:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 69,
+    "fault": null,
+    "idle_minutes": 6,
+    "battery_pct": 94,
+    "odometer": 45272,
+    "timestamp": "2026-09-25T04:12:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 68,
+    "fault": null,
+    "idle_minutes": 7,
+    "battery_pct": 94,
+    "odometer": 45284,
+    "timestamp": "2026-09-25T04:14:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 8,
+    "fault": "OIL_DUE",
+    "idle_minutes": 8,
+    "battery_pct": 94,
+    "odometer": 45296,
+    "timestamp": "2026-09-25T04:16:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 66,
+    "fault": null,
+    "idle_minutes": 9,
+    "battery_pct": 94,
+    "odometer": 45308,
+    "timestamp": "2026-09-25T04:18:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 65,
+    "fault": null,
+    "idle_minutes": 10,
+    "battery_pct": 94,
+    "odometer": 45320,
+    "timestamp": "2026-09-25T04:20:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 64,
+    "fault": null,
+    "idle_minutes": 11,
+    "battery_pct": 94,
+    "odometer": 45332,
+    "timestamp": "2026-09-25T04:22:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 63,
+    "fault": null,
+    "idle_minutes": 12,
+    "battery_pct": 94,
+    "odometer": 45344,
+    "timestamp": "2026-09-25T04:24:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 62,
+    "fault": null,
+    "idle_minutes": 13,
+    "battery_pct": 94,
+    "odometer": 45356,
+    "timestamp": "2026-09-25T04:26:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 61,
+    "fault": "P0301",
+    "idle_minutes": 14,
+    "battery_pct": 94,
+    "odometer": 45368,
+    "timestamp": "2026-09-25T04:28:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 60,
+    "fault": null,
+    "idle_minutes": 0,
+    "battery_pct": 94,
+    "odometer": 45380,
+    "timestamp": "2026-09-25T04:30:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 59,
+    "fault": null,
+    "idle_minutes": 1,
+    "battery_pct": 94,
+    "odometer": 45392,
+    "timestamp": "2026-09-25T04:32:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 58,
+    "fault": null,
+    "idle_minutes": 2,
+    "battery_pct": 94,
+    "odometer": 45404,
+    "timestamp": "2026-09-25T04:34:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 57,
+    "fault": null,
+    "idle_minutes": 3,
+    "battery_pct": 94,
+    "odometer": 45416,
+    "timestamp": "2026-09-25T04:36:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 56,
+    "fault": null,
+    "idle_minutes": 4,
+    "battery_pct": 94,
+    "odometer": 45428,
+    "timestamp": "2026-09-25T04:38:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 75,
+    "fault": null,
+    "idle_minutes": 5,
+    "battery_pct": 94,
+    "odometer": 45440,
+    "timestamp": "2026-09-25T04:40:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 74,
+    "fault": null,
+    "idle_minutes": 6,
+    "battery_pct": 94,
+    "odometer": 45452,
+    "timestamp": "2026-09-25T04:42:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 73,
+    "fault": null,
+    "idle_minutes": 7,
+    "battery_pct": 94,
+    "odometer": 45464,
+    "timestamp": "2026-09-25T04:44:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 72,
+    "fault": null,
+    "idle_minutes": 8,
+    "battery_pct": 94,
+    "odometer": 45476,
+    "timestamp": "2026-09-25T04:46:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 71,
+    "fault": null,
+    "idle_minutes": 9,
+    "battery_pct": 94,
+    "odometer": 45488,
+    "timestamp": "2026-09-25T04:48:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 70,
+    "fault": null,
+    "idle_minutes": 10,
+    "battery_pct": 94,
+    "odometer": 45500,
+    "timestamp": "2026-09-25T04:50:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 69,
+    "fault": null,
+    "idle_minutes": 11,
+    "battery_pct": 94,
+    "odometer": 45512,
+    "timestamp": "2026-09-25T04:52:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 68,
+    "fault": null,
+    "idle_minutes": 12,
+    "battery_pct": 94,
+    "odometer": 45524,
+    "timestamp": "2026-09-25T04:54:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 67,
+    "fault": null,
+    "idle_minutes": 13,
+    "battery_pct": 94,
+    "odometer": 45536,
+    "timestamp": "2026-09-25T04:56:00.000Z"
+  },
+  {
+    "vehicle_id": "VH-1001",
+    "oil_life": 66,
+    "fault": null,
+    "idle_minutes": 14,
+    "battery_pct": 94,
+    "odometer": 45548,
+    "timestamp": "2026-09-25T04:58:00.000Z"
+  }
+]

@@ -1,0 +1,108 @@
+package com.fleetiq.service.normalization;
+
+import com.fleetiq.model.CanonicalVehicleEvent;
+import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
+
+@Component
+public class ToyotaAdapter implements OemAdapter {
+
+    @Override
+    public boolean supports(String source, Map<String, Object> payload) {
+        if ("SIMULATED_TOYOTA".equalsIgnoreCase(source)) {
+            return true;
+        }
+        return payload.containsKey("vehicle_id") && (payload.containsKey("oil_life") || payload.containsKey("idle_minutes"));
+    }
+
+    @Override
+    public CanonicalVehicleEvent normalize(String source, Map<String, Object> payload, String rawPayload) {
+        Object vIdObj = payload.get("vehicle_id");
+        if (vIdObj == null || vIdObj.toString().trim().isEmpty()) {
+            throw new IllegalArgumentException("Toyota payload missing valid vehicle_id");
+        }
+        String vehicleId = vIdObj.toString().trim();
+
+        Double oilLife = getDouble(payload.get("oil_life"));
+        if (oilLife != null && (oilLife < 0 || oilLife > 100)) {
+            throw new IllegalArgumentException("Toyota payload oil_life out of valid range 0-100: " + oilLife);
+        }
+
+        Integer idleMinutes = getInteger(payload.get("idle_minutes"));
+        if (idleMinutes != null && idleMinutes < 0) {
+            throw new IllegalArgumentException("Toyota payload idle_minutes cannot be negative: " + idleMinutes);
+        }
+
+        String fault = payload.get("fault") != null ? payload.get("fault").toString().trim() : null;
+        if (fault != null && (fault.isEmpty() || "null".equalsIgnoreCase(fault))) {
+            fault = null;
+        }
+
+        Double batteryPct = getDouble(payload.get("battery_pct"));
+        Long odometer = getLong(payload.get("odometer"));
+
+        Instant ts = parseTimestamp(payload.get("timestamp"));
+        String eventId = "EVT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        return new CanonicalVehicleEvent(
+                eventId,
+                vehicleId,
+                "TELEMETRY_RAW",
+                "LOW",
+                fault,
+                idleMinutes,
+                oilLife,
+                batteryPct,
+                32.0, // default tire psi
+                idleMinutes != null ? idleMinutes * 0.05 : 0.0,
+                idleMinutes != null ? idleMinutes / 60.0 : 0.0,
+                odometer,
+                "SIMULATED_TOYOTA",
+                "NORMALIZED",
+                rawPayload,
+                ts
+        );
+    }
+
+    private Double getDouble(Object val) {
+        if (val == null) return null;
+        if (val instanceof Number) return ((Number) val).doubleValue();
+        try {
+            return Double.parseDouble(val.toString());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid numeric value: " + val);
+        }
+    }
+
+    private Integer getInteger(Object val) {
+        if (val == null) return null;
+        if (val instanceof Number) return ((Number) val).intValue();
+        try {
+            return Integer.parseInt(val.toString());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid integer value: " + val);
+        }
+    }
+
+    private Long getLong(Object val) {
+        if (val == null) return null;
+        if (val instanceof Number) return ((Number) val).longValue();
+        try {
+            return Long.parseLong(val.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Instant parseTimestamp(Object val) {
+        if (val == null) return Instant.now();
+        try {
+            return Instant.parse(val.toString());
+        } catch (Exception e) {
+            return Instant.now();
+        }
+    }
+}

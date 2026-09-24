@@ -1,0 +1,62 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: fleetiq-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    url: jdbc:h2:mem:fleetiq;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+fleetiq:
+  jev:
+    enabled: ${JEV_API_ENABLED:false}
+    api-url: ${JEV_API_URL:https://api.jev.ai/v1/decisions}
+    api-key: ${JEV_API_KEY:}
+    timeout-ms: ${JEV_TIMEOUT_MS:3000}
+    confidence-threshold: ${JEV_CONFIDENCE_THRESHOLD:0.80}
+    fallback-enabled: true
+  simulator:
+    default-seed: ${SIMULATOR_DEFAULT_SEED:20260925}
+    default-vehicle-count: ${SIMULATOR_DEFAULT_VEHICLE_COUNT:60}
+    default-event-count: ${SIMULATOR_DEFAULT_EVENT_COUNT:100}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:fleetiq}
+    username: ${DB_USER:fleetiq_user}
+    password: ${DB_PASSWORD:fleetiq_secret}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update

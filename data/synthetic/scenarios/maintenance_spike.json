@@ -1,0 +1,9 @@
+{
+  "scenarioName": "maintenance_spike",
+  "description": "Sudden spike in scheduled and overdue preventative maintenance requirements across fleet.",
+  "eventCount": 50,
+  "faultRate": 0.05,
+  "maintenanceRate": 0.6,
+  "idleRate": 0.1,
+  "lowUtilizationRate": 0.1
+}

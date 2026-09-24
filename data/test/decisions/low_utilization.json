@@ -1,0 +1,9 @@
+{
+  "eventId": "EVT-TEST-004",
+  "vehicleId": "VH-1004",
+  "operatingHours": 0.5,
+  "eventType": "LOW_UTILIZATION",
+  "severity": "LOW",
+  "expectedAction": "Reallocate Vehicle Assignment",
+  "expectedPriority": "LOW"
+}
