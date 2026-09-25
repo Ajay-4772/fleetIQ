@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "skills": {
+    "ai-system-architecture": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ai-system-architecture/SKILL.md",
+      "computedHash": "5f211c4a2e61db363ecebe939c52db8ca6831189fb62e0f2fc054e916080b92a"
+    },
+    "api-domain-architecture": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/api-domain-architecture/SKILL.md",
+      "computedHash": "fc492a09dc5297d34f0b5421bc53e6a739aba5389e12d34ffa7cf36faa0b901a"
+    },
+    "architecture-decision-framework": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-decision-framework/SKILL.md",
+      "computedHash": "0983f00eb6ab6ba8bfd8b413e81e4a8f45e13dc4c9751d2ca7189ae6ecb67766"
+    },
+    "architecture-principles": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-principles/SKILL.md",
+      "computedHash": "eae6ce9fcf9a510f12ccd888601b43007592a66170042a707398bca9da4a0c58"
+    },
+    "architecture-review": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-review/SKILL.md",
+      "computedHash": "adc5c13c7fe2aeaaf1b7855c91a358b42f20795c95ab136e84b0106bb433e544"
+    },
+    "codebase-architecture": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/codebase-architecture/SKILL.md",
+      "computedHash": "f0be4183744c65bf0456678231b96ec80a8c88813af9dbad683145543b389363"
+    },
+    "context-engineering": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/context-engineering/SKILL.md",
+      "computedHash": "a240bf6470f6c57c48bdbd89b6b9ee76a9e94e846b737fee58fb8134816f3959"
+    },
+    "database-intelligence": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/database-intelligence/SKILL.md",
+      "computedHash": "cc130d870326634833359ac4ac02803d7507b1b13505a18f59443f84222c7215"
+    },
+    "production-engineering": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/production-engineering/SKILL.md",
+      "computedHash": "36162c008a8ca2b5b40102b44d165523da1a09bb0beea498756c7876ef480da1"
+    },
+    "scalability-distributed-systems": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/scalability-distributed-systems/SKILL.md",
+      "computedHash": "652c5cee5c2fc0d04dbd701ecf763636bd9d6b4226c407548f6af4db2c2237a5"
+    },
+    "security-by-design": {
+      "source": "imadnan4/architect-skills",
+      "sourceType": "github",
+      "skillPath": "skills/security-by-design/SKILL.md",
+      "computedHash": "fe1c4d8e895fbc5798d3ae2acbbaad40422f48657003d3f1f0c247d7ebe9743e"
+    }
+  }
+}

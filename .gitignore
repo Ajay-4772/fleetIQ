@@ -1,5 +1,4 @@
 # System & Project Memory / Rules
-.agent/
 .project-memory/
 scratch/
 
@@ -56,3 +55,18 @@ pnpm-debug.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# projectmem regenerated projections (rebuilt by pjm regenerate)
+.venv/
+.projectmem/summary.md
+.projectmem/PROJECT_MAP.md
+.projectmem/AI_INSTRUCTIONS.md
+.projectmem/issues/
+.projectmem/watch.*
+.projectmem/data/
+.projectmem/*.db
+.projectmem/*.db-*
+.projectmem/*.sqlite
+.projectmem/*.sqlite-*
+.projectmem/*.sqlite3
+.projectmem/*.sqlite3-*

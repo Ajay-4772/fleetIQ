@@ -18,13 +18,7 @@ public class FleetQueryController {
 
     @PostMapping("/query")
     public ResponseEntity<FleetQueryResponse> executeQuery(@RequestBody FleetQueryRequest request) {
-        try {
-            FleetQueryResponse response = fleetQueryService.executeQuery(request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(
-                    new FleetQueryResponse(request != null ? request.getIntent() : "UNKNOWN", e.getMessage(), 0, null, null)
-            );
-        }
+        FleetQueryResponse response = fleetQueryService.executeQuery(request);
+        return ResponseEntity.ok(response);
     }
 }

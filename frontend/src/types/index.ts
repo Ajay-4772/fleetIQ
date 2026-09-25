@@ -142,15 +142,16 @@ export interface ImpactMetrics {
 }
 
 export interface DashboardEvent {
+  eventId?: string;
   eventType: string;
   timestamp: string;
   vehicleId: string;
-  make: string;
+  make?: string;
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
   source: string;
-  recommendedAction: string;
-  estimatedImpact: number;
-  status: string;
+  recommendedAction?: string;
+  estimatedImpact?: number;
+  status?: string;
   data?: any;
 }
 
@@ -227,4 +228,67 @@ export interface SearchResult {
   actions: ActionItem[];
   events: CanonicalVehicleEvent[];
 }
+
+export interface ChatConversation {
+  id: string;
+  title: string;
+  archived?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+}
+
+export interface ChatMessage {
+  id: string;
+  conversationId?: string;
+  role: 'USER' | 'ASSISTANT' | 'SYSTEM';
+  content: string;
+  queryType?: string;
+  sources?: string[];
+  citations?: string[];
+  evidence?: string;
+  confidence?: number;
+  confidenceScore?: string;
+  modelProvider?: string;
+  modelTag?: string;
+  ruleTag?: string;
+  vehicleId?: string;
+  createdAt: string;
+}
+
+export interface ChatConversationDetail {
+  conversation: ChatConversation;
+  messages: ChatMessage[];
+}
+
+export interface UserAdmin {
+  id: number;
+  username: string;
+  fullName: string;
+  email?: string;
+  role: string;
+  enabled: boolean;
+  createdAt: string;
+}
+
+export interface UserAuditLog {
+  id: number;
+  actorUsername?: string;
+  username?: string;
+  action: string;
+  targetUsername?: string;
+  targetEntity?: string;
+  details?: string;
+  ipAddress?: string;
+  timestamp: string;
+}
+
+export interface CreateUserRequest {
+  username: string;
+  password?: string;
+  fullName: string;
+  email?: string;
+  role: string;
+}
+
 

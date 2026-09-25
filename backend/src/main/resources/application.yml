@@ -12,19 +12,27 @@ spring:
     username: sa
     password: ""
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
         format_sql: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
   h2:
     console:
       enabled: true
       path: /h2-console
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: W3C,B3
   endpoints:
     web:
       exposure:
@@ -32,6 +40,10 @@ management:
   endpoint:
     health:
       show-details: always
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:fleetiq-backend},%X{traceId:-},%X{spanId:-}]"
 
 fleetiq:
   jev:
@@ -64,4 +76,4 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate

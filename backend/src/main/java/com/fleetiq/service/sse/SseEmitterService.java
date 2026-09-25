@@ -1,8 +1,10 @@
 package com.fleetiq.service.sse;
 
 import com.fleetiq.dto.DashboardEventDto;
+import io.micrometer.tracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -20,6 +22,12 @@ public class SseEmitterService {
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
     private final List<DashboardEventDto> recentEventsBuffer = new CopyOnWriteArrayList<>();
     private static final int BUFFER_LIMIT = 50;
+
+    private final ObjectProvider<Tracer> tracerProvider;
+
+    public SseEmitterService(ObjectProvider<Tracer> tracerProvider) {
+        this.tracerProvider = tracerProvider;
+    }
 
     public SseEmitter createEmitter() {
         SseEmitter emitter = new SseEmitter(EMITTER_TIMEOUT);
@@ -64,7 +72,18 @@ public class SseEmitterService {
 
     public void broadcast(String eventName, Object data) {
         if (data instanceof DashboardEventDto) {
-            recentEventsBuffer.add((DashboardEventDto) data);
+            DashboardEventDto dto = (DashboardEventDto) data;
+            Tracer tracer = tracerProvider.getIfAvailable();
+            if (tracer != null && tracer.currentSpan() != null) {
+                String activeTraceId = tracer.currentSpan().context().traceId();
+                if (activeTraceId != null && !activeTraceId.isBlank()) {
+                    dto.setTraceId(activeTraceId);
+                    if (dto.getCorrelationId() == null || dto.getCorrelationId().isBlank()) {
+                        dto.setCorrelationId(activeTraceId);
+                    }
+                }
+            }
+            recentEventsBuffer.add(dto);
             if (recentEventsBuffer.size() > BUFFER_LIMIT) {
                 recentEventsBuffer.remove(0);
             }

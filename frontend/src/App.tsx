@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Calendar, Download, Plus, ChevronDown, FileSpreadsheet, FileJson, CheckCircle2 } from 'lucide-react';
+import { Download, CheckCircle2, Shield, FileText } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { Sidebar, NavTab } from './components/layout/Sidebar';
 import { FleetOverviewCards } from './components/overview/FleetOverviewCards';
@@ -13,26 +13,30 @@ import { VehicleProfileModal } from './components/vehicles/VehicleProfileModal';
 import { IntelligenceHub } from './components/intelligence/IntelligenceHub';
 import { SystemHealthPanel } from './components/system/SystemHealthPanel';
 import { SimulatorModal } from './components/simulator/SimulatorModal';
-import { AiAssistantModal } from './components/assistant/AiAssistantModal';
+import { CopilotWorkspace } from './components/copilot/CopilotWorkspace';
+import { UserManagementPanel } from './components/admin/UserManagementPanel';
+import { LoginPage } from './components/auth/LoginPage';
+import { SafetyDetailsModal } from './components/overview/SafetyDetailsModal';
+import { LegalModal } from './components/system/LegalModal';
+import { AccessDeniedPage, NotFoundPage, ServerErrorPage, MaintenancePage } from './components/system/SystemStatusPages';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useSSE } from './hooks/useSSE';
 import { api } from './services/api';
 
 const FleetIQDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, hasRole } = useAuth();
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Operational Tools Modals
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
-  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
-  const [assistantInitialQuery, setAssistantInitialQuery] = useState('');
+  const [isSafetyModalOpen, setIsSafetyModalOpen] = useState(false);
+  const [legalModalType, setLegalModalType] = useState<'terms' | 'privacy' | 'security' | 'cookies' | null>(null);
 
   // Export dropdown state
-  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
-  const exportRef = useRef<HTMLDivElement>(null);
 
   const {
     summary,
@@ -44,46 +48,33 @@ const FleetIQDashboard: React.FC = () => {
     loading,
     error,
     refreshData
-  } = useDashboardData();
+  } = useDashboardData(isAuthenticated);
 
   // Handle incoming real-time SSE stream events
   const handleIncomingEvent = useCallback(() => {
     refreshData();
   }, [refreshData]);
 
-  const { status: sseStatus, events: streamEvents, clearEvents } = useSSE(handleIncomingEvent);
+  const { status: sseStatus, events: streamEvents, clearEvents } = useSSE(handleIncomingEvent, isAuthenticated);
 
   const handleUpdateActionStatus = async (actionId: string, status: string, notes: string) => {
     await api.updateActionStatus(actionId, status, notes);
     await refreshData();
   };
 
-  // Keyboard shortcut listener: Cmd+K / Ctrl+K opens AI Assistant Copilot
+  // Keyboard shortcut listener: Cmd+K / Ctrl+K opens AI Assistant Copilot tab
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setAssistantInitialQuery('');
-        setIsAssistantOpen(true);
+        setActiveTab('copilot');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Close export dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
-        setIsExportMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const handleTriggerExport = async (type: 'vehicles' | 'actions' | 'events', format: 'csv' | 'json' = 'csv') => {
-    setIsExportMenuOpen(false);
     try {
       setExportMessage(`Exporting ${type} as ${format.toUpperCase()}...`);
       await api.downloadExport(type, format);
@@ -95,6 +86,29 @@ const FleetIQDashboard: React.FC = () => {
     }
   };
 
+  // Auth Guard
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-300 font-sans">
+        <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-xs font-semibold tracking-wider uppercase text-slate-400">
+          Initializing Secure Session & RBAC Tokens...
+        </p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <LoginPage onOpenLegal={(type) => setLegalModalType(type)} />
+        <LegalModal type={legalModalType} onClose={() => setLegalModalType(null)} />
+      </>
+    );
+  }
+
+  const isAdmin = hasRole('ADMIN') || hasRole('ROLE_ADMIN');
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[#f4f5f9] text-slate-900 font-sans antialiased">
       <Header
@@ -103,10 +117,7 @@ const FleetIQDashboard: React.FC = () => {
         actions={actions}
         onRefresh={refreshData}
         onOpenSimulator={() => setIsSimulatorOpen(true)}
-        onOpenAssistant={(q) => {
-          setAssistantInitialQuery(q || '');
-          setIsAssistantOpen(true);
-        }}
+        onOpenAssistant={() => setActiveTab('copilot')}
         onSelectVehicle={(vId) => setSelectedVehicleId(vId)}
         onSelectAction={(action) => setSelectedVehicleId(action.vehicleId)}
       />
@@ -118,15 +129,14 @@ const FleetIQDashboard: React.FC = () => {
           openActionCount={summary?.openActionCount}
           criticalActionCount={summary?.criticalActionCount}
           onOpenSimulator={() => setIsSimulatorOpen(true)}
-          onOpenAssistant={() => {
-            setAssistantInitialQuery('');
-            setIsAssistantOpen(true);
-          }}
+          onOpenAssistant={() => setActiveTab('copilot')}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(prev => !prev)}
         />
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6">
           {error && (
-            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-700 shadow-sm flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-700 shadow-xs flex items-center justify-between">
               <span>{error}</span>
               <button
                 onClick={refreshData}
@@ -138,7 +148,7 @@ const FleetIQDashboard: React.FC = () => {
           )}
 
           {exportMessage && (
-            <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-700 shadow-sm flex items-center gap-2">
+            <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-700 shadow-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-blue-600" />
               <span className="font-semibold">{exportMessage}</span>
             </div>
@@ -147,116 +157,43 @@ const FleetIQDashboard: React.FC = () => {
           {/* 1. OVERVIEW TAB */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
-              {/* Dashboard Action Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Fleet Intelligence Overview</h1>
+                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Operations Intelligence Center</h1>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Real-time connected vehicle telemetry, health diagnostics & operations dispatch
+                    Real-time multi-OEM telematics ingestion, decision engine queue, and live fleet readiness metrics
                   </p>
                 </div>
-
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Live Telemetry Window</span>
-                  </div>
-
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => setIsSimulatorOpen(true)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200/80 shadow-2xs transition"
+                    onClick={() => setActiveTab('copilot')}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-xs transition"
                   >
-                    <Plus className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Scenario Simulator</span>
+                    <span>Launch AI Copilot</span>
                   </button>
-
-                  {/* Real Export Dropdown */}
-                  <div className="relative" ref={exportRef}>
-                    <button
-                      onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
-                      className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Export Data</span>
-                      <ChevronDown className="w-3 h-3 ml-0.5 opacity-80" />
-                    </button>
-
-                    {isExportMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-40 animate-in fade-in zoom-in-95 duration-150">
-                        <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                          Production Datasets
-                        </div>
-                        <button
-                          onClick={() => handleTriggerExport('vehicles', 'csv')}
-                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
-                        >
-                          <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-                          <span>Vehicles Registry (CSV)</span>
-                        </button>
-                        <button
-                          onClick={() => handleTriggerExport('actions', 'csv')}
-                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
-                        >
-                          <FileSpreadsheet className="w-4 h-4 text-blue-600" />
-                          <span>Priority Actions (CSV)</span>
-                        </button>
-                        <button
-                          onClick={() => handleTriggerExport('events', 'csv')}
-                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
-                        >
-                          <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
-                          <span>Telemetry Events (CSV)</span>
-                        </button>
-                        <div className="border-t border-slate-100 my-1"></div>
-                        <button
-                          onClick={() => handleTriggerExport('vehicles', 'json')}
-                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
-                        >
-                          <FileJson className="w-4 h-4 text-amber-600" />
-                          <span>Vehicles Raw JSON</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <button
+                    onClick={() => handleTriggerExport('vehicles', 'csv')}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/80 shadow-2xs transition"
+                  >
+                    <Download className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Export CSV</span>
+                  </button>
                 </div>
               </div>
 
-              {/* 4 KPI Top Cards */}
-              <FleetOverviewCards summary={summary} onNavigateTab={(tab) => setActiveTab(tab)} />
+              <CriticalAlertsBanner actions={actions} onSelectAction={(a) => setSelectedVehicleId(a.vehicleId)} />
+              <FleetOverviewCards summary={summary} />
 
-              {/* Critical Alerts Banner */}
-              <CriticalAlertsBanner
-                actions={actions}
-                onSelectAction={(a) => setSelectedVehicleId(a.vehicleId)}
-              />
+              {/* Main Analytics Dashboard (Full Width) */}
+              <div className="w-full">
+                <FleetHealthSection health={health} />
+              </div>
 
-              {/* Main 2-Column Split */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                {/* Left Column (8 cols): Fleet Health Chart + Action Queue + Live Stream */}
-                <div className="lg:col-span-8 space-y-6">
-                  <FleetHealthSection health={health} />
-                  <PriorityActionCenter
-                    actions={actions}
-                    onUpdateStatus={handleUpdateActionStatus}
-                    onSelectVehicle={setSelectedVehicleId}
-                  />
-                  <LiveOperationsPanel
-                    events={streamEvents}
-                    onClear={clearEvents}
-                    onSelectVehicle={setSelectedVehicleId}
-                  />
-                </div>
-
-                {/* Right Column (4 cols): Most Day Active + Radial Gauge + AI Assistant Widget */}
-                <div className="lg:col-span-4 space-y-6">
-                  <RightSidebarWidgets
-                    onAskAi={(q) => {
-                      setAssistantInitialQuery(q);
-                      setIsAssistantOpen(true);
-                    }}
-                    onViewDetails={() => setActiveTab('intelligence')}
-                  />
-                </div>
+              {/* Parallel Widgets Row: Most Day Active + Fleet Safety Rate (2 Columns) */}
+              <div className="w-full">
+                <RightSidebarWidgets
+                  onViewDetails={() => setIsSafetyModalOpen(true)}
+                />
               </div>
             </div>
           )}
@@ -265,15 +202,11 @@ const FleetIQDashboard: React.FC = () => {
           {activeTab === 'live' && (
             <div className="space-y-6">
               <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Live Operations Feed</h1>
+                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Real-Time Ingestion & Streaming</h1>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Sub-second Server-Sent Events (SSE) telemetry normalized across multi-OEM ingestion adapters
+                  Live Server-Sent Events (SSE) stream capturing multi-OEM raw payloads, schema validation, and normalization
                 </p>
               </div>
-              <CriticalAlertsBanner
-                actions={actions}
-                onSelectAction={(a) => setSelectedVehicleId(a.vehicleId)}
-              />
               <LiveOperationsPanel
                 events={streamEvents}
                 onClear={clearEvents}
@@ -330,13 +263,28 @@ const FleetIQDashboard: React.FC = () => {
             </div>
           )}
 
-          {/* 5. INTELLIGENCE TAB */}
+          {/* 5. DEDICATED AI COPILOT WORKSPACE TAB */}
+          {activeTab === 'copilot' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">FleetIQ Intelligence Copilot</h1>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Full-page conversational interface with persistent chat history, deterministic safety guardrails, and RAG OEM citations
+                  </p>
+                </div>
+              </div>
+              <CopilotWorkspace onSelectVehicle={setSelectedVehicleId} />
+            </div>
+          )}
+
+          {/* 6. INTELLIGENCE TAB */}
           {activeTab === 'intelligence' && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Intelligence & Decisioning Hub</h1>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Multi-signal rule engine calibration, Jev AI models, fallback monitoring, and financial risk breakdown
+                  Multi-signal rule engine calibration, deterministic fallback monitoring, and financial risk breakdown
                 </p>
               </div>
               <IntelligenceHub
@@ -349,7 +297,16 @@ const FleetIQDashboard: React.FC = () => {
             </div>
           )}
 
-          {/* 6. SYSTEM TAB */}
+          {/* 7. USER MANAGEMENT TAB (ADMIN ONLY) */}
+          {activeTab === 'users' && (
+            isAdmin ? (
+              <UserManagementPanel />
+            ) : (
+              <AccessDeniedPage onReturnHome={() => setActiveTab('overview')} />
+            )
+          )}
+
+          {/* 8. SYSTEM HEALTH TAB */}
           {activeTab === 'system' && (
             <div className="space-y-6">
               <div>
@@ -364,6 +321,55 @@ const FleetIQDashboard: React.FC = () => {
               />
             </div>
           )}
+
+          {/* 9. SYSTEM STATUS ERROR PAGES */}
+          {(activeTab as string) === '404' && (
+            <NotFoundPage onReturnHome={() => setActiveTab('overview')} />
+          )}
+
+          {(activeTab as string) === '500' && (
+            <ServerErrorPage onReturnHome={() => setActiveTab('overview')} onRetry={refreshData} requestId="CORR-FLIQ-883921" />
+          )}
+
+          {(activeTab as string) === '503' && (
+            <MaintenancePage onReturnHome={() => setActiveTab('overview')} onRetry={refreshData} />
+          )}
+
+          {/* Global Footer with Compliance & Documentation Links */}
+          <footer className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+            <div>
+              <span>FleetIQ Enterprise Telematics Platform • API v1.0.0</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setLegalModalType('terms')}
+                className="hover:text-slate-600 transition"
+              >
+                Terms
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setLegalModalType('privacy')}
+                className="hover:text-slate-600 transition"
+              >
+                Privacy
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setLegalModalType('security')}
+                className="hover:text-slate-600 transition"
+              >
+                Security Policy
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setLegalModalType('cookies')}
+                className="hover:text-slate-600 transition"
+              >
+                Cookies
+              </button>
+            </div>
+          </footer>
         </main>
       </div>
 
@@ -375,22 +381,24 @@ const FleetIQDashboard: React.FC = () => {
         />
       )}
 
-      {/* Global AI Assistant Copilot Modal */}
-      <AiAssistantModal
-        isOpen={isAssistantOpen}
-        onClose={() => setIsAssistantOpen(false)}
-        initialQuery={assistantInitialQuery}
-        onSelectVehicle={(vId) => {
-          setIsAssistantOpen(false);
-          setSelectedVehicleId(vId);
-        }}
-      />
-
       {/* Global Multi-OEM Simulator Tool Modal */}
       <SimulatorModal
         isOpen={isSimulatorOpen}
         onClose={() => setIsSimulatorOpen(false)}
         onScenarioExecuted={refreshData}
+      />
+
+      {/* Global Legal & Policy Modal */}
+      <LegalModal
+        type={legalModalType}
+        onClose={() => setLegalModalType(null)}
+      />
+
+      {/* Fleet Safety Details Modal */}
+      <SafetyDetailsModal
+        isOpen={isSafetyModalOpen}
+        onClose={() => setIsSafetyModalOpen(false)}
+        onSelectVehicle={(vId) => setSelectedVehicleId(vId)}
       />
     </div>
   );

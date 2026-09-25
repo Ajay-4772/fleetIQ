@@ -1,0 +1,2 @@
+# projectmem shared event log (source of truth)
+.projectmem/events.jsonl merge=union

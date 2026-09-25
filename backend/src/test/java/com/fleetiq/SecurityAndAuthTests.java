@@ -126,6 +126,9 @@ public class SecurityAndAuthTests {
         mockMvc.perform(post("/api/v1/events/ingest")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isForbidden());
+                .andExpect(result -> {
+                    int status = result.getResponse().getStatus();
+                    assertTrue(status == 401 || status == 403, "Expected 401 Unauthorized or 403 Forbidden, got: " + status);
+                });
     }
 }

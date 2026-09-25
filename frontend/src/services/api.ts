@@ -69,6 +69,14 @@ export const api = {
       headers: authHeaders()
     }).then(handleResponse<User>),
 
+  logout: (): Promise<any> =>
+    fetch(`${BASE_URL}/api/v1/auth/logout`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' })
+    })
+      .then(handleResponse)
+      .catch(() => ({ status: 'SUCCESS' })),
+
   // Grounded AI Assistant
   queryAssistant: (question: string): Promise<AssistantResponse> =>
     fetch(`${BASE_URL}/api/v1/assistant/query`, {
@@ -196,5 +204,105 @@ export const api = {
 
   // Actuator Health
   getActuatorHealth: (): Promise<any> =>
-    fetch(`${BASE_URL}/actuator/health`).then(handleResponse)
+    fetch(`${BASE_URL}/actuator/health`).then(handleResponse),
+
+  // Persistent AI Copilot Conversations
+  getConversations: (): Promise<import('../types').ChatConversation[]> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').ChatConversation[]>),
+
+  createConversation: (title?: string): Promise<import('../types').ChatConversation> => {
+    const query = title ? `?title=${encodeURIComponent(title)}` : '';
+    return fetch(`${BASE_URL}/api/v1/assistant/conversations${query}`, {
+      method: 'POST',
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').ChatConversation>);
+  },
+
+  getConversationDetails: (id: string): Promise<import('../types').ChatConversationDetail> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations/${id}`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').ChatConversationDetail>),
+
+  sendConversationMessage: (id: string, message: string): Promise<import('../types').ChatMessage> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations/${id}/messages`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ message })
+    }).then(handleResponse<import('../types').ChatMessage>),
+
+  renameConversation: (id: string, title: string): Promise<import('../types').ChatConversation> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations/${id}?title=${encodeURIComponent(title)}`, {
+      method: 'PATCH',
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').ChatConversation>),
+
+  deleteConversation: (id: string): Promise<void> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    }).then((res) => {
+      if (!res.ok) throw new Error(`Failed to delete conversation: ${res.statusText}`);
+    }),
+
+  // Admin User Management
+  getAdminUsers: (): Promise<import('../types').UserAdmin[]> =>
+    fetch(`${BASE_URL}/api/v1/admin/users`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').UserAdmin[]>),
+
+  searchAdminUsers: (q?: string): Promise<import('../types').UserAdmin[]> => {
+    const query = q ? `?q=${encodeURIComponent(q)}` : '';
+    return fetch(`${BASE_URL}/api/v1/admin/users/search${query}`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').UserAdmin[]>);
+  },
+
+  createAdminUser: (data: { username: string; password: string; fullName: string; role: string }): Promise<import('../types').UserAdmin> =>
+    fetch(`${BASE_URL}/api/v1/admin/users`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(data)
+    }).then(handleResponse<import('../types').UserAdmin>),
+
+  updateAdminUserStatus: (id: number, enabled: boolean): Promise<import('../types').UserAdmin> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/${id}/status?enabled=${enabled}`, {
+      method: 'PATCH',
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').UserAdmin>),
+
+  updateAdminUserRole: (id: number, role: string): Promise<import('../types').UserAdmin> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/${id}/role?role=${role}`, {
+      method: 'PATCH',
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').UserAdmin>),
+
+  getAdminUserAuditLogs: (): Promise<import('../types').UserAuditLog[]> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/audit`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').UserAuditLog[]>),
+
+  // Aliases for CopilotWorkspace and UserManagementPanel
+  listConversations: (): Promise<import('../types').ChatConversation[]> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').ChatConversation[]>),
+
+  getConversation: (id: string): Promise<import('../types').ChatConversationDetail> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations/${id}`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').ChatConversationDetail>),
+
+  sendMessage: (id: string, message: string): Promise<import('../types').ChatMessage> =>
+    fetch(`${BASE_URL}/api/v1/assistant/conversations/${id}/messages`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ message })
+    }).then(handleResponse<import('../types').ChatMessage>),
+
+  getAdminAuditLogs: (): Promise<import('../types').UserAuditLog[]> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/audit`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').UserAuditLog[]>)
 };

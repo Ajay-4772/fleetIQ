@@ -6,74 +6,61 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (username: string, password: string) => Promise<LoginResponse>;
   logout: () => void;
-  switchRole: (roleKey: 'admin' | 'ops_lead' | 'operator' | 'viewer') => Promise<void>;
   hasRole: (role: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const DEMO_CREDENTIALS: Record<string, { username: string; pass: string }> = {
-  admin: { username: 'admin', pass: 'Admin@FleetIQ2026' },
-  ops_lead: { username: 'ops_lead', pass: 'Ops@FleetIQ2026' },
-  operator: { username: 'operator', pass: 'Operator@FleetIQ2026' },
-  viewer: { username: 'viewer', pass: 'Viewer@FleetIQ2026' }
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setTokenState] = useState<string | null>(getAuthToken());
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Initial bootstrap: load user if token exists, or auto-login as ops_lead for demo
+    // Check if an existing valid JWT token is stored
     if (token) {
       api
         .getCurrentUser()
-        .then(setUser)
+        .then((userData) => {
+          setUser(userData);
+        })
         .catch(() => {
-          // If token expired, auto-login with default demo lead
-          autoLoginDemo('ops_lead');
+          // Token expired or invalid -> clean logout
+          logout();
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     } else {
-      autoLoginDemo('ops_lead');
+      setIsLoading(false);
     }
-  }, []);
+  }, [token]);
 
-  const autoLoginDemo = async (roleKey: 'admin' | 'ops_lead' | 'operator' | 'viewer') => {
-    const cred = DEMO_CREDENTIALS[roleKey];
+  const login = async (username: string, password: string): Promise<LoginResponse> => {
+    setIsLoading(true);
     try {
-      const res = await api.login(cred.username, cred.pass);
+      const res = await api.login(username, password);
+      setAuthToken(res.token);
       setTokenState(res.token);
       setUser({
         username: res.username,
         fullName: res.fullName,
         role: res.role
       });
-    } catch (e) {
-      console.warn('Auto-login error:', e);
+      return res;
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const login = async (username: string, password: string): Promise<LoginResponse> => {
-    const res = await api.login(username, password);
-    setTokenState(res.token);
-    setUser({
-      username: res.username,
-      fullName: res.fullName,
-      role: res.role
-    });
-    return res;
-  };
-
   const logout = () => {
+    api.logout().catch(() => {});
     setAuthToken(null);
     setTokenState(null);
     setUser(null);
-  };
-
-  const switchRole = async (roleKey: 'admin' | 'ops_lead' | 'operator' | 'viewer') => {
-    await autoLoginDemo(roleKey);
   };
 
   const hasRole = (role: string): boolean => {
@@ -87,10 +74,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: !!token && !!user,
+        isLoading,
         login,
         logout,
-        switchRole,
         hasRole
       }}
     >

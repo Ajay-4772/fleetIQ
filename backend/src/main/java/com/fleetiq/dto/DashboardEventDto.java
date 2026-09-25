@@ -6,6 +6,7 @@ import java.util.UUID;
 public class DashboardEventDto {
     private String eventId;
     private String correlationId;
+    private String traceId;
     private String entityId;
     private String eventType;
     private String timestamp;
@@ -20,6 +21,7 @@ public class DashboardEventDto {
 
     public DashboardEventDto() {
         this.eventId = UUID.randomUUID().toString();
+        this.correlationId = UUID.randomUUID().toString();
         this.timestamp = Instant.now().toString();
     }
 
@@ -65,6 +67,9 @@ public class DashboardEventDto {
 
     public String getCorrelationId() { return correlationId; }
     public void setCorrelationId(String correlationId) { this.correlationId = correlationId; }
+
+    public String getTraceId() { return traceId; }
+    public void setTraceId(String traceId) { this.traceId = traceId; }
 
     public String getEntityId() { return entityId; }
     public void setEntityId(String entityId) { this.entityId = entityId; }

@@ -28,10 +28,17 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final ApiKeyAuthenticationFilter apiKeyFilter;
+    private final RateLimitingFilter rateLimitingFilter;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter, ApiKeyAuthenticationFilter apiKeyFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter,
+                          ApiKeyAuthenticationFilter apiKeyFilter,
+                          RateLimitingFilter rateLimitingFilter,
+                          com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
         this.jwtFilter = jwtFilter;
         this.apiKeyFilter = apiKeyFilter;
+        this.rateLimitingFilter = rateLimitingFilter;
+        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -51,6 +58,34 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // For H2 console
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(org.springframework.http.HttpStatus.UNAUTHORIZED.value());
+                            response.setContentType(org.springframework.http.MediaType.APPLICATION_JSON_VALUE);
+                            com.fleetiq.dto.ApiErrorResponse err = new com.fleetiq.dto.ApiErrorResponse(
+                                    org.springframework.http.HttpStatus.UNAUTHORIZED.value(),
+                                    "Unauthorized",
+                                    "UNAUTHORIZED",
+                                    "Authentication required to access this resource",
+                                    request.getRequestURI(),
+                                    response.getHeader("X-Trace-Id") != null ? response.getHeader("X-Trace-Id") : "N/A"
+                            );
+                            response.getWriter().write(objectMapper.writeValueAsString(err));
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(org.springframework.http.HttpStatus.FORBIDDEN.value());
+                            response.setContentType(org.springframework.http.MediaType.APPLICATION_JSON_VALUE);
+                            com.fleetiq.dto.ApiErrorResponse err = new com.fleetiq.dto.ApiErrorResponse(
+                                    org.springframework.http.HttpStatus.FORBIDDEN.value(),
+                                    "Forbidden",
+                                    "ACCESS_DENIED",
+                                    "You do not have permission to execute this operation",
+                                    request.getRequestURI(),
+                                    response.getHeader("X-Trace-Id") != null ? response.getHeader("X-Trace-Id") : "N/A"
+                            );
+                            response.getWriter().write(objectMapper.writeValueAsString(err));
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
                         // Public Endpoints
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -77,10 +112,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/system/**", "/api/system/**")
                         .hasAuthority("ROLE_ADMIN")
 
+                        // User Management Administration (Admin)
+                        .requestMatchers("/api/v1/admin/**", "/api/admin/**")
+                        .hasAuthority("ROLE_ADMIN")
+
                         // Read endpoints and assistant queries (All authenticated users including Viewer)
                         .requestMatchers("/api/v1/**", "/api/**").authenticated()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -92,8 +132,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-API-Key", "X-Requested-With", "Accept"));
-        config.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-API-Key", "X-Requested-With", "Accept", "traceparent", "tracestate", "X-Trace-Id"));
+        config.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition", "X-Trace-Id", "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

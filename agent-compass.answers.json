@@ -1,0 +1,18 @@
+{
+  "name": "C:\\Users\\ajaya\\Desktop\\fleetiq",
+  "scope": "@scope",
+  "packageManager": "npm",
+  "stacks": [
+    "react-web"
+  ],
+  "providers": [
+    "claude",
+    "codex",
+    "gemini",
+    "copilot"
+  ],
+  "useSpecKit": true,
+  "codeIntelligence": "none",
+  "skillSync": "copy",
+  "skillScope": "fit+style"
+}

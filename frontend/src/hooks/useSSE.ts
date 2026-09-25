@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { DashboardEvent } from '../types';
+import { api } from '../services/api';
 
 export type SSEConnectionStatus = 'LIVE' | 'RECONNECTING' | 'DISCONNECTED';
 
@@ -9,9 +10,10 @@ interface UseSSEReturn {
   lastEvent: DashboardEvent | null;
   reconnect: () => void;
   clearEvents: () => void;
+  reloadEvents: () => Promise<void>;
 }
 
-export function useSSE(onEventReceived?: (event: DashboardEvent) => void): UseSSEReturn {
+export function useSSE(onEventReceived?: (event: DashboardEvent) => void, enabled: boolean = true): UseSSEReturn {
   const [status, setStatus] = useState<SSEConnectionStatus>('DISCONNECTED');
   const [events, setEvents] = useState<DashboardEvent[]>([]);
   const [lastEvent, setLastEvent] = useState<DashboardEvent | null>(null);
@@ -24,6 +26,40 @@ export function useSSE(onEventReceived?: (event: DashboardEvent) => void): UseSS
   useEffect(() => {
     onEventReceivedRef.current = onEventReceived;
   }, [onEventReceived]);
+
+  const fetchHistoricalEvents = useCallback(async () => {
+    if (!enabled) return;
+    try {
+      const res = await api.getEvents(0, 50);
+      if (res && res.content) {
+        const mapped: DashboardEvent[] = res.content.map((evt) => ({
+          eventId: evt.eventId,
+          vehicleId: evt.vehicleId,
+          make: evt.source || 'OEM',
+          source: evt.source || 'TOYOTA',
+          eventType: evt.eventType || 'TELEMETRY_NORMAL',
+          severity: evt.severity || 'LOW',
+          timestamp: evt.timestamp,
+          status: evt.status || 'NORMAL',
+          data: evt.faultCode ? { faultCode: evt.faultCode } : undefined,
+          estimatedImpact: 0,
+          recommendedAction: evt.faultCode ? `Inspect DTC ${evt.faultCode}` : 'Normal operational telemetry logged'
+        }));
+
+        setEvents((prev) => {
+          const existingIds = new Set(prev.map((e) => e.eventId || `${e.vehicleId}-${e.timestamp}`));
+          const newItems = mapped.filter((m) => !existingIds.has(m.eventId || `${m.vehicleId}-${m.timestamp}`));
+          return [...prev, ...newItems].slice(0, 50);
+        });
+      }
+    } catch (err) {
+      console.warn('Initial event stream hydration failed:', err);
+    }
+  }, [enabled]);
+
+  useEffect(() => {
+    fetchHistoricalEvents();
+  }, [fetchHistoricalEvents]);
 
   const clearEvents = useCallback(() => {
     setEvents([]);
@@ -65,66 +101,75 @@ export function useSSE(onEventReceived?: (event: DashboardEvent) => void): UseSS
       try {
         const parsed: DashboardEvent = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
         setLastEvent(parsed);
-        setEvents((prev) => [parsed, ...prev.slice(0, 49)]);
+        setEvents((prev) => [
+          parsed,
+          ...prev.filter(
+            (p) =>
+              (p.eventId || `${p.vehicleId}-${p.timestamp}`) !==
+              (parsed.eventId || `${parsed.vehicleId}-${parsed.timestamp}`)
+          ).slice(0, 49)
+        ]);
 
         if (onEventReceivedRef.current) {
           onEventReceivedRef.current(parsed);
         }
       } catch (err) {
-        // Skip unparseable heartbeat or strings
+        // Skip unparseable heartbeat strings
       }
     };
 
-    // Generic and specific event names
+    // Listen to standard message and specific event names
     const eventTypes = [
       'message',
       'VEHICLE_EVENT_RECEIVED',
       'EVENT_NORMALIZED',
-      'EVENT_PROCESSING_FAILED',
       'DECISION_CREATED',
       'ACTION_CREATED',
       'ACTION_UPDATED',
       'CRITICAL_EVENT',
       'AI_DECISION_COMPLETED',
       'AI_FALLBACK',
-      'FLEET_METRIC_UPDATED',
-      'SYSTEM_HEALTH_CHANGED',
+      'BATTERY_WARNING',
       'ENGINE_FAULT',
       'MAINTENANCE_DUE',
-      'EXCESSIVE_IDLE',
-      'BATTERY_WARNING',
       'TIRE_PRESSURE_LOW',
-      'LOW_UTILIZATION',
       'TELEMETRY_NORMAL'
     ];
 
     eventTypes.forEach((type) => {
       es.addEventListener(type, handleIncoming);
     });
-
-    es.addEventListener('HEARTBEAT', () => {
-      setStatus('LIVE');
-    });
   }, []);
 
   useEffect(() => {
+    if (!enabled) {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+      setStatus('DISCONNECTED');
+      return;
+    }
+
     connect();
 
     return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
       if (reconnectTimeoutRef.current) {
         window.clearTimeout(reconnectTimeoutRef.current);
       }
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
     };
-  }, [connect]);
+  }, [connect, enabled]);
 
   return {
     status,
     events,
     lastEvent,
     reconnect: connect,
-    clearEvents
+    clearEvents,
+    reloadEvents: fetchHistoricalEvents
   };
 }

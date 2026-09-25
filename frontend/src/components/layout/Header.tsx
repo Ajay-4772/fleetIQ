@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectVehicle,
   onSelectAction
 }) => {
-  const { user, switchRole, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -126,12 +126,7 @@ export const Header: React.FC<HeaderProps> = ({
             </svg>
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">FleetIQ</span>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200/60">
-                PRO
-              </span>
-            </div>
+            <span className="font-extrabold text-base tracking-tight text-slate-900 block leading-tight">FleetIQ</span>
             <p className="text-[11px] text-slate-400 font-medium">Connected Vehicle Intelligence</p>
           </div>
         </div>
@@ -259,11 +254,11 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Controls */}
       <div className="flex items-center gap-3">
-        {/* SSE Live Connection Status Indicator */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80">
+        {/* Streamlined Live Status Indicator */}
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px] font-semibold text-slate-600">
           <span className="relative flex h-2 w-2">
             {sseStatus === 'LIVE' && (
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" aria-hidden="true"></span>
             )}
             <span
               className={`relative inline-flex rounded-full h-2 w-2 ${
@@ -275,38 +270,19 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             ></span>
           </span>
-          <span className="text-xs font-semibold text-slate-700">
-            {sseStatus === 'LIVE' ? 'Real-Time Stream' : sseStatus === 'RECONNECTING' ? 'Reconnecting...' : 'Offline'}
+          <span>
+            {sseStatus === 'LIVE' ? 'Live' : sseStatus === 'RECONNECTING' ? 'Reconnecting' : 'Offline'}
           </span>
         </div>
-
-        {/* Global AI Assistant Trigger */}
-        <button
-          onClick={() => onOpenAssistant()}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200 transition"
-          title="Open AI Assistant Copilot"
-        >
-          <Bot className="w-3.5 h-3.5 text-blue-600" />
-          <span className="hidden sm:inline">Ask AI</span>
-        </button>
-
-        {/* Simulator Button */}
-        <button
-          onClick={onOpenSimulator}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 text-xs font-semibold transition border border-slate-200"
-          title="Launch Telematics Scenario Simulator"
-        >
-          <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-          <span className="hidden sm:inline">Simulator</span>
-        </button>
 
         {/* Refresh Button */}
         <button
           onClick={onRefresh}
-          className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/80 transition"
+          className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200/80 transition"
           title="Refresh Data"
+          aria-label="Refresh Data"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
+          <RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />
         </button>
 
         {/* Notification Bell Dropdown */}
@@ -385,34 +361,14 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </div>
 
-              {/* RBAC Role Switcher (For live testing of roles) */}
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-1 mb-1.5">
-                  Switch Demo Role (RBAC)
+              {/* Authenticated RBAC Role Display */}
+              <div className="py-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-1 mb-1">
+                  Active Security Role
                 </span>
-                <div className="space-y-1">
-                  {[
-                    { key: 'ops_lead' as const, name: 'Operations Lead', role: 'ROLE_OPERATIONS_LEAD' },
-                    { key: 'admin' as const, name: 'Administrator', role: 'ROLE_ADMIN' },
-                    { key: 'operator' as const, name: 'Dispatcher / Operator', role: 'ROLE_OPERATOR' },
-                    { key: 'viewer' as const, name: 'Read-only Analyst', role: 'ROLE_VIEWER' }
-                  ].map((r) => (
-                    <button
-                      key={r.key}
-                      onClick={async () => {
-                        await switchRole(r.key);
-                        setShowUserMenu(false);
-                      }}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl text-xs transition ${
-                        user?.role === r.role
-                          ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200/60'
-                          : 'hover:bg-slate-50 text-slate-600'
-                      }`}
-                    >
-                      <span>{r.name}</span>
-                      {user?.role === r.role && <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />}
-                    </button>
-                  ))}
+                <div className="p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-xs">
+                  <div className="text-[10px] text-slate-500">Backend Enforced:</div>
+                  <div className="font-bold text-blue-700 font-mono mt-0.5">{user?.role || 'ROLE_OPERATOR'}</div>
                 </div>
               </div>
 

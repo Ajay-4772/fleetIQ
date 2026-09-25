@@ -10,7 +10,7 @@ import {
   ActionItem
 } from '../types';
 
-export function useDashboardData() {
+export function useDashboardData(enabled: boolean = true) {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [health, setHealth] = useState<FleetHealth | null>(null);
   const [decisionMetrics, setDecisionMetrics] = useState<DecisionMetrics | null>(null);
@@ -50,8 +50,10 @@ export function useDashboardData() {
   }, []);
 
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    if (enabled) {
+      fetchAll();
+    }
+  }, [fetchAll, enabled]);
 
   return {
     summary,
