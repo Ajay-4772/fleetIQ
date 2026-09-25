@@ -121,11 +121,14 @@ public class EventProcessingService {
         if (vOpt.isPresent()) {
             Vehicle v = vOpt.get();
             make = v.getMake();
-            if (event.getOilLifePct() != null) v.setOilLifePct(event.getOilLifePct());
-            if (event.getBatteryHealthPct() != null) v.setBatteryHealthPct(event.getBatteryHealthPct());
-            if (event.getTirePressurePsi() != null) v.setTirePressurePsi(event.getTirePressurePsi());
-            if (event.getOdometerKm() != null && event.getOdometerKm() > (v.getMileageKm() != null ? v.getMileageKm() : 0)) {
-                v.setMileageKm(event.getOdometerKm());
+            if (event.getOilLifePct() != null) v.setOilLifePct(event.getOilLifePct().doubleValue());
+            if (event.getBatteryHealthPct() != null) v.setBatteryHealthPct(event.getBatteryHealthPct().doubleValue());
+            if (event.getTirePressurePsi() != null) v.setTirePressurePsi(event.getTirePressurePsi().doubleValue());
+            if (event.getOdometerKm() != null) {
+                long currentMileage = v.getMileageKm() != null ? v.getMileageKm().longValue() : 0L;
+                if (event.getOdometerKm().longValue() > currentMileage) {
+                    v.setMileageKm(event.getOdometerKm().longValue());
+                }
             }
             if ("CRITICAL".equalsIgnoreCase(event.getSeverity())) {
                 v.setStatus("MAINTENANCE");

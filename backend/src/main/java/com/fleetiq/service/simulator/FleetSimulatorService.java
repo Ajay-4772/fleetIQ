@@ -33,7 +33,7 @@ public class FleetSimulatorService {
 
     public SimulatorScenarioResponse runScenario(String scenarioName, SimulatorScenarioRequest customConfig) {
         long startTime = System.currentTimeMillis();
-        long seed = (customConfig != null && customConfig.getSeed() != null) ? customConfig.getSeed() : defaultSeed;
+        long seed = (customConfig != null && customConfig.getSeed() != null) ? customConfig.getSeed().longValue() : defaultSeed;
         Random rng = new Random(seed);
 
         int count = 50;
@@ -84,11 +84,11 @@ public class FleetSimulatorService {
         }
 
         if (customConfig != null) {
-            if (customConfig.getEventCount() != null && customConfig.getEventCount() > 0) count = customConfig.getEventCount();
-            if (customConfig.getFaultRate() != null) faultRate = customConfig.getFaultRate();
-            if (customConfig.getMaintenanceRate() != null) maintenanceRate = customConfig.getMaintenanceRate();
-            if (customConfig.getIdleRate() != null) idleRate = customConfig.getIdleRate();
-            if (customConfig.getLowUtilizationRate() != null) lowUtilRate = customConfig.getLowUtilizationRate();
+            if (customConfig.getEventCount() != null && customConfig.getEventCount() > 0) count = customConfig.getEventCount().intValue();
+            if (customConfig.getFaultRate() != null) faultRate = customConfig.getFaultRate().doubleValue();
+            if (customConfig.getMaintenanceRate() != null) maintenanceRate = customConfig.getMaintenanceRate().doubleValue();
+            if (customConfig.getIdleRate() != null) idleRate = customConfig.getIdleRate().doubleValue();
+            if (customConfig.getLowUtilizationRate() != null) lowUtilRate = customConfig.getLowUtilizationRate().doubleValue();
         }
 
         List<Vehicle> vehicles = vehicleRepository.findAll();
@@ -133,7 +133,7 @@ public class FleetSimulatorService {
 
     public LoadTestResponse runLoadTest(int level, Long customSeed) {
         long startTime = System.currentTimeMillis();
-        long seed = customSeed != null ? customSeed : defaultSeed;
+        long seed = customSeed != null ? customSeed.longValue() : defaultSeed;
         Random rng = new Random(seed);
 
         int targetEvents = level <= 0 ? 100 : level;
@@ -210,7 +210,7 @@ public class FleetSimulatorService {
         int idleMinutes = hasIdle ? (60 + rng.nextInt(60)) : (2 + rng.nextInt(15));
         double oilLife = hasMaint ? (2.0 + rng.nextInt(6)) : (35.0 + rng.nextInt(60));
         double battery = (faultCode != null && faultCode.equals("P0562")) ? (58.0 + rng.nextInt(8)) : (85.0 + rng.nextInt(14));
-        long odometer = (v.getMileageKm() != null ? v.getMileageKm() : 40000L) + (step * 5L);
+        long odometer = (v.getMileageKm() != null ? v.getMileageKm().longValue() : 40000L) + (step * 5L);
         String timestamp = Instant.now().minusSeconds((long) step * 30).toString();
 
         switch (make) {
