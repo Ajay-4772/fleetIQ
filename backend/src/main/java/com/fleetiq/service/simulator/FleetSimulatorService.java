@@ -210,7 +210,7 @@ public class FleetSimulatorService {
         int idleMinutes = hasIdle ? (60 + rng.nextInt(60)) : (2 + rng.nextInt(15));
         double oilLife = hasMaint ? (2.0 + rng.nextInt(6)) : (35.0 + rng.nextInt(60));
         double battery = (faultCode != null && faultCode.equals("P0562")) ? (58.0 + rng.nextInt(8)) : (85.0 + rng.nextInt(14));
-        long odometer = (v.getMileageKm() != null ? v.getMileageKm().longValue() : 40000L) + (step * 5L);
+        long odometer = (v.getMileageKm() != null ? v.getMileageKm().longValue() : 40000L) + (hasLowUtil ? (step * 1L) : (step * 5L));
         String timestamp = Instant.now().minusSeconds((long) step * 30).toString();
 
         switch (make) {

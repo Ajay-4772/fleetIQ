@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fleetiq.dto.ActionStatusUpdateRequest;
 import com.fleetiq.dto.FleetQueryRequest;
 import com.fleetiq.dto.IngestionRequest;
-import com.fleetiq.model.ActionItem;
 import com.fleetiq.model.Vehicle;
-import com.fleetiq.repository.ActionItemRepository;
 import com.fleetiq.repository.VehicleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,9 +31,6 @@ public class IntegrationAndApiTests {
 
     @Autowired
     private VehicleRepository vehicleRepository;
-
-    @Autowired
-    private ActionItemRepository actionItemRepository;
 
     @Autowired
     private ObjectMapper objectMapper;

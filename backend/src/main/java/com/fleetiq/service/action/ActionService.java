@@ -61,7 +61,6 @@ public class ActionService {
         }
 
         ActionItem item = opt.get();
-        String oldStatus = item.getStatus();
         String newStatus = request.getStatus().toUpperCase();
 
         if (!newStatus.equals("OPEN") && !newStatus.equals("IN_PROGRESS") &&

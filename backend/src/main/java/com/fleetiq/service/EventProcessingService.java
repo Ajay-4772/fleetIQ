@@ -12,8 +12,6 @@ import com.fleetiq.service.detection.IssueDetectionService;
 import com.fleetiq.service.impact.ImpactCalculationService;
 import com.fleetiq.service.normalization.NormalizationService;
 import com.fleetiq.service.sse.DashboardEventPublisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +20,6 @@ import java.util.Optional;
 
 @Service
 public class EventProcessingService {
-
-    private static final Logger log = LoggerFactory.getLogger(EventProcessingService.class);
 
     private final NormalizationService normalizationService;
     private final IssueDetectionService issueDetectionService;

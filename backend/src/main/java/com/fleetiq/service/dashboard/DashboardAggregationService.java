@@ -189,7 +189,6 @@ public class DashboardAggregationService {
     public ImpactMetricsDto getImpactMetrics() {
         Double totalSum = actionRepository.sumTotalImpact();
         Double openSum = actionRepository.sumImpactByStatus("OPEN");
-        Double resolvedSum = actionRepository.sumImpactByStatus("RESOLVED");
 
         double totalImpact = totalSum != null ? totalSum : 0.0;
         double openImpact = openSum != null ? openSum : 0.0;
