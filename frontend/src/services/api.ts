@@ -56,14 +56,17 @@ function authHeaders(extra: Record<string, string> = {}): Record<string, string>
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
-    let message = errorText;
+    let message = '';
     try {
       const parsed = JSON.parse(errorText);
-      message = parsed.message || parsed.error || errorText;
+      message = parsed.message || parsed.error || '';
     } catch {
-      // keep raw errorText
+      // keep empty
     }
-    throw new Error(`API error ${res.status}: ${message || res.statusText}`);
+    const cleanMessage = message || errorText || res.statusText || 'Request failed';
+    const err: any = new Error(cleanMessage);
+    err.status = res.status;
+    throw err;
   }
   return res.json();
 }

@@ -124,7 +124,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [token, logout]);
 
   const login = async (username: string, password: string): Promise<LoginResponse> => {
-    setIsLoading(true);
     setStatus('AUTHENTICATING');
     setError(null);
     try {
@@ -142,13 +141,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       handleAuthError(err);
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const register = async (payload: RegisterRequest): Promise<AuthTokensResponse> => {
-    setIsLoading(true);
     setStatus('AUTHENTICATING');
     setError(null);
     try {
@@ -167,8 +163,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setStatus('ERROR');
       setError(err.message || 'Registration failed. Please verify submitted details.');
       throw err;
-    } finally {
-      setIsLoading(false);
     }
   };
 
