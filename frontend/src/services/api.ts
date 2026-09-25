@@ -22,17 +22,28 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Token management in localStorage
 let currentToken: string | null = localStorage.getItem('fleetiq_auth_token') || null;
+let currentRefreshToken: string | null = localStorage.getItem('fleetiq_refresh_token') || null;
 
-export const setAuthToken = (token: string | null) => {
+export const setAuthToken = (token: string | null, refreshToken?: string | null) => {
   currentToken = token;
   if (token) {
     localStorage.setItem('fleetiq_auth_token', token);
   } else {
     localStorage.removeItem('fleetiq_auth_token');
   }
+
+  if (refreshToken !== undefined) {
+    currentRefreshToken = refreshToken;
+    if (refreshToken) {
+      localStorage.setItem('fleetiq_refresh_token', refreshToken);
+    } else {
+      localStorage.removeItem('fleetiq_refresh_token');
+    }
+  }
 };
 
 export const getAuthToken = (): string | null => currentToken;
+export const getRefreshToken = (): string | null => currentRefreshToken;
 
 function authHeaders(extra: Record<string, string> = {}): Record<string, string> {
   const headers: Record<string, string> = { ...extra };
@@ -45,7 +56,14 @@ function authHeaders(extra: Record<string, string> = {}): Record<string, string>
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const errorText = await res.text();
-    throw new Error(`API error ${res.status}: ${errorText || res.statusText}`);
+    let message = errorText;
+    try {
+      const parsed = JSON.parse(errorText);
+      message = parsed.message || parsed.error || errorText;
+    } catch {
+      // keep raw errorText
+    }
+    throw new Error(`API error ${res.status}: ${message || res.statusText}`);
   }
   return res.json();
 }
@@ -60,22 +78,73 @@ export const api = {
     })
       .then(handleResponse<LoginResponse>)
       .then((res) => {
-        setAuthToken(res.token);
+        setAuthToken(res.token || res.accessToken || null, res.refreshToken || null);
         return res;
       }),
+
+  register: (payload: import('../types').RegisterRequest): Promise<import('../types').AuthTokensResponse> =>
+    fetch(`${BASE_URL}/api/v1/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(handleResponse<import('../types').AuthTokensResponse>)
+      .then((res) => {
+        setAuthToken(res.token || res.accessToken || null, res.refreshToken || null);
+        return res;
+      }),
+
+  refreshToken: async (): Promise<string | null> => {
+    if (!currentRefreshToken) {
+      return null;
+    }
+    try {
+      const res = await fetch(`${BASE_URL}/api/v1/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: currentRefreshToken })
+      }).then(handleResponse<import('../types').AuthTokensResponse>);
+
+      setAuthToken(res.accessToken || res.token || null, res.refreshToken || null);
+      return res.accessToken || res.token || null;
+    } catch {
+      setAuthToken(null, null);
+      return null;
+    }
+  },
+
+  forgotPassword: (email: string): Promise<{ message: string; status: string }> =>
+    fetch(`${BASE_URL}/api/v1/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    }).then(handleResponse<{ message: string; status: string }>),
+
+  resetPassword: (payload: import('../types').ResetPasswordRequest): Promise<{ message: string; status: string }> =>
+    fetch(`${BASE_URL}/api/v1/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(handleResponse<{ message: string; status: string }>),
 
   getCurrentUser: (): Promise<User> =>
     fetch(`${BASE_URL}/api/v1/auth/me`, {
       headers: authHeaders()
     }).then(handleResponse<User>),
 
-  logout: (): Promise<any> =>
-    fetch(`${BASE_URL}/api/v1/auth/logout`, {
+  logout: (): Promise<any> => {
+    const refresh = currentRefreshToken;
+    return fetch(`${BASE_URL}/api/v1/auth/logout`, {
       method: 'POST',
-      headers: authHeaders({ 'Content-Type': 'application/json' })
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ refreshToken: refresh || '' })
     })
       .then(handleResponse)
-      .catch(() => ({ status: 'SUCCESS' })),
+      .catch(() => ({ status: 'SUCCESS' }))
+      .finally(() => {
+        setAuthToken(null, null);
+      });
+  },
 
   // Grounded AI Assistant
   queryAssistant: (question: string): Promise<AssistantResponse> =>

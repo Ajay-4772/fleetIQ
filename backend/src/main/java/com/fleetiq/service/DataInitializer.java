@@ -2,6 +2,7 @@ package com.fleetiq.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fleetiq.model.User;
 import com.fleetiq.model.Vehicle;
 import com.fleetiq.repository.UserRepository;
 import com.fleetiq.repository.VehicleRepository;
@@ -45,10 +46,21 @@ public class DataInitializer implements CommandLineRunner {
         // Seed default users if empty
         if (userRepository.count() == 0) {
             log.info("Users table is empty. Initializing default role-based accounts...");
-            userRepository.save(new com.fleetiq.model.User("admin", passwordEncoder.encode("Admin@FleetIQ2026"), "System Administrator", com.fleetiq.model.Role.ROLE_ADMIN));
-            userRepository.save(new com.fleetiq.model.User("ops_lead", passwordEncoder.encode("Ops@FleetIQ2026"), "Operations Lead", com.fleetiq.model.Role.ROLE_OPERATIONS_LEAD));
-            userRepository.save(new com.fleetiq.model.User("operator", passwordEncoder.encode("Operator@FleetIQ2026"), "Fleet Dispatcher", com.fleetiq.model.Role.ROLE_OPERATOR));
-            userRepository.save(new com.fleetiq.model.User("viewer", passwordEncoder.encode("Viewer@FleetIQ2026"), "Fleet Analyst", com.fleetiq.model.Role.ROLE_VIEWER));
+            User admin = new com.fleetiq.model.User("admin", passwordEncoder.encode("Admin@FleetIQ2026"), "System Administrator", "admin@fleetiq.internal", com.fleetiq.model.Role.ROLE_ADMIN, "FleetIQ Core Ops");
+            admin.setEmailVerified(true);
+            userRepository.save(admin);
+
+            User opsLead = new com.fleetiq.model.User("ops_lead", passwordEncoder.encode("Ops@FleetIQ2026"), "Operations Lead", "ops@fleetiq.internal", com.fleetiq.model.Role.ROLE_OPERATIONS_LEAD, "FleetIQ Core Ops");
+            opsLead.setEmailVerified(true);
+            userRepository.save(opsLead);
+
+            User operator = new com.fleetiq.model.User("operator", passwordEncoder.encode("Operator@FleetIQ2026"), "Fleet Dispatcher", "operator@fleetiq.internal", com.fleetiq.model.Role.ROLE_OPERATOR, "FleetIQ Dispatch");
+            operator.setEmailVerified(true);
+            userRepository.save(operator);
+
+            User viewer = new com.fleetiq.model.User("viewer", passwordEncoder.encode("Viewer@FleetIQ2026"), "Fleet Analyst", "viewer@fleetiq.internal", com.fleetiq.model.Role.ROLE_VIEWER, "FleetIQ Analytics");
+            viewer.setEmailVerified(true);
+            userRepository.save(viewer);
             log.info("Initialized 4 default user accounts (admin, ops_lead, operator, viewer).");
         }
 

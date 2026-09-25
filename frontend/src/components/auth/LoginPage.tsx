@@ -1,18 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  LogIn,
-  User as UserIcon,
-  Mail,
+  Shield,
   Lock,
+  Mail,
+  User as UserIcon,
+  Building,
+  ArrowRight,
   Eye,
   EyeOff,
-  ArrowRight,
   AlertCircle,
   CheckCircle2,
-  X,
-  ShieldCheck,
-  Building2,
-  Globe
+  KeyRound,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -20,475 +19,750 @@ interface LoginPageProps {
   onOpenLegal?: (type: 'terms' | 'privacy' | 'security' | 'cookies') => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
-  const { login } = useAuth();
+type AuthView = 'login' | 'register' | 'forgot' | 'reset';
 
-  // Sign In Form State
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
+  const { login, register, forgotPassword, resetPassword, error: authError, clearError } = useAuth();
+
+  const [activeView, setActiveView] = useState<AuthView>('login');
+
+  // Login Form State
+  const [loginIdentifier, setLoginIdentifier] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  // Register Form State
+  const [regFullName, setRegFullName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regUsername, setRegUsername] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [regOrganization, setRegOrganization] = useState('');
+  const [regTermsAccepted, setRegTermsAccepted] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+
+  // Forgot Password State
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+
+  // Reset Password State
+  const [resetToken, setResetToken] = useState('');
+  const [resetNewPassword, setResetNewPassword] = useState('');
+  const [resetConfirmPassword, setResetConfirmPassword] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState<string | null>(null);
+
+  // Local Form Error & Loading States
+  const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sign Up / Request Access Form State
-  const [signupName, setSignupName] = useState('');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupFeedback, setSignupFeedback] = useState<string | null>(null);
-  const [isSigningUp, setIsSigningUp] = useState(false);
+  // Check URL parameters for reset token on initial load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tokenParam = params.get('token');
+    const resetParam = params.get('reset');
+    if (tokenParam || resetParam === 'true') {
+      if (tokenParam) setResetToken(tokenParam);
+      setActiveView('reset');
+    }
+  }, []);
 
-  // Forgot Password Modal
-  const [showForgotModal, setShowForgotModal] = useState(false);
-  const [modalFeedback, setModalFeedback] = useState<string | null>(null);
-  const [modalEmail, setModalEmail] = useState('');
+  const switchView = (view: AuthView) => {
+    clearError();
+    setFormError(null);
+    setForgotSuccess(null);
+    setResetSuccess(null);
+    setActiveView(view);
+  };
 
+  // 1. Handle Login
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
-      setError('Please provide both username and password.');
+    setFormError(null);
+    clearError();
+
+    if (!loginIdentifier.trim() || !loginPassword.trim()) {
+      setFormError('Please enter your corporate identifier and password.');
       return;
     }
 
-    setError(null);
     setIsSubmitting(true);
-
     try {
-      await login(username.trim(), password.trim());
-    } catch (err: any) {
-      if (err.message && err.message.includes('429')) {
-        setError('Rate limit exceeded. Please wait a moment before retrying.');
-      } else if (err.message && (err.message.includes('401') || err.message.includes('Bad credentials'))) {
-        setError('Invalid username or password. Please verify credentials.');
-      } else if (err.message && err.message.includes('disabled')) {
-        setError('Account has been deactivated. Please contact your FleetIQ Administrator.');
-      } else {
-        setError(err.message || 'Authentication service temporarily unavailable. Please retry.');
-      }
+      await login(loginIdentifier.trim(), loginPassword);
+    } catch {
+      // AuthContext handles error state
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleSignupSubmit = (e: React.FormEvent) => {
+  // 2. Handle Registration
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!signupName.trim() || !signupEmail.trim() || !signupPassword.trim()) {
-      setSignupFeedback('Please fill out all required fields.');
+    setFormError(null);
+    clearError();
+
+    if (!regFullName.trim() || !regEmail.trim() || !regUsername.trim() || !regPassword) {
+      setFormError('Please complete all required fields.');
       return;
     }
 
-    setIsSigningUp(true);
-    setTimeout(() => {
-      setIsSigningUp(false);
-      setSignupFeedback(`Account request for ${signupName} submitted for administrator provisioning approval.`);
-      setTimeout(() => {
-        setSignupName('');
-        setSignupEmail('');
-        setSignupPassword('');
-        setSignupFeedback(null);
-      }, 4000);
-    }, 600);
+    if (regPassword !== regConfirmPassword) {
+      setFormError('Passwords do not match.');
+      return;
+    }
+
+    if (regPassword.length < 8) {
+      setFormError('Password must be at least 8 characters long.');
+      return;
+    }
+
+    if (!regTermsAccepted) {
+      setFormError('You must agree to the Terms of Service and Privacy Policy to continue.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await register({
+        fullName: regFullName.trim(),
+        email: regEmail.trim(),
+        username: regUsername.trim(),
+        password: regPassword,
+        organization: regOrganization.trim() || undefined,
+        termsAccepted: regTermsAccepted
+      });
+    } catch (err: any) {
+      setFormError(err.message || 'Registration failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const fillCredential = (u: string, p: string) => {
-    setUsername(u);
-    setPassword(p);
-    setError(null);
-  };
-
-  const handleForgotPassword = (e: React.FormEvent) => {
+  // 3. Handle Forgot Password
+  const handleForgotSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!modalEmail.trim()) return;
-    setModalFeedback(`Password reset instructions dispatched to ${modalEmail}.`);
-    setTimeout(() => {
-      setShowForgotModal(false);
-      setModalFeedback(null);
-      setModalEmail('');
-    }, 3000);
+    setFormError(null);
+    clearError();
+
+    if (!forgotEmail.trim()) {
+      setFormError('Please provide your corporate email address.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await forgotPassword(forgotEmail.trim());
+      setForgotSuccess(res.message);
+    } catch (err: any) {
+      setFormError(err.message || 'Unable to process request.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // 4. Handle Reset Password
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+    clearError();
+
+    if (!resetToken.trim() || !resetNewPassword || !resetConfirmPassword) {
+      setFormError('Please provide the reset token and your new password.');
+      return;
+    }
+
+    if (resetNewPassword !== resetConfirmPassword) {
+      setFormError('Passwords do not match.');
+      return;
+    }
+
+    if (resetNewPassword.length < 8) {
+      setFormError('Password must be at least 8 characters long.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await resetPassword({
+        token: resetToken.trim(),
+        newPassword: resetNewPassword,
+        confirmPassword: resetConfirmPassword
+      });
+      setResetSuccess(res.message);
+      setTimeout(() => {
+        switchView('login');
+      }, 3000);
+    } catch (err: any) {
+      setFormError(err.message || 'Password reset failed. The token may be expired or invalid.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const displayError = formError || authError;
 
   return (
-    <div className="min-h-screen bg-[#f1f4f9] text-slate-800 flex flex-col justify-center items-center p-4 sm:p-8 relative overflow-hidden font-sans select-none">
-      {/* Organic Royal Blue Fluid Blobs in Background */}
-      {/* Top Left Organic Blob */}
-      <svg
-        className="absolute -top-16 -left-16 w-80 h-80 sm:w-[480px] sm:h-[480px] pointer-events-none z-0 text-[#4361ee]/90 drop-shadow-sm"
-        viewBox="0 0 500 500"
-        fill="currentColor"
-      >
-        <path d="M 0,0 L 420,0 C 390,140 430,280 320,380 C 230,460 90,390 0,440 Z" />
-      </svg>
-
-      {/* Top Right Accent Blob */}
-      <svg
-        className="absolute -top-10 right-1/4 w-48 h-48 sm:w-64 sm:h-64 pointer-events-none z-0 text-[#4361ee]/80"
-        viewBox="0 0 200 200"
-        fill="currentColor"
-      >
-        <circle cx="100" cy="50" r="80" />
-      </svg>
-
-      {/* Bottom Right Organic Blob */}
-      <svg
-        className="absolute -bottom-20 -right-20 w-80 h-80 sm:w-[500px] sm:h-[500px] pointer-events-none z-0 text-[#4361ee]/90 drop-shadow-sm"
-        viewBox="0 0 500 500"
-        fill="currentColor"
-      >
-        <path d="M 500,500 L 80,500 C 130,370 70,220 180,120 C 280,30 430,90 500,0 Z" />
-      </svg>
-
-      {/* Main Tablet / Frame Container */}
-      <div className="w-full max-w-4xl bg-[#f8fafc] border-2 border-slate-700/80 rounded-[28px] sm:rounded-[36px] shadow-2xl p-6 sm:p-10 relative z-10 my-4 backdrop-blur-xs">
-        {/* Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-normal text-slate-700 tracking-tight">
-            Minimal login and signup forms
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 font-medium">
-            FleetIQ Enterprise Operations Portal • Multi-OEM Telemetry & Intelligence
-          </p>
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white">
+      {/* Top Corporate Header */}
+      <header className="px-6 sm:px-12 py-5 flex items-center justify-between border-b border-slate-800 bg-slate-950/60 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-xs">
+            <Shield className="w-4 h-4 text-white" aria-hidden="true" />
+          </div>
+          <div>
+            <span className="font-bold text-base tracking-tight text-white">FleetIQ</span>
+            <span className="text-[11px] font-semibold text-slate-400 ml-2.5 hidden sm:inline">
+              Connected Vehicle Intelligence
+            </span>
+          </div>
         </div>
 
-        {/* Dual Cards Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-3xl mx-auto">
-          {/* Card 1: Welcome! Sign in to your account */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-100 flex flex-col justify-between hover:shadow-lg transition-all duration-200">
-            <div>
-              {/* Blue Top Arrow Icon */}
-              <div className="flex justify-center mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[#4361ee]">
-                  <LogIn className="w-7 h-7 stroke-[2.2]" />
+        <div className="flex items-center gap-2 text-xs text-slate-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+          <span>Operations Center</span>
+        </div>
+      </header>
+
+      {/* Main Authentication Container */}
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 my-6">
+        <div className="w-full max-w-md bg-slate-950 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+          {/* Header Title Section */}
+          <div className="space-y-1.5 text-center">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              {activeView === 'login' && 'Sign in to FleetIQ'}
+              {activeView === 'register' && 'Request Enterprise Access'}
+              {activeView === 'forgot' && 'Reset Account Password'}
+              {activeView === 'reset' && 'Set New Password'}
+            </h1>
+            <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+              {activeView === 'login' && 'Enter your credentials to access telematics streams and fleet operations.'}
+              {activeView === 'register' && 'Register your corporate profile for multi-OEM telemetry authorization.'}
+              {activeView === 'forgot' && 'Enter your corporate email to receive a secure authorization reset token.'}
+              {activeView === 'reset' && 'Provide your authorization token and configure a new security password.'}
+            </p>
+          </div>
+
+          {/* Unified Error Alert Banner */}
+          {displayError && (
+            <div
+              role="alert"
+              className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-xs text-rose-300 flex items-start gap-2.5"
+            >
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" aria-hidden="true" />
+              <span className="leading-snug">{displayError}</span>
+            </div>
+          )}
+
+          {/* VIEW 1: SIGN IN */}
+          {activeView === 'login' && (
+            <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="login-username" className="block text-xs font-medium text-slate-300 mb-1.5">
+                  Corporate Email or Username
+                </label>
+                <div className="relative">
+                  <UserIcon className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" aria-hidden="true" />
+                  <input
+                    id="login-username"
+                    name="username"
+                    type="text"
+                    required
+                    autoComplete="username"
+                    value={loginIdentifier}
+                    onChange={(e) => setLoginIdentifier(e.target.value)}
+                    placeholder="e.g. admin@fleetiq.internal or dispatcher_dave"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-white placeholder-slate-500 transition"
+                  />
                 </div>
               </div>
 
-              {/* Headings */}
-              <h2 className="text-xl font-bold text-slate-800 text-center">Welcome!</h2>
-              <p className="text-xs text-slate-400 text-center mt-0.5 mb-6">Sign in to your account</p>
-
-              {/* Error Alert */}
-              {error && (
-                <div className="mb-4 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-600 flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {/* Login Form */}
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs text-slate-500 font-medium mb-1">Name</label>
-                  <div className="relative border-b border-slate-200 focus-within:border-[#4361ee] transition">
-                    <input
-                      type="text"
-                      required
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="e.g. admin or operator"
-                      className="w-full py-1.5 pr-8 text-sm text-slate-800 bg-transparent outline-none placeholder-slate-300 font-sans"
-                    />
-                    <UserIcon className="w-4 h-4 text-slate-300 absolute right-1 top-2" />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs text-slate-500 font-medium mb-1">Password</label>
-                  <div className="relative border-b border-slate-200 focus-within:border-[#4361ee] transition">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••••••"
-                      className="w-full py-1.5 pr-8 text-sm text-slate-800 bg-transparent outline-none placeholder-slate-300 font-sans"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-1 top-2 text-slate-300 hover:text-slate-500 transition"
-                      title={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me & Forgot Password */}
-                <div className="flex items-center justify-between pt-1 text-xs">
-                  <label className="flex items-center gap-1.5 text-slate-400 cursor-pointer hover:text-slate-600 transition">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-3.5 h-3.5 rounded text-[#4361ee] border-slate-300 focus:ring-[#4361ee]"
-                    />
-                    <span>remember me?</span>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label htmlFor="login-password" className="text-xs font-medium text-slate-300">
+                    Security Password
                   </label>
                   <button
                     type="button"
-                    onClick={() => setShowForgotModal(true)}
-                    className="text-[#4361ee] hover:underline font-medium"
+                    onClick={() => switchView('forgot')}
+                    className="text-[11px] text-blue-400 hover:text-blue-300 transition"
                   >
-                    forgot password?
+                    Forgot password?
                   </button>
                 </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" aria-hidden="true" />
+                  <input
+                    id="login-password"
+                    name="password"
+                    type={showLoginPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="current-password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-white placeholder-slate-500 transition"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition"
+                    aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
 
-                {/* Login Button */}
-                <div className="pt-2">
+              <div className="flex items-center justify-between pt-0.5 text-xs text-slate-400">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>Keep session active</span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Verifying Credentials...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                  </>
+                )}
+              </button>
+
+              <div className="pt-4 border-t border-slate-800 text-center">
+                <p className="text-xs text-slate-400">
+                  Need platform access?{' '}
+                  <button
+                    type="button"
+                    onClick={() => switchView('register')}
+                    className="text-blue-400 hover:text-blue-300 font-semibold transition"
+                  >
+                    Request an account
+                  </button>
+                </p>
+              </div>
+            </form>
+          )}
+
+          {/* VIEW 2: REGISTER */}
+          {activeView === 'register' && (
+            <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+              <div>
+                <label htmlFor="reg-fullname" className="block text-xs font-medium text-slate-300 mb-1">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <UserIcon className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <input
+                    id="reg-fullname"
+                    type="text"
+                    required
+                    autoComplete="name"
+                    value={regFullName}
+                    onChange={(e) => setRegFullName(e.target.value)}
+                    placeholder="Jane Doe"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="reg-email" className="block text-xs font-medium text-slate-300 mb-1">
+                  Corporate Email
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <input
+                    id="reg-email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    value={regEmail}
+                    onChange={(e) => setRegEmail(e.target.value)}
+                    placeholder="jane.doe@enterprise.com"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="reg-username" className="block text-xs font-medium text-slate-300 mb-1">
+                    Username
+                  </label>
+                  <input
+                    id="reg-username"
+                    type="text"
+                    required
+                    autoComplete="username"
+                    value={regUsername}
+                    onChange={(e) => setRegUsername(e.target.value)}
+                    placeholder="jdoe_ops"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="reg-org" className="block text-xs font-medium text-slate-300 mb-1">
+                    Organization
+                  </label>
+                  <div className="relative">
+                    <Building className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                    <input
+                      id="reg-org"
+                      type="text"
+                      value={regOrganization}
+                      onChange={(e) => setRegOrganization(e.target.value)}
+                      placeholder="Fleet Logistics Inc"
+                      className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="reg-password" className="block text-xs font-medium text-slate-300 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <input
+                    id="reg-password"
+                    type={showRegPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="new-password"
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    placeholder="Min 8 chars, 1 uppercase, 1 digit, 1 symbol"
+                    className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegPassword(!showRegPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"
+                  >
+                    {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="reg-confirm-password" className="block text-xs font-medium text-slate-300 mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  id="reg-confirm-password"
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  value={regConfirmPassword}
+                  onChange={(e) => setRegConfirmPassword(e.target.value)}
+                  placeholder="Repeat security password"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                />
+              </div>
+
+              <div className="pt-1">
+                <label className="flex items-start gap-2 text-[11px] text-slate-400 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={regTermsAccepted}
+                    onChange={(e) => setRegTermsAccepted(e.target.checked)}
+                    className="w-3.5 h-3.5 mt-0.5 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>
+                    I accept the{' '}
+                    <button
+                      type="button"
+                      onClick={() => onOpenLegal && onOpenLegal('terms')}
+                      className="text-blue-400 hover:underline"
+                    >
+                      Terms of Service
+                    </button>{' '}
+                    and{' '}
+                    <button
+                      type="button"
+                      onClick={() => onOpenLegal && onOpenLegal('privacy')}
+                      className="text-blue-400 hover:underline"
+                    >
+                      Privacy Policy
+                    </button>
+                    .
+                  </span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer mt-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Provisioning Account...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Submit Registration</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </>
+                )}
+              </button>
+
+              <div className="pt-3 border-t border-slate-800 text-center">
+                <p className="text-xs text-slate-400">
+                  Already registered?{' '}
+                  <button
+                    type="button"
+                    onClick={() => switchView('login')}
+                    className="text-blue-400 hover:text-blue-300 font-semibold transition"
+                  >
+                    Return to Sign In
+                  </button>
+                </p>
+              </div>
+            </form>
+          )}
+
+          {/* VIEW 3: FORGOT PASSWORD */}
+          {activeView === 'forgot' && (
+            <div className="space-y-4">
+              {forgotSuccess ? (
+                <div className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-800/80 text-xs text-emerald-300 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-bold">Instructions Dispatched</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-400 leading-relaxed">{forgotSuccess}</p>
+                  <div className="pt-2 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => switchView('reset')}
+                      className="text-blue-400 hover:underline text-xs font-semibold"
+                    >
+                      I have a reset token &rarr;
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchView('login')}
+                      className="text-slate-400 hover:text-white text-xs"
+                    >
+                      Back to Sign In
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotSubmit} className="space-y-4">
+                  <div>
+                    <label htmlFor="forgot-email" className="block text-xs font-medium text-slate-300 mb-1.5">
+                      Corporate Registered Email
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                      <input
+                        id="forgot-email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        placeholder="e.g. operator@fleetiq.internal"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                      />
+                    </div>
+                  </div>
+
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-6 py-2 rounded-lg bg-[#4361ee] hover:bg-[#3b52d4] disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-2 shadow-sm transition active:scale-95"
+                    className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Authenticating...</span>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Processing Request...</span>
                       </>
                     ) : (
                       <>
-                        <span>Login</span>
+                        <span>Send Reset Instructions</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </>
                     )}
                   </button>
-                </div>
-              </form>
-            </div>
 
-            {/* Quick Demo Credentials Strip */}
-            <div className="mt-6 pt-4 border-t border-slate-100">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">
-                Quick Dev Credentials
-              </span>
-              <div className="grid grid-cols-3 gap-1.5 text-center">
-                <button
-                  type="button"
-                  onClick={() => fillCredential('admin', 'Admin@FleetIQ2026')}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-blue-50 hover:border-blue-200 border border-slate-200/80 transition"
-                >
-                  <span className="text-[11px] font-bold text-slate-700 block">Admin</span>
-                  <span className="text-[9px] text-[#4361ee] font-mono block">ROLE_ADMIN</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => fillCredential('operator', 'Operator@FleetIQ2026')}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 border border-slate-200/80 transition"
-                >
-                  <span className="text-[11px] font-bold text-slate-700 block">Operator</span>
-                  <span className="text-[9px] text-emerald-600 font-mono block">OPERATOR</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => fillCredential('viewer', 'Viewer@FleetIQ2026')}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-amber-50 hover:border-amber-200 border border-slate-200/80 transition"
-                >
-                  <span className="text-[11px] font-bold text-slate-700 block">Viewer</span>
-                  <span className="text-[9px] text-amber-600 font-mono block">VIEWER</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2: Create account! */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-100 flex flex-col justify-between hover:shadow-lg transition-all duration-200">
-            <div>
-              {/* Blue Top User Circle Icon */}
-              <div className="flex justify-center mb-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-[#4361ee]">
-                  <div className="w-8 h-8 rounded-full border-2 border-[#4361ee] flex items-center justify-center">
-                    <UserIcon className="w-4 h-4 stroke-[2.4]" />
+                  <div className="flex items-center justify-between pt-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => switchView('login')}
+                      className="flex items-center gap-1.5 text-slate-400 hover:text-white transition"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Back to Sign In</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => switchView('reset')}
+                      className="text-blue-400 hover:text-blue-300 font-medium"
+                    >
+                      Already have a token?
+                    </button>
                   </div>
-                </div>
-              </div>
-
-              {/* Heading */}
-              <h2 className="text-xl font-bold text-slate-800 text-center mb-6">Create account!</h2>
-
-              {/* Feedback alert */}
-              {signupFeedback && (
-                <div className="mb-4 p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <span>{signupFeedback}</span>
-                </div>
+                </form>
               )}
+            </div>
+          )}
 
-              {/* Signup Form */}
-              <form onSubmit={handleSignupSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs text-slate-500 font-medium mb-1">Name</label>
-                  <div className="relative border-b border-slate-200 focus-within:border-[#4361ee] transition">
-                    <input
-                      type="text"
-                      required
-                      value={signupName}
-                      onChange={(e) => setSignupName(e.target.value)}
-                      placeholder="Full Name"
-                      className="w-full py-1.5 pr-8 text-sm text-slate-800 bg-transparent outline-none placeholder-slate-300 font-sans"
-                    />
-                    <UserIcon className="w-4 h-4 text-slate-300 absolute right-1 top-2" />
+          {/* VIEW 4: RESET PASSWORD */}
+          {activeView === 'reset' && (
+            <div className="space-y-4">
+              {resetSuccess ? (
+                <div className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-800/80 text-xs text-emerald-300 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-bold">Password Updated</span>
                   </div>
+                  <p className="text-[11px] text-emerald-400 leading-relaxed">{resetSuccess}</p>
+                  <p className="text-[11px] text-slate-400 pt-1">Redirecting to sign-in portal...</p>
                 </div>
-
-                <div>
-                  <label className="block text-xs text-slate-500 font-medium mb-1">E-mail</label>
-                  <div className="relative border-b border-slate-200 focus-within:border-[#4361ee] transition">
-                    <input
-                      type="email"
-                      required
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      placeholder="corporate@domain.com"
-                      className="w-full py-1.5 pr-8 text-sm text-slate-800 bg-transparent outline-none placeholder-slate-300 font-sans"
-                    />
-                    <Mail className="w-4 h-4 text-slate-300 absolute right-1 top-2" />
+              ) : (
+                <form onSubmit={handleResetSubmit} className="space-y-4">
+                  <div>
+                    <label htmlFor="reset-token" className="block text-xs font-medium text-slate-300 mb-1.5">
+                      Password Reset Token
+                    </label>
+                    <div className="relative">
+                      <KeyRound className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                      <input
+                        id="reset-token"
+                        type="text"
+                        required
+                        value={resetToken}
+                        onChange={(e) => setResetToken(e.target.value)}
+                        placeholder="Paste single-use token"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none font-mono text-xs text-white placeholder-slate-500"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs text-slate-500 font-medium mb-1">Password</label>
-                  <div className="relative border-b border-slate-200 focus-within:border-[#4361ee] transition">
+                  <div>
+                    <label htmlFor="reset-new-password" className="block text-xs font-medium text-slate-300 mb-1.5">
+                      New Password
+                    </label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                      <input
+                        id="reset-new-password"
+                        type={showResetPassword ? 'text' : 'password'}
+                        required
+                        value={resetNewPassword}
+                        onChange={(e) => setResetNewPassword(e.target.value)}
+                        placeholder="Min 8 chars, 1 uppercase, 1 digit, 1 symbol"
+                        className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowResetPassword(!showResetPassword)}
+                        className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200"
+                      >
+                        {showResetPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="reset-confirm-password" className="block text-xs font-medium text-slate-300 mb-1.5">
+                      Confirm New Password
+                    </label>
                     <input
+                      id="reset-confirm-password"
                       type="password"
                       required
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      placeholder="••••••••••••"
-                      className="w-full py-1.5 pr-8 text-sm text-slate-800 bg-transparent outline-none placeholder-slate-300 font-sans"
+                      value={resetConfirmPassword}
+                      onChange={(e) => setResetConfirmPassword(e.target.value)}
+                      placeholder="Repeat new password"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
                     />
-                    <Lock className="w-4 h-4 text-slate-300 absolute right-1 top-2" />
                   </div>
-                </div>
 
-                {/* Create Button */}
-                <div className="pt-2">
                   <button
                     type="submit"
-                    disabled={isSigningUp}
-                    className="px-6 py-2 rounded-lg bg-[#4361ee] hover:bg-[#3b52d4] disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-2 shadow-sm transition active:scale-95"
+                    disabled={isSubmitting}
+                    className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                   >
-                    {isSigningUp ? (
+                    {isSubmitting ? (
                       <>
-                        <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Submitting...</span>
+                        <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Updating Password...</span>
                       </>
                     ) : (
                       <>
-                        <span>Create</span>
+                        <span>Update Security Password</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </>
                     )}
                   </button>
-                </div>
-              </form>
-            </div>
 
-            {/* Social / SSO Section */}
-            <div className="mt-6 pt-4 border-t border-slate-100 text-center">
-              <span className="text-[11px] text-slate-400 block mb-2">
-                Or create account using enterprise SSO:
-              </span>
-              <div className="flex items-center justify-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSignupFeedback('Corporate SAML / Okta SSO flow initialized.');
-                    setTimeout(() => setSignupFeedback(null), 3000);
-                  }}
-                  className="w-8 h-8 rounded-full border border-slate-200 hover:border-[#4361ee] flex items-center justify-center text-slate-500 hover:text-[#4361ee] transition bg-white"
-                  title="Okta Enterprise SSO"
-                >
-                  <Building2 className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSignupFeedback('Azure AD / Microsoft Entra SSO flow initialized.');
-                    setTimeout(() => setSignupFeedback(null), 3000);
-                  }}
-                  className="w-8 h-8 rounded-full border border-slate-200 hover:border-[#4361ee] flex items-center justify-center text-slate-500 hover:text-[#4361ee] transition bg-white"
-                  title="Azure AD / Entra ID"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSignupFeedback('Google Workspace SSO flow initialized.');
-                    setTimeout(() => setSignupFeedback(null), 3000);
-                  }}
-                  className="w-8 h-8 rounded-full border border-slate-200 hover:border-[#4361ee] flex items-center justify-center text-slate-500 hover:text-[#4361ee] transition bg-white"
-                  title="Google Workspace"
-                >
-                  <Globe className="w-4 h-4" />
-                </button>
-              </div>
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => switchView('login')}
+                      className="text-xs text-slate-400 hover:text-white transition"
+                    >
+                      Return to Sign In
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
-          </div>
+          )}
         </div>
+      </main>
 
-        {/* Footer Text */}
-        <div className="mt-8 text-center text-xs text-slate-400">
-          <p>© 2026 Minimal Forms. All rights reserved | FleetIQ Technologies Inc.</p>
-          <div className="flex items-center justify-center gap-3 mt-1.5 text-[11px] text-slate-400">
-            <button onClick={() => onOpenLegal && onOpenLegal('terms')} className="hover:text-slate-600">
-              Terms of Service
-            </button>
-            <span>•</span>
-            <button onClick={() => onOpenLegal && onOpenLegal('privacy')} className="hover:text-slate-600">
-              Privacy Policy
-            </button>
-            <span>•</span>
-            <button onClick={() => onOpenLegal && onOpenLegal('security')} className="hover:text-slate-600">
-              Security Compliance
-            </button>
-          </div>
+      {/* Corporate Compliance & Legal Footer */}
+      <footer className="px-6 sm:px-12 py-4 border-t border-slate-800 bg-slate-950/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+        <div>
+          <span>© 2026 FleetIQ Technologies Inc. Multi-OEM Telematics & Fleet Intelligence.</span>
         </div>
-      </div>
-
-      {/* Forgot Password Modal */}
-      {showForgotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-slate-800">Reset Account Password</h3>
-              <button
-                onClick={() => setShowForgotModal(false)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {modalFeedback ? (
-              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-700 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{modalFeedback}</span>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotPassword} className="space-y-3">
-                <p className="text-xs text-slate-500">
-                  Enter your registered corporate email to receive a password reset authorization link.
-                </p>
-                <div className="border-b border-slate-200 focus-within:border-[#4361ee] transition">
-                  <input
-                    type="email"
-                    required
-                    placeholder="name@company.com"
-                    value={modalEmail}
-                    onChange={(e) => setModalEmail(e.target.value)}
-                    className="w-full py-1.5 text-xs text-slate-800 bg-transparent outline-none placeholder-slate-400"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-2 px-3 rounded-lg bg-[#4361ee] hover:bg-[#3b52d4] text-white text-xs font-semibold transition"
-                >
-                  Send Reset Link
-                </button>
-              </form>
-            )}
-          </div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => onOpenLegal && onOpenLegal('terms')}
+            className="hover:text-slate-200 transition"
+          >
+            Terms of Service
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => onOpenLegal && onOpenLegal('privacy')}
+            className="hover:text-slate-200 transition"
+          >
+            Privacy Policy
+          </button>
+          <span>•</span>
+          <button
+            onClick={() => onOpenLegal && onOpenLegal('security')}
+            className="hover:text-slate-200 transition"
+          >
+            Security Compliance
+          </button>
         </div>
-      )}
+      </footer>
     </div>
   );
 };

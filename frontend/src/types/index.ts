@@ -197,17 +197,49 @@ export interface LoadTestResponse {
 
 export interface User {
   username: string;
+  id?: number;
   fullName: string;
+  email?: string;
   role: 'ROLE_ADMIN' | 'ROLE_OPERATIONS_LEAD' | 'ROLE_OPERATOR' | 'ROLE_VIEWER' | string;
+  organization?: string;
+  emailVerified?: boolean;
+  lastLoginAt?: string;
 }
 
 export interface LoginResponse {
   token: string;
-  type: string;
+  accessToken?: string;
+  refreshToken?: string;
+  type?: string;
+  tokenType?: string;
   username: string;
   fullName: string;
+  email?: string;
   role: string;
-  expiresInMs: number;
+  organization?: string;
+  expiresInMs?: number;
+  message?: string;
+}
+
+export interface AuthTokensResponse extends LoginResponse {}
+
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  username: string;
+  password: string;
+  organization?: string;
+  termsAccepted: boolean;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export interface AssistantResponse {

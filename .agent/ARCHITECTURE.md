@@ -1,12 +1,12 @@
 # FleetIQ — Architecture Knowledge Base
 
-**Verification Date**: September 25, 2026
-**Status**: Verified against active codebase and AST graph (7,774 nodes, 15,735 edges).
+**Verification Date**: September 25, 2026  
+**Status**: Verified against active codebase and AST graph (7,774+ nodes, 15,735+ edges).
 
 ---
 
 ## 1. System Overview
-FleetIQ is a high-reliability connected vehicle intelligence and decision-engineering platform. It ingests multi-OEM telemetry (Tesla, Ford, BMW, Toyota), normalizes disparate schemas into a canonical domain model, detects faults, computes business/safety impact, evaluates automated action recommendations through an AI decision engine with deterministic rules fallback, and streams updates to an operations UI via Server-Sent Events (SSE).
+FleetIQ is a high-reliability connected vehicle intelligence and decision-engineering platform. It ingests multi-OEM telemetry (Tesla, Ford, BMW, Toyota), normalizes disparate schemas into a canonical domain model, detects faults, computes business/safety impact, evaluates automated action recommendations through an AI decision engine with deterministic rules fallback, enforces enterprise RBAC with real-time zero-trust authorization, and streams updates to an operations UI via Server-Sent Events (SSE).
 
 ```
 [OEM Telemetry / Simulator] 
@@ -42,12 +42,13 @@ FleetIQ is a high-reliability connected vehicle intelligence and decision-engine
 - `backend/`: Spring Boot 3.3.2 application managing ingestion, normalization, business rules, AI abstraction, database persistence, security, and SSE streaming.
   - `src/main/java/com/fleetiq/`:
     - `config/`: Spring security configuration, Jackson object mappers, Actuator configuration.
-    - `controller/`: REST endpoints for authentication, actions, dashboard metrics, exports, fleet queries, and simulator.
-    - `dto/`: Data transfer objects for requests, responses, and metrics.
-    - `model/`: JPA entities (`Vehicle`, `CanonicalVehicleEvent`, `ActionItem`, `Decision`, `User`, `RawIngestionRecord`).
+    - `controller/`: REST endpoints for authentication (`AuthController`), admin user management (`AdminUserController`), actions, dashboard metrics, exports, fleet queries, and simulator.
+    - `dto/`: Data transfer objects for auth requests/responses (`RegisterRequest`, `ForgotPasswordRequest`, `ResetPasswordRequest`, `RefreshTokenRequest`, `AuthTokensResponse`), metrics, and fleet data.
+    - `model/`: JPA entities (`Vehicle`, `CanonicalVehicleEvent`, `ActionItem`, `Decision`, `User`, `Role`, `RefreshToken`, `PasswordResetToken`, `UserAuditLog`, `ChatConversation`, `ChatMessage`, `RawIngestionRecord`).
     - `repository/`: Spring Data JPA repositories with custom derived and JPQL queries.
-    - `security/`: JWT token provider, auth filters, user details service, and API key validator.
+    - `security/`: `JwtAuthenticationFilter` (per-request DB validation for 0-second role updates), `JwtTokenProvider`, `RateLimitingFilter`, `PasswordPolicyValidator`, `ApiKeyAuthenticationFilter`.
     - `service/`:
+      - `auth/`: `AuthService` (dual-token lifecycle, lockout tracking, token rotation, single-use reset tokens).
       - `action/`: Priority action creation, score calculation, and status progression.
       - `assistant/`: Grounded fleet copilot query processor.
       - `dashboard/`: KPI aggregations, health statistics, and trend analysis.
@@ -60,13 +61,14 @@ FleetIQ is a high-reliability connected vehicle intelligence and decision-engine
       - `simulator/`: Deterministic synthetic event generator.
       - `sse/`: Thread-safe Server-Sent Events client management and broadcasting.
 - `frontend/`: Single-page application built with Vite, React 18, and TypeScript.
-  - `src/components/`: Priority action center, fleet overview, live telemetry panel, and AI assistant modal.
-  - `src/services/`: API client services with JWT authentication headers and SSE event listeners.
+  - `src/components/`: Priority action center, fleet overview, live telemetry panel, dedicated full-page AI copilot workspace, admin user management panel, system status pages, and enterprise authentication pages (`LoginPage.tsx`).
+  - `src/services/`: API client services with dual-token authentication handling (`api.ts`), auto-refresh interceptors, and SSE event listeners.
 - `docker-compose.yml`: Multi-container configuration orchestrating PostgreSQL database and services.
 
 ---
 
 ## 3. Domain Boundaries
+- **Security & Authorization Boundary**: Identity, token issuance, and server-side RBAC are fully encapsulated in `security/` and `service/auth/`. No downstream service relies on client-provided claims; authorities are resolved from the database per-request.
 - **Ingestion Boundary**: Isolate OEM-specific payload eccentricities. Adapters (`TeslaEvAdapter`, `FordAdapter`, `BmwAdapter`, `ToyotaAdapter`) implement `OemAdapter`, mapping to `CanonicalVehicleEvent`. Downstream layers never access raw OEM formats.
 - **Decision Engine Boundary**: The decision logic is completely encapsulated behind `DecisionService`. Callers request an evaluation for a vehicle event without knowing whether it is fulfilled by an external AI API or local deterministic heuristics.
 - **Action Lifecycle Boundary**: `ActionItem` encapsulates operational state (`PENDING`, `IN_PROGRESS`, `RESOLVED`, `DISMISSED`) and priority scores, decoupled from how the underlying fault was detected.
@@ -76,89 +78,67 @@ FleetIQ is a high-reliability connected vehicle intelligence and decision-engine
 
 ## 4. Application Layers
 1. **Security & Ingestion Layer**:
-   - `JwtAuthenticationFilter`: Validates Bearer tokens on protected REST APIs.
+   - `JwtAuthenticationFilter`: Validates Bearer tokens on protected REST APIs and re-verifies user active status and authorities against DB in real-time.
+   - `RateLimitingFilter`: Tiered token-bucket rate limiting (15 req/min on auth, 40 on AI, 300 on telemetry, 600 general).
    - `ApiKeyAuthenticationFilter`: Validates ingestion keys on high-throughput telemetry endpoints.
 2. **Controller Layer**:
-   - Exposes RESTful endpoints under `/api/v1/` and `/api/fleet/`.
+   - Exposes RESTful endpoints under `/api/v1/`.
    - Validates request payloads with `@Valid` and Jakarta validation annotations.
+   - Enforces method-level RBAC via `@PreAuthorize`.
 3. **Service Layer**:
    - Contains business logic, normalization, decision routing, impact calculation, and event broadcasting.
    - Transaction boundaries managed via Spring `@Transactional`.
 4. **Persistence Layer**:
    - Spring Data JPA repositories with query indexing for VIN, timestamps, and priority levels.
 5. **Database Tier**:
-   - In-memory H2 (PostgreSQL compatibility mode) for zero-dependency development and testing.
+   - Managed via Flyway migrations (`V1__initial_schema.sql`, `V2__user_audit_and_copilot_chat.sql`, `V3__auth_tokens_and_user_lifecycle.sql`).
+   - In-memory H2 (PostgreSQL compatibility mode) for unit and integration testing.
    - PostgreSQL 16 for production deployments.
 
 ---
 
 ## 5. Database Architecture
 ### Core Entities & Relationships
-- **Vehicle**: Master fleet record.
-  - Fields: `vin` (unique), `make`, `model`, `year`, `powertrainType`, `status`, `currentOdometerKm`, `batteryLevelPct`, `fuelLevelPct`, `lastSeen`.
-- **CanonicalVehicleEvent**: Normalized telemetry record.
-  - Fields: `id`, `eventId`, `vin`, `oem`, `source`, `timestamp`, `eventType`, `severity`, `speedKph`, `odometerKm`, `batterySocPct`, `fuelLevelPct`, `oilLifePct`, `brakePadWearPct`, `tirePressurePsi`, `faultCode`, `latitude`, `longitude`.
-- **Decision**: AI / rule evaluation output.
-  - Fields: `id`, `decisionId`, `vin`, `eventId`, `recommendedAction`, `decisionSource` (`AI_JEV` vs `DETERMINISTIC_RULES`), `confidenceScore`, `reasoning`, `ruleTriggered`, `executionTimeMs`, `timestamp`.
-- **ActionItem**: Operator work item.
-  - Fields: `id`, `actionId`, `vin`, `oem`, `title`, `description`, `actionType`, `priority` (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`), `priorityScore`, `status`, `estimatedCostUsd`, `estimatedDowntimeHours`, `createdAt`, `updatedAt`.
-- **User**: Authentication record.
-  - Fields: `id`, `username`, `passwordHash`, `role` (`ROLE_DISPATCHER`, `ROLE_ADMIN`, `ROLE_OPERATOR`).
+- **User**: Authentication & identity record (`id`, `username`, `email`, `password_hash`, `role`, `enabled`, `email_verified`, `last_login_at`, `failed_attempts`, `locked_until`, `organization`, `created_at`, `updated_at`).
+- **RefreshToken**: Rotatable 7-day session token (`id`, `user_id`, `token`, `expires_at`, `revoked`, `created_at`).
+- **PasswordResetToken**: Single-use 1-hour reset token (`id`, `user_id`, `token`, `expires_at`, `used`, `created_at`).
+- **UserAuditLog**: Tamper-evident security audit trail (`id`, `user_id`, `actor_username`, `action`, `details`, `ip_address`, `timestamp`).
+- **Vehicle**: Master fleet record (`vin`, `make`, `model`, `year`, `powertrainType`, `status`, `currentOdometerKm`, `batteryLevelPct`, `fuelLevelPct`, `lastSeen`).
+- **CanonicalVehicleEvent**: Normalized telemetry record (`id`, `eventId`, `vin`, `oem`, `source`, `timestamp`, `eventType`, `severity`, etc.).
+- **Decision**: AI / rule evaluation output (`id`, `decisionId`, `vin`, `eventId`, `recommendedAction`, `decisionSource`, `confidenceScore`, etc.).
+- **ActionItem**: Operator work item (`id`, `actionId`, `vin`, `oem`, `title`, `description`, `actionType`, `priority`, `status`, `estimatedCostUsd`, etc.).
+- **ChatConversation** & **ChatMessage**: Persistent multi-turn AI Copilot conversational state.
 
 ---
 
-## 6. Event Flow
-1. Telemetry is received via `/api/v1/simulator/generate` or incoming OEM webhook.
-2. `NormalizationService` identifies the OEM and delegates to the appropriate `OemAdapter`.
-3. An immutable `CanonicalVehicleEvent` is constructed and persisted to the database.
-4. `DetectionService` checks for critical diagnostic fault codes (DTCs) or out-of-band telemetry thresholds.
-5. `ImpactService` estimates projected financial impact ($USD) and operational downtime.
-6. `HybridDecisionService` queries `JevDecisionService`; if unavailable, timed out, or confidence < 0.80, `RuleBasedDecisionService` generates a deterministic decision.
-7. `ActionService` creates an `ActionItem` with calculated priority score.
-8. `SseService` dispatches a `vehicle_update` and `action_update` event to active SSE browser sessions.
+## 6. Real-Time RBAC & Event Flow
+1. User logs in via `POST /api/v1/auth/login`. System verifies BCrypt hash, checks lockout, issues 15-min JWT access token + 7-day DB refresh token.
+2. On every protected request, `JwtAuthenticationFilter` validates signature and queries `UserRepository.findByUsername()`.
+3. If admin demotes or deactivates the user in PostgreSQL, the very next request evaluates the updated state:
+   - If disabled: Rejected immediately with `401 Unauthorized`.
+   - If role changed: Evaluates with new role authority (e.g. `ROLE_OPERATOR` -> `ROLE_VIEWER` cannot patch action items).
+4. Telemetry is received via `/api/v1/simulator/generate` or incoming OEM webhook.
+5. `NormalizationService` identifies OEM and delegates to appropriate `OemAdapter`.
+6. `CanonicalVehicleEvent` is constructed and persisted to the database.
+7. `DetectionService` checks for critical DTCs or out-of-band telemetry thresholds.
+8. `ImpactService` estimates projected financial impact ($USD) and downtime.
+9. `HybridDecisionService` queries AI with deterministic fallback.
+10. `ActionService` creates an `ActionItem` with calculated priority score.
+11. `SseService` dispatches live updates to connected operations consoles.
 
 ---
 
-## 7. AI Decision-Engine Architecture
-- **Interface**: `DecisionService` with method `Decision evaluate(CanonicalVehicleEvent event, Vehicle vehicle)`.
-- **AI Implementation**: `JevDecisionService` calls external AI endpoint with structured JSON payload, enforcing strict timeouts (`JEV_TIMEOUT_MS: 3000`).
-- **Deterministic Fallback**: `RuleBasedDecisionService` uses hardcoded automotive domain invariants:
-  - Critical DTCs (e.g., `P0A80` Hybrid Battery Degradation, `P0300` Random Engine Misfire) -> Immediate `CRITICAL` ground vehicle action.
-  - Oil Life < 10% or Brake Pad Wear < 15% -> Scheduled `HIGH` priority maintenance.
-  - EV Battery SoC < 10% -> Immediate route-to-charging action.
-- **Failover Logic**: `HybridDecisionService` wraps AI calls in a try-catch-fallback block; any network error, HTTP 5xx, or sub-threshold confidence triggers immediate deterministic fallback.
-
----
-
-## 8. External Integrations
-- **JEV AI Decision API**: Optional remote service (`api.jev.ai/v1/decisions`).
-- **OEM Telemetry APIs**: Pluggable ingestion adapters (BMW CarData, Ford Pro Telematics, Tesla Fleet API, Toyota Connected).
-- **Other External Systems**: `TODO — NOT YET VERIFIED` (e.g., ERP, telematics hardware vendors).
-
----
-
-## 9. Configuration & Environments
-- Controlled via `application.yml` and Spring Profiles:
-  - `dev` (default): Embedded H2 database, console enabled, JEV API disabled (fallback rules active).
-  - `postgres`: Active when `SPRING_PROFILES_ACTIVE=postgres`, targets PostgreSQL container via JDBC.
-
----
-
-## 10. Deployment Architecture
-- Docker Compose orchestrates `backend` (port 8080), `frontend` (port 80/5173), and `postgres` (port 5432).
-- Kubernetes / Cloud Run / ECS: `TODO — NOT YET VERIFIED`.
-
----
-
-## 11. Testing Architecture
+## 7. Testing Architecture
 - JUnit 5 + Mockito 5 + Spring Boot Starter Test.
-- Fast tests use mocked services and in-memory H2 database.
-- Dedicated test classes verify normalizers, AI fallback paths, RAG retrieval, and security filters.
+- Fast, isolated integration and security test suites:
+  - `AuthenticationAndSessionTests` (13 tests verifying login, lockout, tokens, reset, deactivation, and real-time RBAC).
+  - `AdminUserAndRbacTests` (5 tests).
+  - `SecurityAndAuthTests` (6 tests).
+  - Plus 10 other domain test suites totaling 73/73 passing tests.
 
 ---
 
-## 12. Observability Architecture
+## 8. Observability Architecture
 - **Actuator**: Endpoints at `/actuator/health`, `/actuator/metrics`, `/actuator/info`.
-- **Logging**: Standard SLF4J / Logback structured console logging.
-- **Distributed Tracing (OpenTelemetry / Zipkin)**: `TODO — NOT YET VERIFIED`.
-- **Metrics Scraping (Prometheus)**: `TODO — NOT YET VERIFIED`.
+- **Distributed Tracing**: OpenTelemetry tracing via `micrometer-tracing-bridge-otel` with W3C `traceparent` propagation and MDC correlation in `TraceResponseFilter`.
+- **Structured Logging**: Logback with MDC `traceId` and `spanId` on all application logs.

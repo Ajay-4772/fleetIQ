@@ -20,12 +20,30 @@ public class User {
     @Column(nullable = false, length = 128)
     private String fullName;
 
+    @Column(unique = true, length = 128)
+    private String email;
+
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
     private Role role;
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @Column(nullable = false)
+    private int failedAttempts = 0;
+
+    @Column
+    private Instant lockedUntil;
+
+    @Column
+    private Instant lastLoginAt;
+
+    @Column(length = 128)
+    private String organization;
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
@@ -38,7 +56,29 @@ public class User {
         this.fullName = fullName;
         this.role = role;
         this.enabled = true;
+        this.emailVerified = false;
+        this.failedAttempts = 0;
         this.createdAt = Instant.now();
+    }
+
+    public User(String username, String password, String fullName, String email, Role role, String organization) {
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.email = email;
+        this.role = role;
+        this.organization = organization;
+        this.enabled = true;
+        this.emailVerified = false;
+        this.failedAttempts = 0;
+        this.createdAt = Instant.now();
+    }
+
+    public boolean isAccountNonLocked() {
+        if (lockedUntil == null) {
+            return true;
+        }
+        return Instant.now().isAfter(lockedUntil);
     }
 
     public Long getId() { return id; }
@@ -53,11 +93,29 @@ public class User {
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
 
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public int getFailedAttempts() { return failedAttempts; }
+    public void setFailedAttempts(int failedAttempts) { this.failedAttempts = failedAttempts; }
+
+    public Instant getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(Instant lockedUntil) { this.lockedUntil = lockedUntil; }
+
+    public Instant getLastLoginAt() { return lastLoginAt; }
+    public void setLastLoginAt(Instant lastLoginAt) { this.lastLoginAt = lastLoginAt; }
+
+    public String getOrganization() { return organization; }
+    public void setOrganization(String organization) { this.organization = organization; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
