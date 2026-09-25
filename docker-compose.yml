@@ -3,33 +3,33 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: fleetiq-postgres
+    container_name: vehyron-postgres
     environment:
-      POSTGRES_DB: fleetiq
-      POSTGRES_USER: fleetiq_user
-      POSTGRES_PASSWORD: fleetiq_secret
+      POSTGRES_DB: vehyron
+      POSTGRES_USER: vehyron_user
+      POSTGRES_PASSWORD: vehyron_secret
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fleetiq_user -d fleetiq"]
+      test: ["CMD-SHELL", "pg_isready -U vehyron_user -d vehyron"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  fleetiq-backend:
+  vehyron-backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: fleetiq-backend
+    container_name: vehyron-backend
     environment:
       SPRING_PROFILES_ACTIVE: postgres
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: fleetiq
-      DB_USER: fleetiq_user
-      DB_PASSWORD: fleetiq_secret
+      DB_NAME: vehyron
+      DB_USER: vehyron_user
+      DB_PASSWORD: vehyron_secret
       SERVER_PORT: 8080
     ports:
       - "8080:8080"
@@ -37,15 +37,15 @@ services:
       postgres:
         condition: service_healthy
 
-  fleetiq-frontend:
+  vehyron-frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: fleetiq-frontend
+    container_name: vehyron-frontend
     ports:
       - "5173:80"
     depends_on:
-      - fleetiq-backend
+      - vehyron-backend
 
 volumes:
   postgres_data:

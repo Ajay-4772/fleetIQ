@@ -20,12 +20,12 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             </div>
             <div>
               <h3 className="text-sm font-extrabold text-slate-900 tracking-tight">
-                {type === 'terms' && 'FleetIQ Terms and Conditions of Service'}
-                {type === 'privacy' && 'FleetIQ Enterprise Data Privacy Policy'}
-                {type === 'security' && 'Security Architecture & Vulnerability Reporting'}
-                {type === 'cookies' && 'FleetIQ Cookie & Session Policy'}
+                {type === 'terms' && 'VEHYRON Terms and Conditions of Service'}
+                {type === 'privacy' && 'VEHYRON Enterprise Data Privacy Policy'}
+                {type === 'security' && 'VEHYRON Security Architecture & Vulnerability Reporting'}
+                {type === 'cookies' && 'VEHYRON Cookie & Session Policy'}
               </h3>
-              <p className="text-[10px] text-slate-500 font-mono">Document Version: 2026.1-STABLE</p>
+              <p className="text-[10px] text-slate-500 font-mono">Document Version: 2026.1-STABLE ([LEGAL ENTITY NAME])</p>
             </div>
           </div>
           <button
@@ -40,7 +40,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
         <div className="p-3.5 bg-amber-50 border-b border-amber-200/70 text-xs text-amber-800 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
           <span className="font-semibold">
-            LEGAL REVIEW REQUIRED — This is an enterprise product template pending final corporate legal and compliance sign-off.
+            LEGAL REVIEW REQUIRED — Preliminary screening performed; formal trademark, domain, and entity clearance required before commercial launch.
           </span>
         </div>
 
@@ -50,11 +50,11 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             <>
               <h4 className="font-bold text-slate-900 text-sm">1. Acceptance of Service Terms</h4>
               <p>
-                By accessing FleetIQ Operations Platform, authorized corporate entities agree to govern telematics data ingestion, automated decision pipelines, and fleet dispatch actions in compliance with applicable jurisdictional transport regulations.
+                By accessing VEHYRON Operations Platform, authorized corporate entities agree to govern telematics data ingestion, automated decision pipelines, and fleet dispatch actions in compliance with applicable jurisdictional transport regulations.
               </p>
               <h4 className="font-bold text-slate-900 text-sm">2. Multi-OEM Telematics Usage</h4>
               <p>
-                FleetIQ processes connected vehicle signals from supported OEMs (Toyota, Ford, BMW, Tesla). Operational dispatch recommendations produced by the deterministic engine or AI Copilot are advisory and subject to human operator oversight.
+                VEHYRON processes connected vehicle signals from supported OEMs (Toyota, Ford, BMW, Tesla). Operational dispatch recommendations produced by the deterministic engine or AI Copilot are advisory and subject to human operator oversight.
               </p>
               <h4 className="font-bold text-slate-900 text-sm">3. Acceptable Use & RBAC Credentials</h4>
               <p>
@@ -67,7 +67,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             <>
               <h4 className="font-bold text-slate-900 text-sm">1. Data Ingestion & Storage</h4>
               <p>
-                FleetIQ collects Vehicle Identification Numbers (VIN), sensor telemetry (battery state of charge, odometer, speed, engine temperature), and Diagnostic Trouble Codes (DTC). No passenger Personally Identifiable Information (PII) is captured.
+                VEHYRON collects Vehicle Identification Numbers (VIN), sensor telemetry (battery state of charge, odometer, speed, engine temperature), and Diagnostic Trouble Codes (DTC). No passenger Personally Identifiable Information (PII) is captured.
               </p>
               <h4 className="font-bold text-slate-900 text-sm">2. AI Copilot Data Boundary</h4>
               <p>
@@ -84,11 +84,11 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             <>
               <h4 className="font-bold text-slate-900 text-sm">1. Enterprise Security Baseline</h4>
               <p>
-                FleetIQ enforces Spring Security JWT stateless authentication, server-side RBAC authorization, per-IP rate-limiting filters (429 Too Many Requests), and Flyway schema governance.
+                VEHYRON enforces Spring Security JWT stateless authentication, server-side RBAC authorization, per-IP rate-limiting filters (429 Too Many Requests), and Flyway schema governance.
               </p>
               <h4 className="font-bold text-slate-900 text-sm">2. Vulnerability Disclosure</h4>
               <p>
-                Security researchers and corporate partners should report potential findings directly to the designated security team: <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-900">security@fleetiq.internal</code>.
+                Security researchers and corporate partners should report potential findings directly to the designated security team: <code className="bg-slate-100 px-1 py-0.5 rounded font-mono text-slate-900">security@vehyron.internal</code>.
               </p>
             </>
           )}
@@ -97,7 +97,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
             <>
               <h4 className="font-bold text-slate-900 text-sm">1. Session Tokens</h4>
               <p>
-                FleetIQ uses local storage and HTTP headers exclusively for stateless JWT bearer authorization tokens. No cross-site advertising or third-party behavioral trackers are utilized.
+                VEHYRON uses local storage and HTTP headers exclusively for stateless JWT bearer authorization tokens. No cross-site advertising or third-party behavioral trackers are utilized.
               </p>
             </>
           )}

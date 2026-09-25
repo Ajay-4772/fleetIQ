@@ -1,6 +1,6 @@
-# FleetIQ — Production Authentication, Real-Time RBAC & UI Hardening Report
+# VEHYRON — Production Authentication, Real-Time RBAC & UI Hardening Report
 
-**Project**: FleetIQ Connected Vehicle Intelligence & Operations Command Center  
+**Project**: VEHYRON Connected Vehicle Intelligence & Operations Command Center  
 **Report Date**: September 25, 2026  
 **Status**: PRODUCTION-HARDENED & VERIFIED  
 
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & Audit Scope
 
-FleetIQ has undergone an end-to-end audit and transformation from a vibe-coded prototype into an enterprise-grade telematics and fleet intelligence platform.
+VEHYRON has undergone an end-to-end audit and transformation from a vibe-coded prototype into an enterprise-grade telematics and fleet intelligence platform.
 
 ### What Was Audited:
 1. **Frontend Architecture**: React 18, TypeScript, Tailwind CSS, Vite, SSE client, global search, navigation, modals, and charts.
@@ -132,4 +132,4 @@ The following screenshots are persisted in `outputs/` for review:
 
 ## 7. Status & Readiness
 
-FleetIQ is now in a **Production-Hardened, Verified** state for Batch 1. The codebase is clean, maintainable, strictly typed, covered by automated integration tests, and primed to absorb future screenshot audits (Batch 2, Batch 3) without regression.
+VEHYRON is now in a **Production-Hardened, Verified** state for Batch 1. The codebase is clean, maintainable, strictly typed, covered by automated integration tests, and primed to absorb future screenshot audits (Batch 2, Batch 3) without regression.

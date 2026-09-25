@@ -22,45 +22,53 @@ export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary,
     return '$' + Math.round(val).toLocaleString();
   };
 
+  const hasData = summary.totalVehicles > 0;
+
   const cards = [
     {
       title: 'Fleet Assets',
       value: summary.totalVehicles.toString(),
-      trend: '+12.5%',
-      trendUp: true,
+      trend: hasData ? `${summary.totalVehicles} registered` : 'No data',
+      trendUp: hasData,
       period: 'monitored vehicles',
       icon: Car,
       iconColor: 'text-blue-600 bg-blue-50',
-      subtitle: `${summary.activeVehicles} Active · ${summary.maintenanceVehicles} Service · ${summary.inactiveVehicles} Idle`,
+      subtitle: hasData
+        ? `${summary.activeVehicles} Active · ${summary.maintenanceVehicles} Service · ${summary.inactiveVehicles} Idle`
+        : 'Connect data source to register assets',
       targetTab: 'vehicles' as const
     },
     {
       title: 'Fleet Health Index',
-      value: `${summary.fleetHealthScore}%`,
-      trend: '+4.2%',
-      trendUp: true,
+      value: hasData ? `${summary.fleetHealthScore}%` : 'Insufficient data',
+      trend: hasData ? `${summary.healthyVehicles} healthy` : '—',
+      trendUp: hasData && summary.fleetHealthScore >= 80,
       period: 'Operational Integrity',
       icon: ShieldCheck,
       iconColor: 'text-emerald-600 bg-emerald-50',
-      subtitle: `${summary.healthyVehicles} Healthy · ${summary.atRiskVehicles} Warning · ${summary.criticalVehicles} Critical`,
+      subtitle: hasData
+        ? `${summary.healthyVehicles} Healthy · ${summary.atRiskVehicles} Warning · ${summary.criticalVehicles} Critical`
+        : 'Awaiting incoming vehicle telemetry',
       targetTab: 'actions' as const
     },
     {
       title: 'Active Utilization',
-      value: `${summary.overallUtilizationPct}%`,
-      trend: '+8.1%',
-      trendUp: true,
+      value: hasData ? `${summary.overallUtilizationPct}%` : 'Insufficient data',
+      trend: hasData ? `${summary.activeVehicles} in duty` : '—',
+      trendUp: hasData && summary.overallUtilizationPct >= 50,
       period: 'Operating Duty',
       icon: Zap,
       iconColor: 'text-indigo-600 bg-indigo-50',
-      subtitle: `${summary.openActionCount} Open Actions · ${summary.criticalActionCount} High Priority`,
+      subtitle: hasData
+        ? `${summary.openActionCount} Open Actions · ${summary.criticalActionCount} High Priority`
+        : '0 open operational directives',
       targetTab: 'vehicles' as const
     },
     {
       title: 'Est. Operational Risk',
-      value: formatCurrency(summary.estimatedTotalImpact),
-      trend: '-14.8%',
-      trendUp: false,
+      value: hasData ? formatCurrency(summary.estimatedTotalImpact) : '$0',
+      trend: hasData && summary.criticalActionCount > 0 ? `${summary.criticalActionCount} critical` : 'Nominal',
+      trendUp: summary.criticalActionCount === 0,
       period: 'Active Unresolved Risk',
       icon: AlertTriangle,
       iconColor: 'text-rose-600 bg-rose-50',

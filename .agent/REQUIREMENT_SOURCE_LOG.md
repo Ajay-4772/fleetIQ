@@ -1,4 +1,4 @@
-# FleetIQ — Requirement Source Log
+# VEHYRON — Requirement Source Log
 
 **Version**: 1.0.0  
 **Context Tracking**: Historical Prompt & Master Directives  
@@ -20,7 +20,7 @@
 | **SRC-08** | Global Error Handling | Replace ad-hoc per-controller try-catch logic with `@ControllerAdvice` returning consistent, sanitized error payloads with request trace IDs. |
 | **SRC-09** | AI Copilot Full-Page Experience | Eliminate the AI side drawer modal (`AiAssistantModal.tsx`). Implement dedicated ChatGPT-style page (`/intelligence/copilot`) with persistent history and user isolation. |
 | **SRC-10** | UI Animation Remediation | Remove distracting 3D blue glowing orb animation and pulsating radio lighting from `index.css` and `RightSidebarWidgets.tsx`. Enforce clean, restrained enterprise styling. |
-| **SRC-11** | IDE Independence | Ensure FleetIQ is completely independent of Antigravity. Enable full development and maintenance in VS Code, IntelliJ IDEA, and GitHub Codespaces via DevContainer. |
+| **SRC-11** | IDE Independence | Ensure VEHYRON is completely independent of Antigravity. Enable full development and maintenance in VS Code, IntelliJ IDEA, and GitHub Codespaces via DevContainer. |
 | **SRC-12** | Docker & CI/CD | Provide multi-stage Docker builds, `docker-compose.yml` local orchestration, and GitHub Actions CI pipeline (`.github/workflows/ci.yml`) enforcing automated test verification. |
 | **SRC-13** | Scalability & Load Balancing | Analyze system capacity, database connection pooling, statelessness, and horizontal scaling. Document load testing plan across burst ingestion and concurrent queries. |
 | **SRC-14** | Public & System Pages | Implement complete web application surface including dedicated routes for `/` (Landing), `/login`, `/404`, `/401`, `/403`, `/500`, and `/maintenance`. |

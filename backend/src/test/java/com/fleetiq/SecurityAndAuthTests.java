@@ -37,7 +37,7 @@ public class SecurityAndAuthTests {
     @Test
     @DisplayName("Case S1: Login success with valid admin credentials")
     void testLoginSuccess() throws Exception {
-        LoginRequest req = new LoginRequest("admin", "Admin@FleetIQ2026");
+        LoginRequest req = new LoginRequest("admin", "Admin@Vehyron2026");
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -66,15 +66,12 @@ public class SecurityAndAuthTests {
     }
 
     @Test
-    @DisplayName("Case S3: Viewer role is forbidden from mutating actions (RBAC check)")
-    void testViewerForbiddenFromMutatingAction() throws Exception {
-        String viewerToken = jwtTokenProvider.generateToken("viewer", "ROLE_VIEWER");
-        ActionStatusUpdateRequest update = new ActionStatusUpdateRequest("RESOLVED", "Attempted by viewer");
+    @DisplayName("Case S3: Operator role is forbidden from accessing Admin User Management (RBAC check)")
+    void testOperatorForbiddenFromAdminEndpoints() throws Exception {
+        String operatorToken = jwtTokenProvider.generateToken("operator", "ROLE_OPERATOR");
 
-        mockMvc.perform(patch("/api/v1/actions/ACT-0001/status")
-                        .header("Authorization", "Bearer " + viewerToken)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(update)))
+        mockMvc.perform(get("/api/v1/admin/users")
+                        .header("Authorization", "Bearer " + operatorToken))
                 .andExpect(status().isForbidden());
     }
 

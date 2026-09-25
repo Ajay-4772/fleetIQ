@@ -1,7 +1,7 @@
-# FleetIQ — Enterprise Data Privacy Policy
+# VEHYRON — Enterprise Data Privacy Policy
 
 > [!CAUTION]
-> **LEGAL REVIEW REQUIRED:** This document is an enterprise data privacy template tailored to the actual data ingestion characteristics of FleetIQ. It must be reviewed and certified by corporate data protection officers (DPO) and compliance legal counsel prior to production operation.
+> **LEGAL REVIEW REQUIRED:** This document is an enterprise data privacy template tailored to the actual data ingestion characteristics of VEHYRON. It must be reviewed and certified by corporate data protection officers (DPO) and compliance legal counsel prior to production operation.
 
 **Template Version:** 2026.1-STABLE  
 **Scope:** Telematics Data Ingestion, User Accounts, and AI Conversation Privacy
@@ -10,7 +10,7 @@
 
 ## 1. Actual Categories of Data Ingested
 
-FleetIQ processes telemetry directly relevant to commercial fleet operations:
+VEHYRON processes telemetry directly relevant to commercial fleet operations:
 
 1. **User Identity & Security Data:** Username, full name, corporate email address, hashed passwords, security role (`ROLE_ADMIN`, `ROLE_OPERATOR`, `ROLE_ANALYST`, `ROLE_VIEWER`), login timestamps, and client IP addresses stored in `user_audit_logs`.
 2. **Vehicle Telematics & Asset Identifiers:** Vehicle Identification Numbers (VIN), OEM make/model, odometer readings, vehicle speed, engine coolant temperature, High Voltage battery State of Charge (SOC), battery cell temperature, and tire pressure metrics.

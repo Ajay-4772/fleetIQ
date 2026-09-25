@@ -3,11 +3,11 @@ server:
 
 spring:
   application:
-    name: fleetiq-backend
+    name: vehyron-backend
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   datasource:
-    url: jdbc:h2:mem:fleetiq;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    url: jdbc:h2:mem:vehyron;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
     driverClassName: org.h2.Driver
     username: sa
     password: ""
@@ -43,9 +43,11 @@ management:
 
 logging:
   pattern:
-    level: "%5p [${spring.application.name:fleetiq-backend},%X{traceId:-},%X{spanId:-}]"
+    level: "%5p [${spring.application.name:vehyron-backend},%X{traceId:-},%X{spanId:-}]"
 
-fleetiq:
+vehyron:
+  seed:
+    enabled: ${VEHYRON_SEED_ENABLED:false}
   jev:
     enabled: ${JEV_API_ENABLED:false}
     api-url: ${JEV_API_URL:https://api.jev.ai/v1/decisions}
@@ -59,9 +61,16 @@ fleetiq:
     default-event-count: ${SIMULATOR_DEFAULT_EVENT_COUNT:100}
   security:
     jwt:
-      secret: ${JWT_SECRET:FleetIQSecretKeyForJWTSigningMustBeAtLeast256BitsLongForHMACSHA256Secure}
+      secret: ${JWT_SECRET:VehyronSecretKeyForJWTSigningMustBeAtLeast256BitsLongForHMACSHA256Secure}
       expiration-ms: ${JWT_EXPIRATION_MS:86400000}
-    ingestion-api-key: ${FLEETIQ_INGESTION_API_KEY:fleetiq-ingest-secure-key-2026}
+    ingestion-api-key: ${VEHYRON_INGESTION_API_KEY:${FLEETIQ_INGESTION_API_KEY:vehyron-ingest-secure-key-2026}}
+
+# Backward compatibility alias
+fleetiq:
+  security:
+    ingestion-api-key: ${VEHYRON_INGESTION_API_KEY:${FLEETIQ_INGESTION_API_KEY:vehyron-ingest-secure-key-2026}}
+  seed:
+    enabled: ${VEHYRON_SEED_ENABLED:false}
 
 ---
 spring:
@@ -69,9 +78,9 @@ spring:
     activate:
       on-profile: postgres
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:fleetiq}
-    username: ${DB_USER:fleetiq_user}
-    password: ${DB_PASSWORD:fleetiq_secret}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:vehyron}
+    username: ${DB_USER:vehyron_user}
+    password: ${DB_PASSWORD:vehyron_secret}
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

@@ -200,7 +200,7 @@ export interface User {
   id?: number;
   fullName: string;
   email?: string;
-  role: 'ROLE_ADMIN' | 'ROLE_OPERATIONS_LEAD' | 'ROLE_OPERATOR' | 'ROLE_VIEWER' | string;
+  role: 'ROLE_ADMIN' | 'ROLE_OPERATOR' | 'ADMIN' | 'OPERATOR' | string;
   organization?: string;
   emailVerified?: boolean;
   lastLoginAt?: string;
@@ -229,6 +229,7 @@ export interface RegisterRequest {
   username: string;
   password: string;
   organization?: string;
+  requestedRole?: 'OPERATOR' | 'ADMIN' | string;
   termsAccepted: boolean;
 }
 
@@ -322,5 +323,54 @@ export interface CreateUserRequest {
   email?: string;
   role: string;
 }
+
+export interface DataSource {
+  id: string;
+  name: string;
+  type: 'KAFKA' | 'MQTT' | 'REST' | 'WEBHOOK' | 'PUBSUB' | 'KINESIS' | 'EVENT_HUBS' | 'EXCEL' | 'CSV' | string;
+  status: 'CONNECTED' | 'CONNECTING' | 'DISCONNECTED' | 'ERROR' | 'PAUSED';
+  configuration?: string;
+  credentialReference?: string;
+  schemaMapping?: string;
+  enabled: boolean;
+  eventsReceived: number;
+  eventsProcessed: number;
+  eventsRejected: number;
+  lastConnectedAt?: string;
+  lastEventAt?: string;
+  lastErrorAt?: string;
+  lastError?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface IngestionJob {
+  jobId: string;
+  sourceId?: string;
+  fileName?: string;
+  sourceType: string;
+  totalRecords: number;
+  processedRecords: number;
+  rejectedRecords: number;
+  warningRecords: number;
+  status: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'PARTIALLY_COMPLETED' | 'FAILED';
+  uploadedBy?: string;
+  startedAt: string;
+  completedAt?: string;
+  errorMessage?: string;
+}
+
+export interface DataQualityMetrics {
+  totalReceived: number;
+  successfullyNormalized: number;
+  normalizationFailed: number;
+  invalidPayloads: number;
+  duplicateEvents: number;
+  unsupportedSources: number;
+  processingFailed: number;
+  activeSourcesCount: number;
+  connectedSourcesCount: number;
+}
+
 
 

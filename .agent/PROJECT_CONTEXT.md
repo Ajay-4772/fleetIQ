@@ -1,18 +1,20 @@
-# FleetIQ — Project Context
+# VEHYRON — Project Context
 
 ## 1. System Vision & Purpose
-**FleetIQ** is an enterprise-grade connected vehicle intelligence and decision-engineering platform. It ingests heterogenous, proprietary telemetry events from multiple automotive OEMs (Tesla, Ford, BMW, Toyota), normalizes them into a unified canonical event representation, applies automated diagnostics and cost impact models, and executes intelligent action prioritization via an AI decision engine backed by a deterministic rules-based fallback.
+**VEHYRON** (Connected Vehicle Intelligence Platform) is a production-grade multi-OEM vehicle telemetry, event normalization, operational intelligence, decision-engineering, and AI platform. It ingests heterogeneous, proprietary telemetry events from multiple automotive OEMs (Tesla, Ford, BMW, Toyota) and IoT gateways, normalizes them into a unified canonical event representation, applies automated diagnostics and cost impact models, and executes intelligent action prioritization via an AI decision engine backed by deterministic rules-based fallback.
 
-The platform provides fleet dispatchers, operations managers, and safety compliance officers with real-time operational visibility through Server-Sent Events (SSE), an executive analytics dashboard, and a strictly grounded AI copilot that synthesizes technical manuals with real-time vehicle database state.
+The platform provides fleet dispatchers, operations managers, and safety compliance officers with real-time operational visibility through Server-Sent Events (SSE), an executive analytics dashboard, an enterprise data ingestion gateway, and a strictly grounded AI copilot that synthesizes technical manuals with real-time vehicle database state.
 
 ---
 
 ## 2. Core Architectural Principles
-1. **Multi-OEM Ingestion Decoupling**: OEM-specific payloads vary drastically in terminology, sensor unit scales, and schema depth. OEM adapters normalize raw payloads into immutable `CanonicalVehicleEvent` entities before downstream processing.
-2. **AI with Deterministic Fallback**: Machine learning / LLM decisions operate behind the `DecisionService` abstraction. If the upstream AI service (`JevDecisionService`) times out, encounters errors, or reports low confidence (< 0.80), the system automatically routes to `RuleBasedDecisionService` without latency spikes or operational disruption.
-3. **Dual Database Tiering**: Developed with zero-friction local in-memory H2 (PostgreSQL dialect mode) for rapid test execution and standalone developer workflows, with full PostgreSQL production parity configured via Spring Profiles (`postgres`).
-4. **Grounded Operations AI (Hybrid RAG)**: The conversational copilot (`/api/fleet/query`) does not hallucinate or use ungrounded public knowledge; it queries local markdown documentation knowledge bases (`resources/knowledge/*.md`) alongside live JPA database entities.
-5. **Real-Time Push Architecture**: Operational updates are broadcast over HTTP SSE (`/api/v1/dashboard/stream`), eliminating heavy client-side polling while supporting deterministic event replay via the fleet simulator.
+1. **Multi-OEM Ingestion Gateway & Connectors**: Ingests live telemetry from Apache Kafka, MQTT/IoT, REST pollers, secure webhooks, GCP Pub/Sub, AWS Kinesis, Azure Event Hubs, and batch Excel/CSV datasets. Connectors normalize raw payloads into immutable `CanonicalVehicleEvent` entities.
+2. **Strict Dual-Role RBAC Model**: Exactly two platform roles: `ROLE_ADMIN` (governance, user lifecycle, connectors, upload, system health) and `ROLE_OPERATOR` (operational telemetry, asset registry, diagnostics, action queue, AI copilot).
+3. **Zero Synthetic / Demo Data Baseline**: Clean deployments operate with zero hardcoded vehicles; asset registries and health metrics dynamically hydrate strictly from verified incoming data streams.
+4. **AI with Deterministic Fallback**: Machine learning / LLM decisions operate behind the `DecisionService` abstraction. If upstream AI services encounter errors or report low confidence (< 0.80), the system automatically routes to `RuleBasedDecisionService` without latency spikes or operational disruption.
+5. **Dual Database Tiering**: Developed with zero-friction local in-memory H2 (PostgreSQL dialect mode) for rapid test execution, with full PostgreSQL production parity configured via Spring Profiles (`postgres`).
+6. **Grounded Operations AI (Hybrid RAG)**: The conversational copilot (`/api/fleet/query`) does not hallucinate; it queries local markdown documentation knowledge bases (`resources/knowledge/*.md`) alongside live JPA database entities.
+7. **Real-Time Push Architecture**: Operational updates are broadcast over HTTP SSE (`/api/v1/dashboard/stream`), eliminating heavy client-side polling while supporting deterministic event replay.
 
 ---
 

@@ -1,4 +1,4 @@
-# FleetIQ — Security Audit Logging & Compliance Specification
+# VEHYRON — Security Audit Logging & Compliance Specification
 
 **Document Version:** 2.0.0-PROD  
 **Specification:** Tamper-Evident Event Logging, Security Event Taxonomy, and Administrative Audit Trail  
@@ -8,7 +8,7 @@
 
 ## 1. Audit Logging Architecture
 
-FleetIQ maintains an immutable, append-only security audit log persisted in PostgreSQL (`user_audit_logs`) and mirrored to structured application log streams via SLF4J / Logback with OpenTelemetry MDC correlation (`traceId`, `spanId`).
+VEHYRON maintains an immutable, append-only security audit log persisted in PostgreSQL (`user_audit_logs`) and mirrored to structured application log streams via SLF4J / Logback with OpenTelemetry MDC correlation (`traceId`, `spanId`).
 
 ```
 +-----------------------------------------------------------------------------------+
@@ -77,4 +77,4 @@ Authorization: Bearer <AdminJWT>
 - Endpoint requires `@PreAuthorize("hasRole('ADMIN')")`.
 - Non-admin callers (such as `ROLE_OPERATOR` or `ROLE_VIEWER`) receive `HTTP 403 Forbidden`.
 - Returns paginated audit events ordered chronologically descending (`timestamp DESC`).
-- Surfaced in the FleetIQ Enterprise User Directory UI in the dedicated **Security Audit Trail** tab.
+- Surfaced in the VEHYRON Enterprise User Directory UI in the dedicated **Security Audit Trail** tab.

@@ -1,4 +1,4 @@
-# FleetIQ — Requirement Traceability Matrix
+# VEHYRON — Requirement Traceability Matrix
 
 **Version**: 2.0.0-PROD  
 **Status**: COMPLETE VERIFICATION (All Milestones Verified)  
@@ -56,7 +56,7 @@
 | **FQ-036** | Security | Public self-registration defaulting strictly to `ROLE_VIEWER` | P0 | **VERIFIED** | `AuthService.java`, `RegisterRequest.java` | `docs/security/ACCOUNT_LIFECYCLE.md`| `testRegisterSuccess()` passed |
 | **FQ-037** | Security | Comprehensive security audit trail (`user_audit_logs`) | P0 | **VERIFIED** | `UserAuditLog.java`, `UserAuditLogRepository.java`| `docs/security/AUDIT_LOGGING.md` | `testSecurityAuditLogging()` passed |
 | **FQ-038** | Security | Full RBAC permissions matrix & prohibited actions | P0 | **VERIFIED** | `SecurityConfig.java`, Controller `@PreAuthorize`| `docs/security/RBAC_MATRIX.md` | `testViewerForbiddenFromAdminApi()` passed |
-| **FQ-039** | Frontend | Original FleetIQ Enterprise Authentication UI | P0 | **VERIFIED** | `frontend/src/components/auth/LoginPage.tsx` | `.agent/AUTHENTICATION_AUDIT.md` | Vite build & DevTools screenshots verified |
+| **FQ-039** | Frontend | Original VEHYRON Enterprise Authentication UI | P0 | **VERIFIED** | `frontend/src/components/auth/LoginPage.tsx` | `.agent/AUTHENTICATION_AUDIT.md` | Vite build & DevTools screenshots verified |
 | **FQ-040** | Frontend | Remove internal security marketing claims from login UI | P0 | **VERIFIED** | `LoginPage.tsx` | `.agent/AUTHENTICATION_AUDIT.md` | Verified zero marketing labels on UI |
 | **FQ-041** | Frontend | Remove Quick Dev Credentials chips from production UI | P0 | **VERIFIED** | `LoginPage.tsx` | `.agent/AUTHENTICATION_AUDIT.md` | Verified absence of dev chips |
 | **FQ-042** | Frontend | Centralized Auth State Machine (`AuthContext.tsx`) | P0 | **VERIFIED** | `context/AuthContext.tsx`, `services/api.ts` | `docs/security/AUTHENTICATION.md` | State transitions verified in browser |

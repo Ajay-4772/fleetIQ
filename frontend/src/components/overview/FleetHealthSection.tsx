@@ -6,7 +6,8 @@ import {
   Gauge,
   Clock,
   ArrowDownRight,
-  TrendingUp
+  TrendingUp,
+  ShieldCheck
 } from 'lucide-react';
 import { FleetHealth } from '../../types';
 
@@ -52,6 +53,27 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health, 
   if (!health) {
     return (
       <div className="h-96 rounded-2xl bg-white border border-slate-100 p-6 shadow-card animate-pulse" />
+    );
+  }
+
+  const isHealthEmpty = (health.healthyPercentage === 0 || health.healthyPercentage === undefined) &&
+    (health.atRiskPercentage === 0 || health.atRiskPercentage === undefined) &&
+    (health.criticalPercentage === 0 || health.criticalPercentage === undefined) &&
+    health.maintenanceDueCount === 0 && health.engineFaultCount === 0;
+
+  if (isHealthEmpty) {
+    return (
+      <div className="bg-white border border-slate-100 rounded-2xl p-10 shadow-card text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center mx-auto">
+          <ShieldCheck className="w-6 h-6" />
+        </div>
+        <div className="space-y-1.5 max-w-md mx-auto">
+          <h3 className="text-base font-bold text-slate-900 tracking-tight">Fleet Operational Health</h3>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            No vehicle telemetry records have been ingested yet. Connect an external data source (Kafka, MQTT, REST, Webhook) or upload an Excel/CSV dataset to compute live health intelligence.
+          </p>
+        </div>
+      </div>
     );
   }
 

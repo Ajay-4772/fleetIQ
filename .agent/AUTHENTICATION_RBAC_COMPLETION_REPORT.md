@@ -1,4 +1,4 @@
-# FleetIQ — Complete Authentication, Authorization, RBAC & Login/Signup UX Rebuild Completion Report
+# VEHYRON — Complete Authentication, Authorization, RBAC & Login/Signup UX Rebuild Completion Report
 
 **Milestone:** Enterprise Authentication, Authorization, RBAC & Login/Signup UX Rebuild  
 **Status:** COMPLETE & VERIFIED  
@@ -9,13 +9,13 @@
 
 ## 1. Executive Summary
 
-FleetIQ has undergone a complete, end-to-end rebuild of its identity verification, session management, role-based access control (RBAC), and authentication user experience. The previous copied two-card UI template, mock credentials, and client-side authorization shortcuts have been completely eliminated. 
+VEHYRON has undergone a complete, end-to-end rebuild of its identity verification, session management, role-based access control (RBAC), and authentication user experience. The previous copied two-card UI template, mock credentials, and client-side authorization shortcuts have been completely eliminated. 
 
 The application now runs on an authentic, enterprise-grade architecture featuring:
 1. **Dual-Token Session Architecture:** 15-minute stateless HMAC-SHA256 JWT access tokens paired with stateful, rotatable 7-day UUID refresh tokens in PostgreSQL.
 2. **Real-Time Zero-Trust Authorization (0-Second Propagation):** Per-request database entity resolution in `JwtAuthenticationFilter`, ensuring role changes and account deactivations take effect instantaneously on the target user's very next HTTP request.
 3. **Enterprise Credential Security:** BCrypt cost factor 12, strict password policy validation (`PasswordPolicyValidator`), 15-minute brute-force lockout on 5 consecutive failures, and single-use 1-hour expiring password reset tokens.
-4. **Original Enterprise UI/UX:** A bespoke FleetIQ authentication interface matching the operations dashboard identity, with dedicated flows for Sign In, Request Access (Self-Registration), Forgot Password, and Reset Password.
+4. **Original Enterprise UI/UX:** A bespoke VEHYRON authentication interface matching the operations dashboard identity, with dedicated flows for Sign In, Request Access (Self-Registration), Forgot Password, and Reset Password.
 5. **Rigorous Verification:** 100% test pass rate across the entire platform (**73/73 tests passing**, including 13 dedicated security lifecycle tests).
 
 ---
@@ -89,7 +89,7 @@ Metadata recorded includes `actor_username`, `action`, `details`, `ip_address`, 
 ## 6. Frontend Redesign & User Experience
 
 The authentication experience was completely rebuilt in [`frontend/src/components/auth/LoginPage.tsx`](file:///c:/Users/ajaya/Desktop/fleetiq/frontend/src/components/auth/LoginPage.tsx):
-- **Bespoke Design:** Single-card, high-contrast, restrained layout matching FleetIQ's enterprise operational aesthetic.
+- **Bespoke Design:** Single-card, high-contrast, restrained layout matching VEHYRON's enterprise operational aesthetic.
 - **No Cloned Elements:** Zero decorative waves, no floating SVG blobs, no oversized tablet container borders.
 - **No Implementation Claims:** Purged all "TLS 1.3 / JWT RBAC" decorative text.
 - **No Dev Credentials in Prod:** Quick dev buttons removed from the production interface.
@@ -180,7 +180,7 @@ Screenshots captured using Chrome DevTools MCP and stored in `outputs/`:
 | `backend/src/main/java/com/fleetiq/service/auth/AuthService.java` | Complete authentication & token lifecycle service |
 | `backend/src/main/java/com/fleetiq/controller/AuthController.java` | REST endpoints for login, register, refresh, reset, logout |
 | `backend/src/test/java/com/fleetiq/AuthenticationAndSessionTests.java` | 13 comprehensive backend security integration tests |
-| `frontend/src/components/auth/LoginPage.tsx` | Completely redesigned original FleetIQ authentication UI |
+| `frontend/src/components/auth/LoginPage.tsx` | Completely redesigned original VEHYRON authentication UI |
 | `frontend/src/context/AuthContext.tsx` | Centralized authentication state machine |
 | `frontend/src/services/api.ts` | Dual-token HTTP client with auto-refresh interceptors |
 | `docs/security/AUTHENTICATION.md` | Enterprise authentication & identity architecture specification |
@@ -199,4 +199,4 @@ Screenshots captured using Chrome DevTools MCP and stored in `outputs/`:
 
 ## 10. Conclusion & Production Readiness Declaration
 
-FleetIQ's authentication and authorization tier has transitioned from a development prototype with a copied UI to a production-grade enterprise security architecture. All requirements have been implemented defensively, rigorously tested, visually confirmed, and documented.
+VEHYRON's authentication and authorization tier has transitioned from a development prototype with a copied UI to a production-grade enterprise security architecture. All requirements have been implemented defensively, rigorously tested, visually confirmed, and documented.

@@ -1,7 +1,7 @@
 # FLEETIQ — PROJECT RULES & DIRECTIVES
 
 ## 1. Project Identity & Licensing
-- FleetIQ is an independent, license-safe fleet intelligence platform inspired by modern connected-vehicle architecture.
+- VEHYRON is an independent, license-safe fleet intelligence platform inspired by modern connected-vehicle architecture.
 - ZERO PROPRIETARY DATA: Never use proprietary Motorq data, internal APIs, credentials, or private information.
 - ZERO REAL CUSTOMER/VIN DATA: All vehicle IDs, VINs, registrations, and telemetry are strictly synthetic or derived from verified public sources.
 - No fabricated data claims: Label simulated data as "Simulated multi-OEM telemetry inspired by common connected-vehicle signal patterns."
@@ -9,7 +9,7 @@
 ## 2. Architecture & Source of Truth
 - Backend is the absolute source of truth.
 - Business logic (normalization, priority calculations, severity, issue detection, impact estimation, AI decisioning) resides strictly in the backend.
-- Frontend (React + TypeScript) is a consumer of FleetIQ intelligence via REST APIs and Server-Sent Events (SSE).
+- Frontend (React + TypeScript) is a consumer of VEHYRON intelligence via REST APIs and Server-Sent Events (SSE).
 - Frontend must never invent business calculations or display mock numbers that contradict PostgreSQL.
 
 ## 3. Real-Time Event Architecture

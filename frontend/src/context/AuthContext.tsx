@@ -18,7 +18,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (username: string, password: string) => Promise<LoginResponse>;
+  login: (username: string, password: string, requestedRole?: string) => Promise<LoginResponse>;
   register: (payload: RegisterRequest) => Promise<AuthTokensResponse>;
   forgotPassword: (email: string) => Promise<{ message: string; status: string }>;
   resetPassword: (payload: ResetPasswordRequest) => Promise<{ message: string; status: string }>;
@@ -30,23 +30,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Role to permissions mapping matrix
+// Role to permissions mapping matrix - Strictly 2 Application Roles: ADMIN and OPERATOR
 const ROLE_PERMISSIONS: Record<string, string[]> = {
   ROLE_ADMIN: [
     'USER_READ', 'USER_CREATE', 'USER_STATUS_UPDATE', 'ROLE_ASSIGN', 'AUDIT_READ',
     'SYSTEM_HEALTH_READ', 'VEHICLE_READ', 'VEHICLE_EXPORT', 'ACTION_READ', 'ACTION_UPDATE',
-    'ACTION_EXPORT', 'TELEMETRY_STREAM_READ', 'TELEMETRY_INGEST', 'COPILOT_USE', 'SIMULATOR_EXECUTE'
-  ],
-  ROLE_OPERATIONS_LEAD: [
-    'SYSTEM_HEALTH_READ', 'VEHICLE_READ', 'VEHICLE_EXPORT', 'ACTION_READ', 'ACTION_UPDATE',
-    'ACTION_EXPORT', 'TELEMETRY_STREAM_READ', 'TELEMETRY_INGEST', 'COPILOT_USE', 'SIMULATOR_EXECUTE'
+    'ACTION_EXPORT', 'TELEMETRY_STREAM_READ', 'TELEMETRY_INGEST', 'DATA_SOURCE_MANAGE',
+    'INGESTION_CONFIG', 'INGESTION_UPLOAD', 'INGESTION_RETRY', 'COPILOT_USE', 'SIMULATOR_EXECUTE'
   ],
   ROLE_OPERATOR: [
     'SYSTEM_HEALTH_READ', 'VEHICLE_READ', 'VEHICLE_EXPORT', 'ACTION_READ', 'ACTION_UPDATE',
-    'ACTION_EXPORT', 'TELEMETRY_STREAM_READ', 'COPILOT_USE'
-  ],
-  ROLE_VIEWER: [
-    'SYSTEM_HEALTH_READ', 'VEHICLE_READ', 'VEHICLE_EXPORT', 'ACTION_READ',
     'ACTION_EXPORT', 'TELEMETRY_STREAM_READ', 'COPILOT_USE'
   ]
 };
@@ -77,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError('Account is temporarily locked due to repeated failed login attempts. Please retry later or contact your administrator.');
     } else if (msg.includes('403') || msg.includes('disabled') || msg.includes('deactivated')) {
       setStatus('ACCOUNT_DISABLED');
-      setError('Account has been deactivated. Please contact your FleetIQ Administrator.');
+      setError('Account has been deactivated. Please contact your VEHYRON Administrator.');
     } else if (msg.includes('401') || msg.includes('BAD_CREDENTIALS') || msg.includes('credentials')) {
       setStatus('ERROR');
       setError('Invalid username or password. Please verify your corporate credentials.');
@@ -123,11 +116,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [token, logout]);
 
-  const login = async (username: string, password: string): Promise<LoginResponse> => {
+  const login = async (username: string, password: string, requestedRole?: string): Promise<LoginResponse> => {
     setStatus('AUTHENTICATING');
     setError(null);
     try {
-      const res = await api.login(username, password);
+      const res = await api.login(username, password, requestedRole);
       setTokenState(res.token);
       setUser({
         username: res.username,

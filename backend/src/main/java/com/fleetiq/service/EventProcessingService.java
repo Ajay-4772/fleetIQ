@@ -132,27 +132,61 @@ public class EventProcessingService {
         decisionRepository.save(decision);
         rawRecordRepository.save(new RawIngestionRecord(source, rawJson, "SUCCESS", null));
 
-        // 5. Update Vehicle Telemetry Snapshot
+        // 5. Update Vehicle Telemetry Snapshot & Auto-Register new Fleet Assets
         Optional<Vehicle> vOpt = vehicleRepository.findById(event.getVehicleId());
-        String make = "Unknown";
-        if (vOpt.isPresent()) {
-            Vehicle v = vOpt.get();
-            make = v.getMake();
-            if (event.getOilLifePct() != null) v.setOilLifePct(event.getOilLifePct().doubleValue());
-            if (event.getBatteryHealthPct() != null) v.setBatteryHealthPct(event.getBatteryHealthPct().doubleValue());
-            if (event.getTirePressurePsi() != null) v.setTirePressurePsi(event.getTirePressurePsi().doubleValue());
-            if (event.getOdometerKm() != null) {
-                long currentMileage = v.getMileageKm() != null ? v.getMileageKm().longValue() : 0L;
-                if (event.getOdometerKm().longValue() > currentMileage) {
-                    v.setMileageKm(event.getOdometerKm().longValue());
-                }
+        Vehicle v = vOpt.orElseGet(() -> {
+            Vehicle newV = new Vehicle();
+            newV.setId(event.getVehicleId());
+            String inferredVin = "VIN-" + event.getVehicleId();
+            if (event.getRawPayload() != null && event.getRawPayload().contains("\"vin\"")) {
+                try {
+                    com.fasterxml.jackson.databind.JsonNode n = objectMapper.readTree(event.getRawPayload());
+                    if (n.hasNonNull("vin")) inferredVin = n.get("vin").asText();
+                } catch (Exception ignored) {}
             }
-            if ("CRITICAL".equalsIgnoreCase(event.getSeverity())) {
-                v.setStatus("MAINTENANCE");
+            newV.setVin(inferredVin);
+            newV.setRegistrationNumber("REG-" + event.getVehicleId());
+
+            String inferredMake = "Connected Vehicle";
+            if (event.getRawPayload() != null) {
+                try {
+                    com.fasterxml.jackson.databind.JsonNode n = objectMapper.readTree(event.getRawPayload());
+                    if (n.hasNonNull("oem")) inferredMake = n.get("oem").asText();
+                    else if (n.hasNonNull("make")) inferredMake = n.get("make").asText();
+                } catch (Exception ignored) {}
             }
-            v.setUpdatedAt(Instant.now());
-            vehicleRepository.save(v);
+            if ("Connected Vehicle".equals(inferredMake) && event.getSource() != null) {
+                inferredMake = event.getSource().replace("SIMULATED_", "").replace("_IMPORT", "").replace("WEBHOOK_", "");
+            }
+            newV.setMake(inferredMake);
+            newV.setModel("Fleet Vehicle");
+            newV.setYear(2024);
+            newV.setFuelType("Multi-OEM");
+            newV.setVehicleType("Fleet Unit");
+            newV.setStatus("ACTIVE");
+            newV.setBatteryHealthPct(event.getBatteryHealthPct() != null ? event.getBatteryHealthPct().doubleValue() : 95.0);
+            newV.setOilLifePct(event.getOilLifePct() != null ? event.getOilLifePct().doubleValue() : 80.0);
+            newV.setTirePressurePsi(event.getTirePressurePsi() != null ? event.getTirePressurePsi().doubleValue() : 33.0);
+            newV.setMileageKm(event.getOdometerKm() != null ? event.getOdometerKm().longValue() : 0L);
+            newV.setCreatedAt(Instant.now());
+            return newV;
+        });
+
+        String make = v.getMake() != null ? v.getMake() : "Multi-OEM";
+        if (event.getOilLifePct() != null) v.setOilLifePct(event.getOilLifePct().doubleValue());
+        if (event.getBatteryHealthPct() != null) v.setBatteryHealthPct(event.getBatteryHealthPct().doubleValue());
+        if (event.getTirePressurePsi() != null) v.setTirePressurePsi(event.getTirePressurePsi().doubleValue());
+        if (event.getOdometerKm() != null) {
+            long currentMileage = v.getMileageKm() != null ? v.getMileageKm().longValue() : 0L;
+            if (event.getOdometerKm().longValue() > currentMileage) {
+                v.setMileageKm(event.getOdometerKm().longValue());
+            }
         }
+        if ("CRITICAL".equalsIgnoreCase(event.getSeverity())) {
+            v.setStatus("MAINTENANCE");
+        }
+        v.setUpdatedAt(Instant.now());
+        vehicleRepository.save(v);
 
         // 6. Create Action Item if actionable
         ActionItem action = actionService.createActionFromDecision(decision, event.getSeverity());

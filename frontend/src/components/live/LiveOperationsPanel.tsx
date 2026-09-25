@@ -139,10 +139,21 @@ export const LiveOperationsPanel: React.FC<LiveOperationsPanelProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-sans">
-            {filteredEvents.length === 0 ? (
+            {events.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="py-16 text-center">
+                  <div className="max-w-md mx-auto space-y-2">
+                    <p className="text-sm font-bold text-slate-700">Waiting for incoming telemetry...</p>
+                    <p className="text-xs text-slate-400">
+                      Live event stream is active and awaiting external vehicle signals from IoT connectors, webhooks, or uploaded datasets.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : filteredEvents.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-12 text-center text-slate-400 font-sans text-xs">
-                  {isLoading ? 'Hydrating real-time telemetry stream...' : 'No live telemetry events currently match selected filters.'}
+                  No live telemetry events match selected filters.
                 </td>
               </tr>
             ) : (

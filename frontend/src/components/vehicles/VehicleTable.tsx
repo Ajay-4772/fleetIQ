@@ -125,6 +125,17 @@ export const VehicleTable: React.FC = () => {
                   Loading fleet asset registry...
                 </td>
               </tr>
+            ) : vehicles.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="py-16 text-center">
+                  <div className="max-w-md mx-auto space-y-2">
+                    <p className="text-sm font-bold text-slate-700">No vehicles have been ingested yet.</p>
+                    <p className="text-xs text-slate-400">
+                      Connect a real-time IoT / OEM data source or upload an Excel/CSV dataset to populate the asset registry.
+                    </p>
+                  </div>
+                </td>
+              </tr>
             ) : filtered.length === 0 ? (
               <tr>
                 <td colSpan={9} className="py-12 text-center text-slate-400 font-sans text-xs">

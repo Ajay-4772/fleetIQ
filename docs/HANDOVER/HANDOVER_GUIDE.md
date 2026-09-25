@@ -1,4 +1,4 @@
-# FleetIQ — Master Engineering Handover Guide
+# VEHYRON — Master Engineering Handover Guide
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Complete Software Product Handover  
@@ -8,10 +8,10 @@
 
 ## 1. Executive Handover Statement
 
-This guide formally transfers ownership of **FleetIQ** — a multi-OEM telematics ingestion, automated priority decisioning, and grounded intelligence copilot platform.
+This guide formally transfers ownership of **VEHYRON** — a multi-OEM telematics ingestion, automated priority decisioning, and grounded intelligence copilot platform.
 
 ### Core Handover Tenet: IDE Independence
-FleetIQ does **not** depend on Antigravity or any proprietary AI coding tool. The entire product is contained in this repository:
+VEHYRON does **not** depend on Antigravity or any proprietary AI coding tool. The entire product is contained in this repository:
 - **Source Code:** Standard Java 17 / Spring Boot backend and React / TypeScript / Vite frontend.
 - **Reproducible Environments:** Provided via `.devcontainer/` (Docker-in-Docker, Java 17, Node 20) and `docker-compose.yml`.
 - **Database Migrations:** Managed exclusively through version-controlled Flyway scripts (`backend/src/main/resources/db/migration/`).
@@ -49,7 +49,7 @@ Any engineer equipped with VS Code, IntelliJ IDEA, or GitHub Codespaces can clon
 
 1. **Clone Repository:**
    ```bash
-   git clone https://github.com/[COMPANY_ORG]/fleetiq.git
+   git clone https://github.com/[COMPANY_ORG]/vehyron.git
    cd fleetiq
    ```
 2. **Launch Dependent Database:**

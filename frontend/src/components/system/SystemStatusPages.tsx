@@ -53,7 +53,7 @@ export const AccessDeniedPage: React.FC<ErrorViewProps & { is401?: boolean }> = 
           <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
             {is401
               ? 'Your active session has expired or requires valid enterprise credentials to proceed.'
-              : 'Your assigned security role lacks authorization for this administrative domain. Contact your FleetIQ Administrator.'}
+              : 'Your assigned security role lacks authorization for this administrative domain. Contact your VEHYRON Administrator.'}
           </p>
         </div>
         <button
@@ -121,7 +121,7 @@ export const MaintenancePage: React.FC<ErrorViewProps> = ({ onRetry }) => {
           <span className="text-[11px] font-bold uppercase tracking-wider text-amber-500 font-mono">Status 503</span>
           <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">System Under Maintenance</h2>
           <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
-            FleetIQ telematics database migrations and infrastructure upgrades are currently in progress. Multi-OEM ingestion streams will resume shortly.
+            VEHYRON telematics database migrations and infrastructure upgrades are currently in progress. Multi-OEM ingestion streams will resume shortly.
           </p>
         </div>
         {onRetry && (

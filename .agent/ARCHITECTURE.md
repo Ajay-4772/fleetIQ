@@ -1,39 +1,45 @@
-# FleetIQ — Architecture Knowledge Base
+# VEHYRON — Architecture Knowledge Base
 
 **Verification Date**: September 25, 2026  
-**Status**: Verified against active codebase and AST graph (7,774+ nodes, 15,735+ edges).
+**Status**: Verified against active codebase and AST graph (7,850+ nodes, 15,900+ edges).
 
 ---
 
 ## 1. System Overview
-FleetIQ is a high-reliability connected vehicle intelligence and decision-engineering platform. It ingests multi-OEM telemetry (Tesla, Ford, BMW, Toyota), normalizes disparate schemas into a canonical domain model, detects faults, computes business/safety impact, evaluates automated action recommendations through an AI decision engine with deterministic rules fallback, enforces enterprise RBAC with real-time zero-trust authorization, and streams updates to an operations UI via Server-Sent Events (SSE).
+**VEHYRON** is a high-reliability connected vehicle intelligence and decision-engineering platform. It ingests multi-OEM telemetry from external message brokers (Kafka, MQTT), webhooks, cloud streams (GCP Pub/Sub, AWS Kinesis, Azure Event Hubs), REST pollers, and batch Excel/CSV datasets, normalizes disparate schemas into a canonical domain model, detects faults, computes business/safety impact, evaluates automated action recommendations through an AI decision engine with deterministic rules fallback, enforces enterprise RBAC with real-time zero-trust authorization, and streams updates to an operations UI via Server-Sent Events (SSE).
 
 ```
-[OEM Telemetry / Simulator] 
-           │
-           ▼
-[Normalization Layer (OemAdapter)] ───► [CanonicalVehicleEvent]
-                                                 │
-                                                 ▼
-[Detection & Impact Services] ────────► [DecisionService Abstraction]
-                                                 │
-                                     ┌───────────┴───────────┐
-                                     ▼                       ▼
-                           [JevDecisionService]   [RuleBasedDecisionService]
-                           (AI Cloud API)         (Deterministic Fallback)
-                                     │                       │
-                                     └───────────┬───────────┘
-                                                 │
-                                                 ▼
-                                           [ActionItem]
-                                                 │
-                                                 ├────────► [PostgreSQL / H2]
-                                                 │
-                                                 ▼
-                                     [SSE Broadcasting Service]
-                                                 │
-                                                 ▼
-                                      [React Operations UI]
+[IoT Brokers / OEM APIs / Webhooks / Batch Uploads]
+                         │
+                         ▼
+        [VEHYRON Ingestion Gateway Connectors]
+                         │
+                         ▼
+             [Raw Payload Preservation]
+                         │
+                         ▼
+       [Canonical Normalization (OemAdapter)] ───► [CanonicalVehicleEvent]
+                                                             │
+                                                             ▼
+       [Detection & Impact Services] ────────────► [DecisionService Abstraction]
+                                                             │
+                                                 ┌───────────┴───────────┐
+                                                 ▼                       ▼
+                                       [JevDecisionService]   [RuleBasedDecisionService]
+                                       (AI Cloud API)         (Deterministic Fallback)
+                                                 │                       │
+                                                 └───────────┬───────────┘
+                                                             │
+                                                             ▼
+                                                       [ActionItem]
+                                                             │
+                                                             ├────────► [PostgreSQL / H2]
+                                                             │
+                                                             ▼
+                                                 [SSE Broadcasting Service]
+                                                             │
+                                                             ▼
+                                             [VEHYRON Operations Dashboard]
 ```
 
 ---
@@ -42,12 +48,13 @@ FleetIQ is a high-reliability connected vehicle intelligence and decision-engine
 - `backend/`: Spring Boot 3.3.2 application managing ingestion, normalization, business rules, AI abstraction, database persistence, security, and SSE streaming.
   - `src/main/java/com/fleetiq/`:
     - `config/`: Spring security configuration, Jackson object mappers, Actuator configuration.
-    - `controller/`: REST endpoints for authentication (`AuthController`), admin user management (`AdminUserController`), actions, dashboard metrics, exports, fleet queries, and simulator.
-    - `dto/`: Data transfer objects for auth requests/responses (`RegisterRequest`, `ForgotPasswordRequest`, `ResetPasswordRequest`, `RefreshTokenRequest`, `AuthTokensResponse`), metrics, and fleet data.
-    - `model/`: JPA entities (`Vehicle`, `CanonicalVehicleEvent`, `ActionItem`, `Decision`, `User`, `Role`, `RefreshToken`, `PasswordResetToken`, `UserAuditLog`, `ChatConversation`, `ChatMessage`, `RawIngestionRecord`).
+    - `controller/`: REST endpoints for authentication (`AuthController`), admin user management (`AdminUserController`), ingestion (`IngestionController`), actions, dashboard metrics, exports, fleet queries, and simulator.
+    - `dto/`: Data transfer objects for auth, ingestion requests/responses, metrics, and fleet data.
+    - `model/`: JPA entities (`Vehicle`, `CanonicalVehicleEvent`, `ActionItem`, `Decision`, `User`, `Role`, `DataSource`, `IngestionJob`, `RawIngestionRecord`, `RefreshToken`, `PasswordResetToken`, `UserAuditLog`, `ChatConversation`, `ChatMessage`).
     - `repository/`: Spring Data JPA repositories with custom derived and JPQL queries.
-    - `security/`: `JwtAuthenticationFilter` (per-request DB validation for 0-second role updates), `JwtTokenProvider`, `RateLimitingFilter`, `PasswordPolicyValidator`, `ApiKeyAuthenticationFilter`.
+    - `security/`: `JwtAuthenticationFilter`, `JwtTokenProvider`, `RateLimitingFilter`, `PasswordPolicyValidator`, `ApiKeyAuthenticationFilter`.
     - `service/`:
+      - `ingestion/`: `DataSourceConnector`, `ConnectorRegistry`, `ExcelCsvIngestionService`, implementations for Kafka, MQTT, REST, Webhooks, Pub/Sub, Kinesis, Event Hubs.
       - `auth/`: `AuthService` (dual-token lifecycle, lockout tracking, token rotation, single-use reset tokens).
       - `action/`: Priority action creation, score calculation, and status progression.
       - `assistant/`: Grounded fleet copilot query processor.
@@ -55,7 +62,7 @@ FleetIQ is a high-reliability connected vehicle intelligence and decision-engine
       - `decision/`: AI decision abstraction and fallback implementations.
       - `detection/`: Anomaly and diagnostic fault code evaluator.
       - `impact/`: Maintenance cost, downtime, and safety risk quantification.
-      - `normalization/`: Multi-OEM adapters translating raw payloads to canonical events.
+      - `normalization/`: Multi-OEM adapters (`ToyotaAdapter`, `BmwAdapter`, `FordAdapter`, `TeslaEvAdapter`, `CanonicalVehyronAdapter`).
       - `query/`: Natural language intent routing and fleet status queries.
       - `rag/`: Hybrid document + live database retrieval service.
       - `simulator/`: Deterministic synthetic event generator.

@@ -15,6 +15,7 @@ import { SystemHealthPanel } from './components/system/SystemHealthPanel';
 import { SimulatorModal } from './components/simulator/SimulatorModal';
 import { CopilotWorkspace } from './components/copilot/CopilotWorkspace';
 import { UserManagementPanel } from './components/admin/UserManagementPanel';
+import { DataIngestionCenter } from './components/admin/DataIngestionCenter';
 import { LoginPage } from './components/auth/LoginPage';
 import { SafetyDetailsModal } from './components/overview/SafetyDetailsModal';
 import { LegalModal } from './components/system/LegalModal';
@@ -24,7 +25,7 @@ import { useDashboardData } from './hooks/useDashboardData';
 import { useSSE } from './hooks/useSSE';
 import { api } from './services/api';
 
-const FleetIQDashboard: React.FC = () => {
+const VehyronDashboard: React.FC = () => {
   const { isAuthenticated, isLoading: isAuthLoading, hasRole } = useAuth();
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
@@ -268,7 +269,7 @@ const FleetIQDashboard: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">FleetIQ Intelligence Copilot</h1>
+                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">VEHYRON Intelligence Copilot</h1>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
                     Full-page conversational interface with persistent chat history, deterministic safety guardrails, and RAG OEM citations
                   </p>
@@ -306,6 +307,15 @@ const FleetIQDashboard: React.FC = () => {
             )
           )}
 
+          {/* 8. DATA INGESTION TAB (ADMIN ONLY) */}
+          {activeTab === 'ingestion' && (
+            isAdmin ? (
+              <DataIngestionCenter />
+            ) : (
+              <AccessDeniedPage onReturnHome={() => setActiveTab('overview')} />
+            )
+          )}
+
           {/* 8. SYSTEM HEALTH TAB */}
           {activeTab === 'system' && (
             <div className="space-y-6">
@@ -328,7 +338,7 @@ const FleetIQDashboard: React.FC = () => {
           )}
 
           {(activeTab as string) === '500' && (
-            <ServerErrorPage onReturnHome={() => setActiveTab('overview')} onRetry={refreshData} requestId="CORR-FLIQ-883921" />
+            <ServerErrorPage onReturnHome={() => setActiveTab('overview')} onRetry={refreshData} requestId="CORR-VEHY-883921" />
           )}
 
           {(activeTab as string) === '503' && (
@@ -338,7 +348,7 @@ const FleetIQDashboard: React.FC = () => {
           {/* Global Footer with Compliance & Documentation Links */}
           <footer className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
             <div>
-              <span>FleetIQ Enterprise Telematics Platform • API v1.0.0</span>
+              <span>VEHYRON Connected Vehicle Intelligence Platform • API v1.0.0</span>
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -407,7 +417,7 @@ const FleetIQDashboard: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <FleetIQDashboard />
+      <VehyronDashboard />
     </AuthProvider>
   );
 };

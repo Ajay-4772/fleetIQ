@@ -1,6 +1,6 @@
-# FleetIQ AI Engineering Environment — Setup & Governance Report
+# VEHYRON AI Engineering Environment — Setup & Governance Report
 
-**Project**: FleetIQ Connected Vehicle Intelligence Platform  
+**Project**: VEHYRON Connected Vehicle Intelligence Platform  
 **Setup Date**: September 25, 2026  
 **Environment Status**: Complete & Fully Verified
 

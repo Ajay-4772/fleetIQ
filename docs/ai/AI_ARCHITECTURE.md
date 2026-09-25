@@ -1,4 +1,4 @@
-# FleetIQ — AI Architecture, Model Abstraction & Decision Safety
+# VEHYRON — AI Architecture, Model Abstraction & Decision Safety
 
 **Document Version:** 1.0.0-PROD  
 **Specification:** Hybrid Decision Engine, Provider Abstraction, and Factual Model Audit
@@ -7,7 +7,7 @@
 
 ## 1. Executive Summary & Core Principle
 
-FleetIQ enforces a **Hybrid Telematics Decision Architecture**. Under no circumstances is an AI Large Language Model permitted to operate as an unchecked or sole source of truth for safety-critical vehicle dispatch, braking alarms, or battery thermal interventions.
+VEHYRON enforces a **Hybrid Telematics Decision Architecture**. Under no circumstances is an AI Large Language Model permitted to operate as an unchecked or sole source of truth for safety-critical vehicle dispatch, braking alarms, or battery thermal interventions.
 
 ### Authoritative Processing Pipeline
 ```
@@ -42,7 +42,7 @@ FleetIQ enforces a **Hybrid Telematics Decision Architecture**. Under no circums
 
 ## 2. Factual Audit: JEV & TypeSpace Reality
 
-In adherence with strict anti-fabrication standards, the FleetIQ codebase has been audited line-by-line:
+In adherence with strict anti-fabrication standards, the VEHYRON codebase has been audited line-by-line:
 
 | Provider / Claim | Audit Findings & Code Evidence | Runtime Status |
 | :--- | :--- | :--- |

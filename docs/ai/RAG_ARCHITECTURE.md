@@ -1,13 +1,13 @@
-# FleetIQ — Retrieval-Augmented Generation (RAG) Architecture
+# VEHYRON — Retrieval-Augmented Generation (RAG) Architecture
 
 **Document Version:** 1.0.0-PROD  
 **Specification:** Grounded OEM Knowledge Ingestion, Indexing, and Context Synthesis
 
 ---
 
-## 1. The True Purpose of RAG in FleetIQ
+## 1. The True Purpose of RAG in VEHYRON
 
-Retrieval-Augmented Generation in FleetIQ exists to eliminate hallucinations when operators query diagnostic trouble codes, vehicle maintenance policies, or OEM telematics specs.
+Retrieval-Augmented Generation in VEHYRON exists to eliminate hallucinations when operators query diagnostic trouble codes, vehicle maintenance policies, or OEM telematics specs.
 
 RAG is **not an AI model**; it is an authoritative retrieval pipeline that fetches curated engineering documentation and injects it into the reasoning context before an answer is formulated.
 
@@ -61,7 +61,7 @@ Every grounded response returned by the backend includes an immutable `citations
   "ruleTag": "SAFETY_RULE_CRITICAL_BATTERY",
   "citations": [
     "Toyota Telematics Diagnostic Spec v2.1 (Section 4.3 - High Voltage Systems)",
-    "FleetIQ Authoritative DTC Registry (P0A80 - Replace Hybrid Battery Pack)"
+    "VEHYRON Authoritative DTC Registry (P0A80 - Replace Hybrid Battery Pack)"
   ]
 }
 ```

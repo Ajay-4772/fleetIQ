@@ -1,4 +1,4 @@
-# FleetIQ — Engineering Session Log
+# VEHYRON — Engineering Session Log
 
 ## Session 1: AI Engineering Environment & Governance Setup
 **Timestamp**: September 25, 2026  
@@ -22,7 +22,7 @@
    - Installed `codebase-memory-mcp.exe` (v0.11.0) into user local application programs directory.
    - Added binary to User PATH.
    - Configured project-local Antigravity MCP configuration at `.gemini/config/mcp_config.json`.
-   - Indexed entire FleetIQ codebase: 7,774 nodes, 15,735 edges across 84 Java and 26 TypeScript files. Persistent graph saved at `.codebase-memory/graph.db.zst`.
+   - Indexed entire VEHYRON codebase: 7,774 nodes, 15,735 edges across 84 Java and 26 TypeScript files. Persistent graph saved at `.codebase-memory/graph.db.zst`.
    - Enabled background file watcher (`auto_watch = true`) and auto-indexer (`auto_index = true`).
 5. **Project Intelligence Structure Established**:
    - Created full `.agent/` knowledge suite: `PROJECT_CONTEXT.md`, `CURRENT_STATE.md`, `ARCHITECTURE.md`, `DOMAIN_KNOWLEDGE.md`, `DECISIONS.md`, `KNOWN_ISSUES.md`, `ENGINEERING_STANDARDS.md`, `TEST_STRATEGY.md`, `SECURITY.md`, `OBSERVABILITY.md`, `DEPLOYMENT.md`, `OPERATIONS.md`, `SESSION_LOG.md`.
@@ -41,7 +41,7 @@ Environment fully operational, governed, and verified.
 
 ## Session 2: Database Schema Migration Tooling (Flyway)
 **Timestamp**: September 25, 2026  
-**Objective**: Transition FleetIQ from Hibernate `ddl-auto: update` to versioned, reproducible SQL migrations with Flyway and enforce Hibernate `ddl-auto: validate`.
+**Objective**: Transition VEHYRON from Hibernate `ddl-auto: update` to versioned, reproducible SQL migrations with Flyway and enforce Hibernate `ddl-auto: validate`.
 
 ### Actions Executed
 1. **Skill Consultation**:
@@ -89,7 +89,7 @@ Database schema migration tooling fully implemented, verified, and operational.
    - Updated `backend/src/main/resources/application.yml`:
      - Configured `management.tracing.sampling.probability: 1.0`.
      - Configured `management.tracing.propagation.type: W3C,B3`.
-     - Enhanced logging pattern to automatically correlate MDC fields: `"%5p [${spring.application.name:fleetiq-backend},%X{traceId:-},%X{spanId:-}]"`.
+     - Enhanced logging pattern to automatically correlate MDC fields: `"%5p [${spring.application.name:vehyron-backend},%X{traceId:-},%X{spanId:-}]"`.
 4. **Trace Response Filter & CORS Configuration**:
    - Created `backend/src/main/java/com/fleetiq/config/TraceResponseFilter.java`:
      - Implemented servlet filter at `@Order(Ordered.HIGHEST_PRECEDENCE + 5)` after `ServerHttpObservationFilter`.

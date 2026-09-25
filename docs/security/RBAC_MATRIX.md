@@ -1,4 +1,4 @@
-# FleetIQ — Role-Based Access Control (RBAC) & Permission Matrix
+# VEHYRON — Role-Based Access Control (RBAC) & Permission Matrix
 
 **Classification:** Enterprise Security Specification  
 **Version:** 2.0.0  
@@ -8,7 +8,7 @@
 
 ## 1. Domain Roles
 
-FleetIQ categorizes platform actors into four primary business operational roles, plus one internal automated ingestion principal:
+VEHYRON categorizes platform actors into four primary business operational roles, plus one internal automated ingestion principal:
 
 1. **`ROLE_ADMIN` (System & Fleet Governance Administrator)**
    * Complete governance over platform settings, user lifecycle, role assignment, and security audit logs.
@@ -45,7 +45,7 @@ FleetIQ categorizes platform actors into four primary business operational roles
 | `ACTION_EXPORT` | Export action items list to CSV | Data Export |
 | `TELEMETRY_STREAM_READ`| Connect to live SSE telemetry event stream | Real-time Stream |
 | `TELEMETRY_INGEST` | Ingest external OEM telematics payloads | Ingestion |
-| `COPILOT_USE` | Converse with FleetIQ Intelligence Copilot & persist chat | AI / Analytics |
+| `COPILOT_USE` | Converse with VEHYRON Intelligence Copilot & persist chat | AI / Analytics |
 | `SIMULATOR_EXECUTE` | Trigger synthetic telematics scenarios or fleet reset | Testing / Dev |
 
 ---

@@ -65,11 +65,14 @@ public class AuthController {
             );
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
+            String msg = (e.getMessage() != null && e.getMessage().contains("selected account type"))
+                    ? e.getMessage()
+                    : "Invalid username or password";
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                     "status", 401,
                     "error", "Unauthorized",
                     "code", "BAD_CREDENTIALS",
-                    "message", "Invalid username or password"
+                    "message", msg
             ));
         } catch (DisabledException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(

@@ -1,4 +1,4 @@
-# FleetIQ — Architecture & Engineering Decisions (ADR Index)
+# VEHYRON — Architecture & Engineering Decisions (ADR Index)
 
 This registry tracks verified architectural choices and proposed future decisions. Full records are stored under `docs/decisions/ADR-XXX-<title>.md`.
 
@@ -15,6 +15,8 @@ This registry tracks verified architectural choices and proposed future decision
 | **[ADR-005](file:///c:/Users/ajaya/Desktop/fleetiq/docs/decisions/005-grounded-hybrid-rag-assistant.md)** | Grounded Hybrid RAG Assistant | **ACCEPTED** | AI Copilot | Restrict fleet assistant responses strictly to indexed local operational documentation and live JPA repository lookups to eliminate hallucinations. |
 | **[ADR-007](file:///c:/Users/ajaya/Desktop/fleetiq/docs/decisions/007-database-migration-tooling-flyway-proposal.md)** | Database Schema Migration Tooling (Flyway) | **ACCEPTED** | Database / DevOps | Replace Hibernate `ddl-auto: update` with Flyway versioned SQL migrations (`V1__initial_schema.sql`) and enforce Hibernate `ddl-auto: validate`. |
 | **[ADR-008](file:///c:/Users/ajaya/Desktop/fleetiq/docs/decisions/008-distributed-tracing-opentelemetry-proposal.md)** | Distributed Tracing with OpenTelemetry | **ACCEPTED** | Observability | Implement W3C trace context propagation via Micrometer Tracing Otel bridge, `X-Trace-Id` response header, and MDC logging correlation. |
+| **ADR-009** | VEHYRON Product Brand Identity & Strict Dual-Role RBAC Model | **ACCEPTED** | Identity / Governance | Migrate brand from VEHYRON to VEHYRON while preserving automotive domain concepts (`fleet`, `vehicle`). Enforce exactly two roles: `ROLE_ADMIN` and `ROLE_OPERATOR`. |
+| **ADR-010** | Enterprise Ingestion Gateway & Zero-Demo Dynamic Baseline | **ACCEPTED** | Ingestion / Scalability | Implement pluggable connectors (Kafka, MQTT, REST, Webhooks, Cloud streams, POI/CSV streaming) with zero synthetic vehicles, dynamically hydrating the registry from real data. |
 
 ---
 

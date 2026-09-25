@@ -1,4 +1,4 @@
-# FleetIQ — Engineering Development & Contributor Guide
+# VEHYRON — Engineering Development & Contributor Guide
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Developer Onboarding  
@@ -8,7 +8,7 @@
 
 ## 1. Prerequisites & Tooling Requirements
 
-To develop FleetIQ locally, install:
+To develop VEHYRON locally, install:
 - **Java SE Development Kit 17+** (Eclipse Temurin 17 recommended).
 - **Apache Maven 3.9+**
 - **Node.js 20.x LTS** and **npm 10.x+**
@@ -56,7 +56,7 @@ npm run dev --prefix frontend
 
 ## 4. Git Branching & Commit Conventions
 
-FleetIQ follows GitHub Flow with Conventional Commits:
+VEHYRON follows GitHub Flow with Conventional Commits:
 - `feat:` New telematics feature or API endpoint.
 - `fix:` Bug fix in normalizer, decision engine, or UI.
 - `refactor:` Code restructuring without functional change.

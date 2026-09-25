@@ -25,17 +25,24 @@ public class RegisterRequest {
 
     private String organization;
 
+    private String requestedRole;
+
     @AssertTrue(message = "You must agree to the Terms of Service and Privacy Policy")
     private boolean termsAccepted;
 
     public RegisterRequest() {}
 
     public RegisterRequest(String fullName, String email, String username, String password, String organization, boolean termsAccepted) {
+        this(fullName, email, username, password, organization, "OPERATOR", termsAccepted);
+    }
+
+    public RegisterRequest(String fullName, String email, String username, String password, String organization, String requestedRole, boolean termsAccepted) {
         this.fullName = fullName;
         this.email = email;
         this.username = username;
         this.password = password;
         this.organization = organization;
+        this.requestedRole = requestedRole;
         this.termsAccepted = termsAccepted;
     }
 
@@ -53,6 +60,9 @@ public class RegisterRequest {
 
     public String getOrganization() { return organization; }
     public void setOrganization(String organization) { this.organization = organization; }
+
+    public String getRequestedRole() { return requestedRole; }
+    public void setRequestedRole(String requestedRole) { this.requestedRole = requestedRole; }
 
     public boolean isTermsAccepted() { return termsAccepted; }
     public void setTermsAccepted(boolean termsAccepted) { this.termsAccepted = termsAccepted; }

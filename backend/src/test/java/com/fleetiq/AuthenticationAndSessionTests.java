@@ -62,7 +62,7 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-01: Login with username succeeds and issues access & rotatable refresh tokens")
     void testLoginWithUsernameSuccess() throws Exception {
-        LoginRequest req = new LoginRequest("admin", "Admin@FleetIQ2026");
+        LoginRequest req = new LoginRequest("admin", "Admin@Vehyron2026");
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,21 +87,21 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-02: Login with corporate email succeeds")
     void testLoginWithEmailSuccess() throws Exception {
-        LoginRequest req = new LoginRequest("ops@fleetiq.internal", "Ops@FleetIQ2026");
+        LoginRequest req = new LoginRequest("operator@vehyron.internal", "Operator@Vehyron2026");
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("ops_lead"))
-                .andExpect(jsonPath("$.role").value("ROLE_OPERATIONS_LEAD"));
+                .andExpect(jsonPath("$.username").value("operator"))
+                .andExpect(jsonPath("$.role").value("ROLE_OPERATOR"));
     }
 
     @Test
     @DisplayName("Auth-03: Login failure with wrong password records failed attempts and audit log")
     void testLoginFailureWrongPassword() throws Exception {
         String testUser = "wrong_pass_user_" + System.currentTimeMillis();
-        User user = new User(testUser, passwordEncoder.encode("RealPassword2026!"), "Wrong Pass User", testUser + "@fleetiq.internal", Role.ROLE_VIEWER, "Ops");
+        User user = new User(testUser, passwordEncoder.encode("RealPassword2026!"), "Wrong Pass User", testUser + "@vehyron.internal", Role.ROLE_OPERATOR, "Ops");
         userRepository.save(user);
 
         LoginRequest req = new LoginRequest(testUser, "WrongPassword123!");
@@ -121,7 +121,7 @@ public class AuthenticationAndSessionTests {
     @DisplayName("Auth-04: Account lockout triggered after consecutive failed attempts")
     void testAccountLockout() throws Exception {
         String testUser = "lockout_test_" + System.currentTimeMillis();
-        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Lockout User", testUser + "@fleetiq.internal", Role.ROLE_VIEWER, "Ops");
+        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Lockout User", testUser + "@vehyron.internal", Role.ROLE_OPERATOR, "Ops");
         userRepository.save(user);
 
         // Perform 5 consecutive failed logins
@@ -144,7 +144,7 @@ public class AuthenticationAndSessionTests {
     @DisplayName("Auth-05: Deactivated account rejected with 403 Forbidden")
     void testDeactivatedAccountRejected() throws Exception {
         String testUser = "disabled_user_" + System.currentTimeMillis();
-        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Disabled User", testUser + "@fleetiq.internal", Role.ROLE_VIEWER, "Ops");
+        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Disabled User", testUser + "@vehyron.internal", Role.ROLE_OPERATOR, "Ops");
         user.setEnabled(false);
         userRepository.save(user);
 
@@ -156,7 +156,7 @@ public class AuthenticationAndSessionTests {
     }
 
     @Test
-    @DisplayName("Auth-06: Self-service registration creates user with restricted ROLE_VIEWER and hashed password")
+    @DisplayName("Auth-06: Self-service registration creates user with restricted ROLE_OPERATOR and hashed password")
     void testSelfServiceRegistration() throws Exception {
         String testUser = "reg_user_" + System.currentTimeMillis();
         String testEmail = testUser + "@enterprise.com";
@@ -175,13 +175,13 @@ public class AuthenticationAndSessionTests {
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value(testUser))
-                .andExpect(jsonPath("$.role").value("ROLE_VIEWER"))
+                .andExpect(jsonPath("$.role").value("ROLE_OPERATOR"))
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty());
 
         var userOpt = userRepository.findByUsername(testUser);
         assertTrue(userOpt.isPresent());
-        assertEquals(Role.ROLE_VIEWER, userOpt.get().getRole(), "Must strictly assign restricted ROLE_VIEWER");
+        assertEquals(Role.ROLE_OPERATOR, userOpt.get().getRole(), "Must strictly assign restricted ROLE_OPERATOR");
         assertTrue(passwordEncoder.matches("EnterpriseStrongPass2026!", userOpt.get().getPassword()));
     }
 
@@ -225,7 +225,7 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-09: Forgot password generates single-use reset token and generic response")
     void testForgotPasswordFlow() throws Exception {
-        ForgotPasswordRequest req = new ForgotPasswordRequest("admin@fleetiq.internal");
+        ForgotPasswordRequest req = new ForgotPasswordRequest("admin@vehyron.internal");
 
         mockMvc.perform(post("/api/v1/auth/forgot-password")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -245,7 +245,7 @@ public class AuthenticationAndSessionTests {
     @DisplayName("Auth-10: Reset password updates password, marks token used, and revokes active sessions")
     void testResetPasswordFlow() throws Exception {
         String testUser = "reset_user_" + System.currentTimeMillis();
-        User user = new User(testUser, passwordEncoder.encode("OldPass2026!"), "Reset User", testUser + "@fleetiq.internal", Role.ROLE_VIEWER, "Ops");
+        User user = new User(testUser, passwordEncoder.encode("OldPass2026!"), "Reset User", testUser + "@vehyron.internal", Role.ROLE_OPERATOR, "Ops");
         user = userRepository.save(user);
 
         // Create an active refresh token
@@ -288,7 +288,7 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-11: Refresh token rotation issues new access token and revokes old refresh token")
     void testRefreshTokenRotation() throws Exception {
-        LoginRequest login = new LoginRequest("viewer", "Viewer@FleetIQ2026");
+        LoginRequest login = new LoginRequest("operator", "Operator@Vehyron2026");
         MvcResult res = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(login)))
@@ -329,10 +329,10 @@ public class AuthenticationAndSessionTests {
     @DisplayName("Auth-12: Logout revokes refresh token")
     void testLogoutRevokesToken() throws Exception {
         String testUser = "logout_user_" + System.currentTimeMillis();
-        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Logout User", testUser + "@fleetiq.internal", Role.ROLE_VIEWER, "Ops");
+        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Logout User", testUser + "@vehyron.internal", Role.ROLE_OPERATOR, "Ops");
         user = userRepository.save(user);
 
-        String token = jwtTokenProvider.generateToken(testUser, "ROLE_VIEWER");
+        String token = jwtTokenProvider.generateToken(testUser, "ROLE_OPERATOR");
         String refreshHash = "refr_logout_" + System.currentTimeMillis();
         RefreshToken refreshToken = new RefreshToken(refreshHash, user, java.time.Instant.now().plusSeconds(3600), "127.0.0.1", "Test");
         refreshTokenRepository.save(refreshToken);
@@ -352,12 +352,12 @@ public class AuthenticationAndSessionTests {
     @DisplayName("Auth-13: Real-time authorization reflection and instant session deactivation")
     void testRealTimeAuthorizationAndDeactivation() throws Exception {
         String testUser = "realtime_user_" + System.currentTimeMillis();
-        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Realtime User", testUser + "@fleetiq.internal", Role.ROLE_VIEWER, "Ops");
+        User user = new User(testUser, passwordEncoder.encode("SecurePass2026!"), "Realtime User", testUser + "@vehyron.internal", Role.ROLE_OPERATOR, "Ops");
         user = userRepository.save(user);
 
-        String token = jwtTokenProvider.generateToken(testUser, "ROLE_VIEWER");
+        String token = jwtTokenProvider.generateToken(testUser, "ROLE_OPERATOR");
 
-        // 1. Viewer cannot access admin API
+        // 1. Operator cannot access admin API
         mockMvc.perform(get("/api/v1/admin/users")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());

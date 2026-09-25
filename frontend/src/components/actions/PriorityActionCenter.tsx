@@ -132,7 +132,18 @@ export const PriorityActionCenter: React.FC<PriorityActionCenterProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-sans">
-            {filtered.length === 0 ? (
+            {actions.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="py-16 text-center">
+                  <div className="max-w-md mx-auto space-y-2">
+                    <p className="text-sm font-bold text-slate-700">No operational actions queued.</p>
+                    <p className="text-xs text-slate-400">
+                      When vehicle telemetry or diagnostic issues are ingested and classified by the intelligence engine, prioritized actions and recommendations appear here.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : filtered.length === 0 ? (
               <tr>
                 <td colSpan={8} className="py-10 text-center text-slate-400 text-xs font-medium">
                   No actions matching selected filters.

@@ -1,4 +1,4 @@
-# FleetIQ — Enterprise Authentication & Identity Architecture
+# VEHYRON — Enterprise Authentication & Identity Architecture
 
 **Document Version:** 2.0.0-PROD  
 **Specification:** Identity Verification, Dual Token Handling, Credential Security, and Zero-Trust Request Pipeline  
@@ -8,7 +8,7 @@
 
 ## 1. Architectural Philosophy & Overview
 
-FleetIQ authenticates fleet operations dispatchers, vehicle analysts, enterprise operators, and platform administrators using a robust, dual-token stateless access + stateful rotatable refresh token architecture. 
+VEHYRON authenticates fleet operations dispatchers, vehicle analysts, enterprise operators, and platform administrators using a robust, dual-token stateless access + stateful rotatable refresh token architecture. 
 
 All authentication and identity decisions are authoritative on the backend. The platform strictly prohibits:
 - Mock logins, demo credentials, or client-side authentication shortcuts in production environments.
@@ -35,13 +35,13 @@ All authentication routes are prefixed with `/api/v1/auth` and rate-limited at 1
 
 ## 3. Dual-Token Architecture
 
-FleetIQ employs a dual-token model balancing high-throughput stateless API validation with stateful server-side revocation:
+VEHYRON employs a dual-token model balancing high-throughput stateless API validation with stateful server-side revocation:
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User as Fleet Operator / Admin
-    participant Client as FleetIQ Web Client
+    participant Client as VEHYRON Web Client
     participant Auth as AuthService (Spring Boot)
     participant DB as PostgreSQL Database
 
@@ -83,7 +83,7 @@ sequenceDiagram
 
 Stateless JWT architectures often suffer from stale authorization (e.g., an administrator demoting or deactivating a rogue user, but the user continues accessing APIs until the JWT expires).
 
-**FleetIQ eliminates this vulnerability with 0-second propagation**:
+**VEHYRON eliminates this vulnerability with 0-second propagation**:
 1. When `JwtAuthenticationFilter` intercepts an incoming request with a valid JWT signature:
 2. It queries `UserRepository.findByUsername(username)`.
 3. If the user does not exist or `user.isEnabled() == false`, the request is **immediately rejected with HTTP 401 Unauthorized**.

@@ -1,4 +1,4 @@
-# FleetIQ — UI/UX Architectural Decisions Record (Batch 1)
+# VEHYRON — UI/UX Architectural Decisions Record (Batch 1)
 
 **Status**: ACTIVE & CANONICAL  
 **Rule**: Decisions recorded here govern this batch and all future batches (Batch 2, Batch 3, etc.). Do not regress or undo these decisions in future phases.

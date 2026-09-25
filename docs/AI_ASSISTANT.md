@@ -1,4 +1,4 @@
-# FleetIQ — Grounded AI Assistant Specification
+# VEHYRON — Grounded AI Assistant Specification
 
 ## 1. Grounded AI Mental Model
 
@@ -61,6 +61,6 @@ To guarantee safety and prevent SQL injection or hallucinations:
 ---
 
 ## 4. Offline Fallback & Provider Decoupling
-FleetIQ is designed to operate seamlessly without third-party AI dependencies:
+VEHYRON is designed to operate seamlessly without third-party AI dependencies:
 - **With External AI**: When Jev / Gemini credentials are present, the assistant leverages LLM reasoning to synthesize natural language summaries.
 - **Without External AI**: When credentials are missing or the provider fails, `AiAssistantService` uses deterministic rule-based templates. The system returns 100% accurate, factual answers backed by live database data and RAG documentation with zero downtime.

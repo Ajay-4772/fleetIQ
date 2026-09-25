@@ -1,7 +1,7 @@
-# FleetIQ — Architecture & System Design
+# VEHYRON — Architecture & System Design
 
-## 1. What FleetIQ Is
-**FleetIQ** is an enterprise-grade, real-time connected vehicle data intelligence platform. It ingests high-frequency, multi-OEM telematics streams (Toyota, Ford, BMW, Tesla EV), normalizes disparate schemas into a canonical standard, evaluates operational integrity using rule engines and AI models, calculates financial risk, and dispatches prioritized operational actions to fleet managers.
+## 1. What VEHYRON Is
+**VEHYRON** is an enterprise-grade, real-time connected vehicle data intelligence platform. It ingests high-frequency, multi-OEM telematics streams (Toyota, Ford, BMW, Tesla EV), normalizes disparate schemas into a canonical standard, evaluates operational integrity using rule engines and AI models, calculates financial risk, and dispatches prioritized operational actions to fleet managers.
 
 ---
 
@@ -17,7 +17,7 @@
     OPERATIONS
 ```
 
-FleetIQ answers four core operational questions:
+VEHYRON answers four core operational questions:
 1. **What is happening?** (Live operations feed, normalized telemetry events)
 2. **Which vehicles/issues need attention?** (Vehicle health scores, DTCs, degradation states)
 3. **Why does it matter?** (Explainable rule/AI decisioning, estimated operational risk in currency)

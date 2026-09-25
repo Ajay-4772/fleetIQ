@@ -1,4 +1,4 @@
-# FleetIQ — UI/UX Issues & Tracking Register (Batch 1)
+# VEHYRON — UI/UX Issues & Tracking Register (Batch 1)
 
 **Audit Batch**: 1  
 **Status**: COMPLETED & VERIFIED  
@@ -143,7 +143,7 @@
 - **Component**: `CopilotWorkspace.tsx`
 - **Current Behavior**: Lengthy marketing text explaining telematics correlation and RAG.
 - **Problem**: Visual noise that distracts operators from operational workflows.
-- **Expected Behavior**: Minimalist header ("FleetIQ Copilot") and clean, direct conversational space.
+- **Expected Behavior**: Minimalist header ("VEHYRON Copilot") and clean, direct conversational space.
 - **Priority**: MEDIUM
 - **Status**: VERIFIED
 - **Fix Implemented**: Replaced marketing copy with concise 1-line subtitle.
@@ -278,5 +278,5 @@
 - **Expected Behavior**: Clear, honest labeling of deterministic fallback rules when AI services are unconfigured.
 - **Priority**: MEDIUM
 - **Status**: VERIFIED
-- **Fix Implemented**: Explicit fallback indicators and clear FleetIQ Decision Authority Model explanation without fabricated AI claims.
+- **Fix Implemented**: Explicit fallback indicators and clear VEHYRON Decision Authority Model explanation without fabricated AI claims.
 - **Verification Status**: VERIFIED (Verified in `intelligence_hub_verified.png`).

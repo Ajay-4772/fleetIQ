@@ -1,4 +1,4 @@
-# FleetIQ — Role-Based Access Control (RBAC) Specification
+# VEHYRON — Role-Based Access Control (RBAC) Specification
 
 **Document Version:** 2.0.0-PROD  
 **Specification:** Multi-Tiered Enterprise Authorization, Role Hierarchy, and Server-Side Method Security  
@@ -8,7 +8,7 @@
 
 ## 1. Architectural Philosophy
 
-FleetIQ implements strict, server-side Role-Based Access Control (RBAC). In accordance with Zero-Trust principles:
+VEHYRON implements strict, server-side Role-Based Access Control (RBAC). In accordance with Zero-Trust principles:
 1. **The Backend is Authoritative:** Frontend role checks and conditional UI rendering exist solely for user experience and cognitive ergonomics. Hiding a button or menu item is never treated as a security boundary.
 2. **Deny by Default:** All administrative, mutating, and sensitive routes require explicit authority. Unauthenticated requests receive HTTP 401; authenticated requests with insufficient privileges receive HTTP 403.
 3. **Real-Time Freshness:** Permissions and role memberships are evaluated against the current database state on every incoming request. Role changes made by an administrator take effect instantaneously with zero propagation lag.
@@ -17,10 +17,10 @@ FleetIQ implements strict, server-side Role-Based Access Control (RBAC). In acco
 
 ## 2. Defined System Roles
 
-FleetIQ categorizes platform actors into four distinct enterprise roles:
+VEHYRON categorizes platform actors into four distinct enterprise roles:
 
 ### 2.1. `ROLE_ADMIN` (Platform Administrator)
-- **Scope:** Full operational, security, and administrative governance across the entire FleetIQ instance.
+- **Scope:** Full operational, security, and administrative governance across the entire VEHYRON instance.
 - **Key Capabilities:**
   - Complete user lifecycle administration (create, activate, deactivate, update roles, revoke sessions).
   - Inspection of security audit logs (`/api/v1/admin/users/audit-logs`).
@@ -80,7 +80,7 @@ public ResponseEntity<ActionResponse> updateActionStatus(@PathVariable String id
 
 ## 4. Permission Mapping Matrix
 
-FleetIQ maps high-level business permissions to explicit enterprise roles. For the exhaustive permission-to-endpoint matrix, see [RBAC_MATRIX.md](file:///c:/Users/ajaya/Desktop/fleetiq/docs/security/RBAC_MATRIX.md).
+VEHYRON maps high-level business permissions to explicit enterprise roles. For the exhaustive permission-to-endpoint matrix, see [RBAC_MATRIX.md](file:///c:/Users/ajaya/Desktop/fleetiq/docs/security/RBAC_MATRIX.md).
 
 | Permission String | Description | `ROLE_ADMIN` | `ROLE_OPERATIONS_LEAD` | `ROLE_OPERATOR` | `ROLE_VIEWER` |
 | :--- | :--- | :---: | :---: | :---: | :---: |
@@ -99,7 +99,7 @@ FleetIQ maps high-level business permissions to explicit enterprise roles. For t
 
 ## 5. Real-Time Authorization Propagation
 
-FleetIQ eliminates authorization drift through its **per-request entity lookup pipeline**:
+VEHYRON eliminates authorization drift through its **per-request entity lookup pipeline**:
 
 1. Client sends request with Bearer JWT.
 2. `JwtAuthenticationFilter` validates cryptographic signature and expiry.

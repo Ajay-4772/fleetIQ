@@ -1,4 +1,4 @@
-# FleetIQ — Enterprise Telematics Design System
+# VEHYRON — Enterprise Telematics Design System
 
 **Version**: 2.0.0 (Production Hardening)  
 **Philosophy**: Precision, Trust, Clarity, Information Density, Low Visual Noise  
@@ -8,7 +8,7 @@
 
 ## 1. Design Direction: Operational Enterprise Console
 
-FleetIQ is a critical infrastructure software product. It is NOT an AI SaaS marketing landing page, nor a Dribbble mock dashboard.
+VEHYRON is a critical infrastructure software product. It is NOT an AI SaaS marketing landing page, nor a Dribbble mock dashboard.
 The visual identity communicates stability and situational awareness through:
 - High data density with scannable tabular typography.
 - Restrained, semantic use of color (color indicates operational status, not decoration).

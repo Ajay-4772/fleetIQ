@@ -1,63 +1,72 @@
-# FleetIQ — Real-Time Connected Vehicle Intelligence & Operations Platform
+# VEHYRON — Connected Vehicle Intelligence Platform
 
-> **Transforming Multi-OEM Connected Vehicle Telemetry into Explainable Operational Action**
+> **Multi-OEM vehicle telemetry, event normalization, operational intelligence, and AI-assisted decision engineering platform.**
 
-FleetIQ is an enterprise-grade, real-time connected vehicle data intelligence platform. It ingests high-frequency, multi-OEM telematics streams (Toyota, Ford, BMW, Tesla EV), normalizes disparate schemas into a canonical standard, evaluates operational integrity using rule engines and AI models, calculates financial risk, and dispatches prioritized operational actions to fleet managers.
+**VEHYRON** is a production-grade multi-OEM connected vehicle telemetry and operational decision platform. It ingests high-frequency telemetry events from external IoT brokers (Apache Kafka, MQTT), secure webhooks, cloud streams (GCP Pub/Sub, AWS Kinesis, Azure Event Hubs), REST pollers, and batch Excel/CSV datasets. It normalizes disparate schemas into a canonical domain model, evaluates operational integrity using deterministic rules and AI models, calculates financial risk, and routes prioritized operational actions to operators.
 
 ---
 
 ## 1. Core Mental Model
 
 ```
-       DATA
-        ↓
-   INTELLIGENCE
-        ↓
-     ACTIONS
-        ↓
-    OPERATIONS
+       REAL EXTERNAL DATA (Kafka / MQTT / REST / Webhook / Excel / CSV)
+                                    ↓
+                        INGESTION & RAW STORAGE
+                                    ↓
+                       CANONICAL NORMALIZATION
+                                    ↓
+                          INTELLIGENCE ENGINE
+                                    ↓
+                        EVENT & ISSUE DETECTION
+                                    ↓
+                         PRIORITY & ACTION QUEUE
+                                    ↓
+                    DATABASE & REAL-TIME SSE PUSH
+                                    ↓
+                      VEHYRON OPERATIONS PORTAL
 ```
 
-FleetIQ answers four core operational questions within 30 seconds:
-1. **What is happening?** (Live operations feed, normalized telemetry events)
-2. **Which vehicles/issues need attention?** (Vehicle health scores, DTCs, degradation states)
-3. **Why does it matter?** (Explainable rule/AI decisioning, estimated operational risk in currency)
-4. **What should the operator do?** (Authoritative, prioritized action queue with lifecycle workflows)
+VEHYRON answers four core operational questions in real time:
+1. **What is happening?** (Live operations telemetry, normalized event stream)
+2. **Which vehicles/issues need attention?** (Dynamic asset registry, DTC diagnostics, degradation states)
+3. **Why does it matter?** (Explainable rule/AI decisioning, estimated financial risk)
+4. **What should the operator do?** (Authoritative, prioritized action queue with lifecycle review)
 
 ---
 
 ## 2. End-to-End System Architecture
 
 ```text
-External OEM / Telematics System / Simulator
-                    ↓
-       Ingestion API (POST /api/v1/events/ingest)
-       [X-API-Key: fleetiq-ingest-secure-key-2026]
-                    ↓
-       Source Identification & Validation
-                    ↓
-        OEM Adapter Normalization Pipeline
-      (Toyota, Ford, BMW, Tesla EV Adapters)
-                    ↓
-           Canonical Vehicle Event
-                    ↓
-         PostgreSQL / H2 Persistence
-                    ↓
-             Issue Detection
-                    ↓
-         Operational Impact Engine
-                    ↓
-          Hybrid Decision Engine
-         (Rule-Based + AI Reasoning)
-                    ↓
-         Priority Action Dispatch
-                    ↓
-         Event Publisher (Spring)
-                    ↓
-        Sub-second SSE Event Stream
-        (GET /api/v1/stream/events)
-                    ↓
-        FleetIQ Real-Time UI (React)
+External IoT / OEM Source / Gateway (Kafka, MQTT, Webhook, REST, Batch File)
+                                ↓
+                 VEHYRON Data Source Connectors
+                                ↓
+                 Raw Storage & Audit Persistence
+                                ↓
+                  Schema & Physical Validation
+                                ↓
+               Multi-OEM Normalization Pipeline
+              (Toyota, Ford, BMW, Tesla, Vehyron)
+                                ↓
+                     Canonical Vehicle Event
+                                ↓
+                   PostgreSQL / H2 Persistence
+                                ↓
+                         Issue Detection
+                                ↓
+                    Operational Impact Engine
+                                ↓
+                     Hybrid Decision Engine
+                   (Deterministic + AI Models)
+                                ↓
+                     Priority Action Dispatch
+                                ↓
+                     Event Publisher (Spring)
+                                ↓
+                    Real-Time HTTP SSE Stream
+                   (GET /api/v1/dashboard/stream)
+                                ↓
+                   VEHYRON Operations UI (React)
 ```
 
 ---

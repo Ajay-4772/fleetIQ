@@ -1,7 +1,7 @@
-# FleetIQ — Real-Time Streaming & Event Architecture
+# VEHYRON — Real-Time Streaming & Event Architecture
 
 ## 1. Overview
-FleetIQ implements a reactive, sub-second telemetry delivery pipeline from server to browser using **Server-Sent Events (SSE)** (`text/event-stream`). This avoids the high connection overhead of WebSockets while providing automatic reconnection, firewall compatibility, and native browser `EventSource` support.
+VEHYRON implements a reactive, sub-second telemetry delivery pipeline from server to browser using **Server-Sent Events (SSE)** (`text/event-stream`). This avoids the high connection overhead of WebSockets while providing automatic reconnection, firewall compatibility, and native browser `EventSource` support.
 
 ---
 

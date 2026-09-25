@@ -1,4 +1,4 @@
-# FleetIQ — Enterprise Account Lifecycle & Governance
+# VEHYRON — Enterprise Account Lifecycle & Governance
 
 **Document Version:** 2.0.0-PROD  
 **Specification:** Identity Provisioning, State Transitions, Role Elevation Governance, and Deprovisioning  
@@ -8,7 +8,7 @@
 
 ## 1. Onboarding & Provisioning Models
 
-FleetIQ supports two distinct user onboarding pathways designed to prevent unauthorized privilege escalation:
+VEHYRON supports two distinct user onboarding pathways designed to prevent unauthorized privilege escalation:
 
 ### 1.1. Self-Registration (Public Onboarding)
 - **Endpoint:** `POST /api/v1/auth/register`

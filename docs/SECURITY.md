@@ -1,7 +1,7 @@
-# FleetIQ — Security, Authentication & RBAC Specification
+# VEHYRON — Security, Authentication & RBAC Specification
 
 ## 1. Security Architecture Overview
-FleetIQ applies defense-in-depth principles across all API layers:
+VEHYRON applies defense-in-depth principles across all API layers:
 - **Stateless JWT Authentication** for human operators, fleet leads, and administrators.
 - **Service-to-Service API Key Authentication** for external telemetry pipelines and OEM cloud gateways.
 - **Role-Based Access Control (RBAC)** enforced strictly at the Spring Security filter and controller levels.
@@ -15,10 +15,10 @@ Four default accounts are seeded by `DataInitializer.java` on application bootst
 
 | Username | Password | Role | Permissions |
 |---|---|---|---|
-| `admin` | `Admin@FleetIQ2026` | `ROLE_ADMIN` | Full access: User administration, system settings, data quality overrides, simulator controls, action mutations. |
-| `ops_lead` | `Ops@FleetIQ2026` | `ROLE_OPERATIONS_LEAD` | Operations management: Scenario simulator control, action assignment, operator oversight, export. |
-| `operator` | `Operator@FleetIQ2026` | `ROLE_OPERATOR` | Triage & dispatch: View fleet telemetry, update action lifecycle status (`OPEN` → `IN_PROGRESS` → `RESOLVED` → `DISMISSED`), add technician notes. |
-| `viewer` | `Viewer@FleetIQ2026` | `ROLE_VIEWER` | Read-only access: View overview dashboard, search vehicles, inspect actions, query AI assistant. Mutation requests return **403 Forbidden**. |
+| `admin` | `Admin@VEHYRON2026` | `ROLE_ADMIN` | Full access: User administration, system settings, data quality overrides, simulator controls, action mutations. |
+| `ops_lead` | `Ops@VEHYRON2026` | `ROLE_OPERATIONS_LEAD` | Operations management: Scenario simulator control, action assignment, operator oversight, export. |
+| `operator` | `Operator@VEHYRON2026` | `ROLE_OPERATOR` | Triage & dispatch: View fleet telemetry, update action lifecycle status (`OPEN` → `IN_PROGRESS` → `RESOLVED` → `DISMISSED`), add technician notes. |
+| `viewer` | `Viewer@VEHYRON2026` | `ROLE_VIEWER` | Read-only access: View overview dashboard, search vehicles, inspect actions, query AI assistant. Mutation requests return **403 Forbidden**. |
 
 ---
 

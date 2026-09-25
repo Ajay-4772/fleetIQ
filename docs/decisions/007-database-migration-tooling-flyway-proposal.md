@@ -4,7 +4,7 @@
 **ACCEPTED** (Implemented and Verified)
 
 ## Context
-FleetIQ previously utilized Hibernate's `ddl-auto: update` setting for schema evolution in development and production profiles. In industry-level production environments, automatic DDL updates can lead to unintended schema locks, data corruption, or inability to safely roll back failed releases.
+VEHYRON previously utilized Hibernate's `ddl-auto: update` setting for schema evolution in development and production profiles. In industry-level production environments, automatic DDL updates can lead to unintended schema locks, data corruption, or inability to safely roll back failed releases.
 
 ## Decision
 1. Introduce Flyway (`org.flywaydb:flyway-core` and `org.flywaydb:flyway-database-postgresql`) into `backend/pom.xml`.

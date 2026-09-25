@@ -1,4 +1,4 @@
-# FleetIQ — Enterprise Authorization & RBAC Architecture Model
+# VEHYRON — Enterprise Authorization & RBAC Architecture Model
 
 **Document Version**: 2.0.0  
 **Authority**: Principal Security Architect  
@@ -8,7 +8,7 @@
 
 ## 1. Architectural Philosophy: The Frontend Is Not a Security Boundary
 
-In FleetIQ, client-side role checks (such as `hasRole('ADMIN')`) exist strictly for user experience (hiding irrelevant navigation items and reducing cognitive friction). The server alone determines authorization.
+In VEHYRON, client-side role checks (such as `hasRole('ADMIN')`) exist strictly for user experience (hiding irrelevant navigation items and reducing cognitive friction). The server alone determines authorization.
 
 Any API request originating from a client—regardless of what the frontend UI displayed—must pass through a 5-layer server security pipeline:
 

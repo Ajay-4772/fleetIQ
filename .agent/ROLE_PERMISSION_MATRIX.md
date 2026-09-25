@@ -1,4 +1,4 @@
-# FleetIQ — Fine-Grained Role & Permission Matrix
+# VEHYRON — Fine-Grained Role & Permission Matrix
 
 **Document Version**: 2.0.0  
 **Scope**: Explicit mapping between system permissions, business operations, and security roles.  

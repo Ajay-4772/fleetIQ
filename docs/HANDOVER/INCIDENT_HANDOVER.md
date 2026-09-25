@@ -1,4 +1,4 @@
-# FleetIQ — Incident Management & On-Call Handover
+# VEHYRON — Incident Management & On-Call Handover
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Incident Response Procedures  
@@ -24,13 +24,13 @@ If a new container release introduces a critical regression:
 ### Fast Container Rollback (Docker / Kubernetes)
 ```bash
 # 1. Rollback backend deployment to previous stable revision
-kubectl rollout undo deployment/fleetiq-backend -n production
+kubectl rollout undo deployment/vehyron-backend -n production
 
 # 2. Check rollout status
-kubectl rollout status deployment/fleetiq-backend -n production
+kubectl rollout status deployment/vehyron-backend -n production
 
 # 3. Rollback frontend deployment
-kubectl rollout undo deployment/fleetiq-frontend -n production
+kubectl rollout undo deployment/vehyron-frontend -n production
 
 # 4. Verify Actuator health endpoint
 curl -s https://api.fleetiq.company.com/actuator/health | jq .status

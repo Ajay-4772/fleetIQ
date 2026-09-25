@@ -1,4 +1,4 @@
-# FleetIQ — Credentials & Secret Management Architecture
+# VEHYRON — Credentials & Secret Management Architecture
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Secret Management Governance  
@@ -8,7 +8,7 @@
 
 ## 1. Secret Hygiene Invariant
 
-FleetIQ strictly enforces a **Zero-Hardcoded-Secret Policy**:
+VEHYRON strictly enforces a **Zero-Hardcoded-Secret Policy**:
 - No database passwords, JWT private keys, or third-party API tokens are committed to Git.
 - The `.gitignore` excludes all `.env`, `.pem`, `.key`, and `.credentials` files.
 - `.env.example` provides only sanitized variable templates for local developer orientation.

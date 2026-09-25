@@ -1,4 +1,4 @@
-# FleetIQ — Scalability & High-Throughput Engineering Architecture
+# VEHYRON — Scalability & High-Throughput Engineering Architecture
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Technical Architecture Specification  
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary & Workload Model
 
-FleetIQ is designed to operate as an authoritative multi-OEM telematics ingestion and operational decision platform. This specification evaluates the system's ability to scale horizontally and vertically across high-volume telematics workloads, concurrent operator queries, and AI Copilot reasoning.
+VEHYRON is designed to operate as an authoritative multi-OEM telematics ingestion and operational decision platform. This specification evaluates the system's ability to scale horizontally and vertically across high-volume telematics workloads, concurrent operator queries, and AI Copilot reasoning.
 
 ### Baseline Workload Targets (Enterprise Fleet Scale)
 - **Monitored Vehicles:** 25,000 active connected vehicles across 4 OEM protocols (Toyota, Ford, BMW, Tesla).
@@ -46,7 +46,7 @@ FleetIQ is designed to operate as an authoritative multi-OEM telematics ingestio
                                         │
                 ┌───────────────────────┼───────────────────────┐
                 ▼                       ▼                       ▼
-      [ FleetIQ API Pod 1 ]   [ FleetIQ API Pod 2 ]   [ FleetIQ API Pod N ]
+      [ VEHYRON API Pod 1 ]   [ VEHYRON API Pod 2 ]   [ VEHYRON API Pod N ]
         (Stateless JVM)         (Stateless JVM)         (Stateless JVM)
                 │                       │                       │
                 └───────────────┬───────┴───────────────┬───────┘
@@ -59,7 +59,7 @@ FleetIQ is designed to operate as an authoritative multi-OEM telematics ingestio
 ```
 
 ### Statelessness Guarantee
-1. **Stateless Authentication:** FleetIQ uses signed JWT tokens containing user claims, roles, and expiration. No HTTP session (`HttpSession`) is stored in server memory.
+1. **Stateless Authentication:** VEHYRON uses signed JWT tokens containing user claims, roles, and expiration. No HTTP session (`HttpSession`) is stored in server memory.
 2. **Zero Local Disk Dependency:** Uploaded documents or exports are streamed directly to cloud object storage (S3/GCS); no ephemeral local files are stored.
 3. **Graceful Draining:** Pods respond to `SIGTERM` by closing the Hikari connection pool, completing inflight transactions, and sending SSE close frames before termination.
 

@@ -1,4 +1,4 @@
-# FleetIQ — Terms and Conditions of Platform Service
+# VEHYRON — Terms and Conditions of Platform Service
 
 > [!CAUTION]
 > **LEGAL REVIEW REQUIRED:** This document is an enterprise software legal template designed for corporate customization. It requires formal review and execution by company legal counsel prior to commercial deployment.
@@ -9,7 +9,7 @@
 ---
 
 ## 1. Scope of Telematics Intelligence Service
-FleetIQ provides connected vehicle telematics aggregation, multi-OEM sensor normalization, automated priority action generation, and grounded AI assistant capabilities. The platform recommendations are intended to advise human fleet operators; final dispatch, maintenance scheduling, and physical vehicle operations remain the sole responsibility of the customer.
+VEHYRON provides connected vehicle telematics aggregation, multi-OEM sensor normalization, automated priority action generation, and grounded AI assistant capabilities. The platform recommendations are intended to advise human fleet operators; final dispatch, maintenance scheduling, and physical vehicle operations remain the sole responsibility of the customer.
 
 ## 2. Acceptable Use & Account Governance
 - Corporate customers shall provision accounts only for authorized personnel adhering to Role-Based Access Control (RBAC) tiers.

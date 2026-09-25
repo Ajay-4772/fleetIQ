@@ -1,4 +1,4 @@
-# FleetIQ — Master Implementation & Handover Plan
+# VEHYRON — Master Implementation & Handover Plan
 
 **Document Version**: 1.0.0  
 **Status**: APPROVED ROADMAP  
@@ -9,7 +9,7 @@
 
 ## Roadmap Overview
 
-This master plan transitions FleetIQ from a prototype/demo into a secure, reproducible, enterprise-ready software product prepared for independent company ownership. The plan is organized into controlled, sequential phases designed to preserve existing domain functionality while addressing all production gaps.
+This master plan transitions VEHYRON from a prototype/demo into a secure, reproducible, enterprise-ready software product prepared for independent company ownership. The plan is organized into controlled, sequential phases designed to preserve existing domain functionality while addressing all production gaps.
 
 ---
 
@@ -92,7 +92,7 @@ This master plan transitions FleetIQ from a prototype/demo into a secure, reprod
 ---
 
 ### Phase 7: Comprehensive Architecture, Operations & Handover Documentation
-- **Goal**: Equip the company engineering team to operate, scale, troubleshoot, and maintain FleetIQ independently.
+- **Goal**: Equip the company engineering team to operate, scale, troubleshoot, and maintain VEHYRON independently.
 - **Tasks**:
   1. Author `docs/architecture/SCALABILITY.md` (workload capacity, horizontal scaling, bottleneck analysis).
   2. Author security docs: `docs/security/AUTHENTICATION.md`, `docs/security/RBAC.md`, `docs/security/RATE_LIMITING.md`, `docs/security/SECURITY_ARCHITECTURE.md`.

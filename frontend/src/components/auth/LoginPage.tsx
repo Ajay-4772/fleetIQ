@@ -31,6 +31,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
   // Login Form State
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [loginRole, setLoginRole] = useState<'OPERATOR' | 'ADMIN'>('OPERATOR');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -43,6 +44,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
   const [regOrganization, setRegOrganization] = useState('');
+  const [regRequestedRole, setRegRequestedRole] = useState<'OPERATOR' | 'ADMIN'>('OPERATOR');
   const [regTermsAccepted, setRegTermsAccepted] = useState(false);
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [regError, setRegError] = useState<string | null>(null);
@@ -121,7 +123,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
 
     setIsSubmitting(true);
     try {
-      await login(loginIdentifier.trim(), loginPassword);
+      await login(loginIdentifier.trim(), loginPassword, loginRole);
     } catch (err: any) {
       setLoginError(sanitizeErrorMessage(err.message) || 'Invalid corporate credentials.');
     } finally {
@@ -163,6 +165,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
         username: regUsername.trim(),
         password: regPassword,
         organization: regOrganization.trim() || undefined,
+        requestedRole: regRequestedRole,
         termsAccepted: regTermsAccepted
       });
     } catch (err: any) {
@@ -261,7 +264,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
             <Shield className="w-4 h-4" aria-hidden="true" />
           </div>
           <div>
-            <span className="font-extrabold text-base tracking-tight text-slate-900">FleetIQ</span>
+            <span className="font-extrabold text-base tracking-tight text-slate-900">VEHYRON</span>
             <span className="text-[11px] font-semibold text-slate-500 ml-2.5 hidden sm:inline">
               Connected Vehicle Intelligence
             </span>
@@ -286,8 +289,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
               {activeView === 'reset' && <KeyRound className="w-6 h-6" />}
             </div>
             <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
-              {activeView === 'login' && 'Sign in to FleetIQ'}
-              {activeView === 'register' && 'Request Enterprise Access'}
+              {activeView === 'login' && 'Sign in to VEHYRON'}
+              {activeView === 'register' && 'Create your VEHYRON account'}
               {activeView === 'forgot' && 'Reset Account Password'}
               {activeView === 'reset' && 'Set New Password'}
             </h1>
@@ -352,9 +355,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                       autoComplete="username"
                       value={loginIdentifier}
                       onChange={(e) => setLoginIdentifier(e.target.value)}
-                      placeholder="e.g. admin@fleetiq.internal or dispatcher_dave"
+                      placeholder="e.g. admin@vehyron.internal or operator@vehyron.internal"
                       className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10 text-xs text-slate-900 placeholder-slate-400 transition-all duration-200"
                     />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="login-role-select" className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    Sign in as
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="login-role-select"
+                      value={loginRole}
+                      onChange={(e) => setLoginRole(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10 text-xs font-semibold text-slate-800 transition-all duration-200 cursor-pointer"
+                    >
+                      <option value="OPERATOR">Operator — Fleet Operations & Telemetry</option>
+                      <option value="ADMIN">Admin — Full Platform & Ingestion Governance</option>
+                    </select>
                   </div>
                 </div>
 
@@ -459,7 +479,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                       <p className="text-[11px] text-slate-600 leading-relaxed">
                         An account with{' '}
                         <strong className="text-blue-900 font-semibold">{regEmail || regUsername}</strong> is already
-                        registered in FleetIQ.
+                        registered in VEHYRON.
                       </p>
                     </div>
                   </div>
@@ -597,6 +617,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                       />
                     </div>
                   </div>
+                </div>
+
+                <div>
+                  <label htmlFor="reg-role-select" className="block text-xs font-semibold text-slate-700 mb-1">
+                    Requested Role
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="reg-role-select"
+                      value={regRequestedRole}
+                      onChange={(e) => setRegRequestedRole(e.target.value as any)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-slate-50/80 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10 text-xs font-semibold text-slate-800 transition-all duration-200 cursor-pointer"
+                    >
+                      <option value="OPERATOR">Operator — Standard Operations (Default)</option>
+                      <option value="ADMIN">Admin — Full Platform & Ingestion (Requires Approval)</option>
+                    </select>
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">
+                    Self-service accounts activate as Operator. Admin requests require platform authorization.
+                  </p>
                 </div>
 
                 <div>
@@ -758,7 +798,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                         autoComplete="email"
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
-                        placeholder="e.g. operator@fleetiq.internal"
+                        placeholder="e.g. operator@vehyron.internal"
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10 text-xs text-slate-900 placeholder-slate-400 transition-all duration-200"
                       />
                     </div>
@@ -923,7 +963,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
       {/* Corporate Compliance & Legal Footer */}
       <footer className="px-6 sm:px-12 py-4 border-t border-slate-200/80 bg-white/80 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 shadow-2xs">
         <div>
-          <span>© 2026 FleetIQ Technologies Inc. Multi-OEM Telematics & Fleet Intelligence.</span>
+          <span>© 2026 VEHYRON Platform ([LEGAL ENTITY NAME] — LEGAL REVIEW REQUIRED). Multi-OEM Telematics & Connected Intelligence.</span>
         </div>
         <div className="flex items-center gap-4">
           <button

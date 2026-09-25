@@ -1,4 +1,4 @@
-# FleetIQ — UI/UX Production Hardening Audit (Batch 1)
+# VEHYRON — UI/UX Production Hardening Audit (Batch 1)
 
 **Audit Date**: September 25, 2026  
 **Auditor**: Senior Product Designer + Frontend Architect + UX Engineer  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary & Problem Classification
 
-The current FleetIQ interface provides a solid set of functional concepts (Operations Intelligence Center, Vehicle Registry, Priority Actions, Intelligence Hub, Copilot Workspace, Governance Directory, and System Observability). However, the implementation suffers from severe "vibe-coded" / prototype anti-patterns:
+The current VEHYRON interface provides a solid set of functional concepts (Operations Intelligence Center, Vehicle Registry, Priority Actions, Intelligence Hub, Copilot Workspace, Governance Directory, and System Observability). However, the implementation suffers from severe "vibe-coded" / prototype anti-patterns:
 
 1. **Template & Vibe-Coded Aesthetics**:
    - Excessive card-in-card nesting, heavy drop shadows, rounded bubble containers (`rounded-3xl` everywhere), and pastel-colored backgrounds.

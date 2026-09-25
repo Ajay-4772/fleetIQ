@@ -1,4 +1,4 @@
-# FleetIQ — AI & Intelligence Copilot Handover
+# VEHYRON — AI & Intelligence Copilot Handover
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** AI Architecture & Model Operations  
@@ -8,7 +8,7 @@
 
 ## 1. AI Decision Architecture & Safety Invariants
 
-FleetIQ integrates AI as a decision support layer, not an autonomous authority for safety-critical fleet operations.
+VEHYRON integrates AI as a decision support layer, not an autonomous authority for safety-critical fleet operations.
 
 ### Deterministic Safety Primacy
 - If high-voltage battery cell temperature exceeds 55°C, or a critical brake sensor error occurs (`P0A80`, `C1201`), the **deterministic rule engine** instantly generates a `CRITICAL` priority action.

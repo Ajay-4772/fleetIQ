@@ -296,7 +296,7 @@ export const CopilotWorkspace: React.FC<CopilotWorkspaceProps> = ({ onSelectVehi
             </button>
             <div>
               <h2 className="text-sm font-bold text-slate-900 leading-tight">
-                {activeDetail?.conversation.title || 'FleetIQ Copilot'}
+                {activeDetail?.conversation.title || 'VEHYRON Copilot'}
               </h2>
             </div>
           </div>
@@ -337,7 +337,7 @@ export const CopilotWorkspace: React.FC<CopilotWorkspaceProps> = ({ onSelectVehi
                 <Sparkles className="w-6 h-6" aria-hidden="true" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-slate-900">FleetIQ Operations Assistant</h3>
+                <h3 className="text-base font-bold text-slate-900">VEHYRON Operations Assistant</h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
                   Query connected multi-OEM vehicles, fault codes, battery alerts, and operational priorities.
                 </p>
@@ -455,7 +455,7 @@ export const CopilotWorkspace: React.FC<CopilotWorkspaceProps> = ({ onSelectVehi
                   handleSendMessage();
                 }
               }}
-              placeholder="Ask FleetIQ Copilot about vehicles, DTC fault codes, or maintenance risk..."
+              placeholder="Ask VEHYRON Copilot about vehicles, DTC fault codes, or maintenance risk..."
               className="flex-1 bg-transparent border-none outline-none text-xs text-slate-800 placeholder-slate-400 resize-none font-sans"
             />
             <button

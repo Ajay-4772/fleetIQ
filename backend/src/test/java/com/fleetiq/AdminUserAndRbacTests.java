@@ -75,14 +75,14 @@ public class AdminUserAndRbacTests {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testAdminCreateUserAndAudit() throws Exception {
         String testUsername = "lead_tech_" + System.currentTimeMillis();
-        CreateUserRequest req = new CreateUserRequest(testUsername, "TechSecurePassword2026!", "Lead Technician", Role.ROLE_OPERATIONS_LEAD);
+        CreateUserRequest req = new CreateUserRequest(testUsername, "TechSecurePassword2026!", "Lead Technician", Role.ROLE_OPERATOR);
 
         mockMvc.perform(post("/api/v1/admin/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value(testUsername))
-                .andExpect(jsonPath("$.role").value("ROLE_OPERATIONS_LEAD"))
+                .andExpect(jsonPath("$.role").value("ROLE_OPERATOR"))
                 .andExpect(jsonPath("$.enabled").value(true));
 
         var userOpt = userRepository.findByUsername(testUsername);
@@ -98,7 +98,7 @@ public class AdminUserAndRbacTests {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     void testAdminDeactivateUser() throws Exception {
         String testUsername = "deact_" + System.currentTimeMillis();
-        CreateUserRequest req = new CreateUserRequest(testUsername, "TempPass2026!", "Temp User", Role.ROLE_VIEWER);
+        CreateUserRequest req = new CreateUserRequest(testUsername, "TempPass2026!", "Temp User", Role.ROLE_OPERATOR);
 
         String response = mockMvc.perform(post("/api/v1/admin/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,12 +127,12 @@ public class AdminUserAndRbacTests {
                 testUsername,
                 new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("SecurePass2026!"),
                 "Instant Deact User",
-                Role.ROLE_VIEWER
+                Role.ROLE_OPERATOR
         );
         user = userRepository.save(user);
 
         // Generate valid token for this user using autowired provider
-        String token = tokenProvider.generateToken(testUsername, "ROLE_VIEWER");
+        String token = tokenProvider.generateToken(testUsername, "ROLE_OPERATOR");
 
         // Request with active user succeeds
         mockMvc.perform(get("/api/v1/vehicles")
@@ -157,14 +157,14 @@ public class AdminUserAndRbacTests {
                 testUsername,
                 new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("SecurePass2026!"),
                 "Role Switch User",
-                Role.ROLE_VIEWER
+                Role.ROLE_OPERATOR
         );
         user = userRepository.save(user);
 
-        // Token minted with ROLE_VIEWER
-        String token = tokenProvider.generateToken(testUsername, "ROLE_VIEWER");
+        // Token minted with ROLE_OPERATOR
+        String token = tokenProvider.generateToken(testUsername, "ROLE_OPERATOR");
 
-        // /api/v1/admin/users requires ROLE_ADMIN -> should be forbidden for VIEWER
+        // /api/v1/admin/users requires ROLE_ADMIN -> should be forbidden for OPERATOR
         mockMvc.perform(get("/api/v1/admin/users")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());

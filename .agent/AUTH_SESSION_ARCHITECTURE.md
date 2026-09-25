@@ -1,4 +1,4 @@
-# FleetIQ — Authentication & Session Architecture
+# VEHYRON — Authentication & Session Architecture
 
 **Version:** 2.0.0  
 **Status:** Approved & Implemented  
@@ -8,10 +8,10 @@
 
 ## 1. Architectural Philosophy
 
-FleetIQ is a mission-critical connected vehicle intelligence platform processing high-velocity multi-OEM telematics, fleet diagnostic fault codes, and automated decision queues. The authentication and session architecture must satisfy three core engineering invariants:
+VEHYRON is a mission-critical connected vehicle intelligence platform processing high-velocity multi-OEM telematics, fleet diagnostic fault codes, and automated decision queues. The authentication and session architecture must satisfy three core engineering invariants:
 
 1. **Authoritative Server-Side Governance**: The backend is always the single source of truth. The frontend never decides authorization.
-2. **Instant Revocation Capability**: Stateless JWTs alone cannot be revoked without expiration. FleetIQ implements a hybrid model combining cryptographically signed short-lived access tokens with live database verification in `JwtAuthenticationFilter` and server-persisted, rotatable refresh tokens.
+2. **Instant Revocation Capability**: Stateless JWTs alone cannot be revoked without expiration. VEHYRON implements a hybrid model combining cryptographically signed short-lived access tokens with live database verification in `JwtAuthenticationFilter` and server-persisted, rotatable refresh tokens.
 3. **Defense-in-Depth**: Protection against token theft, brute-force dictionary attacks, CSRF, and account enumeration.
 
 ---
@@ -19,7 +19,7 @@ FleetIQ is a mission-critical connected vehicle intelligence platform processing
 ## 2. Token & Session Lifecycle
 
 ```
-[ Client ]                         [ FleetIQ Auth Controller ]               [ Database (PostgreSQL/H2) ]
+[ Client ]                         [ VEHYRON Auth Controller ]               [ Database (PostgreSQL/H2) ]
     │                                           │                                        │
     │ 1. POST /api/v1/auth/login                │                                        │
     ├──────────────────────────────────────────►│                                        │

@@ -9,6 +9,7 @@ import {
   Sparkles,
   Zap,
   Users,
+  Database,
   ChevronLeft,
   ChevronRight,
   PanelLeftClose,
@@ -24,7 +25,8 @@ export type NavTab =
   | 'intelligence'
   | 'copilot'
   | 'system'
-  | 'users';
+  | 'users'
+  | 'ingestion';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -104,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ]
     },
     {
-      group: 'GOVERNANCE',
+      group: 'ADMINISTRATION',
       items: [
         ...(isAdmin
           ? [
@@ -114,6 +116,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 icon: Users,
                 badge: 'ADMIN',
                 badgeColor: 'bg-purple-50 text-purple-600 border border-purple-200'
+              },
+              {
+                id: 'ingestion' as NavTab,
+                label: 'Data Ingestion',
+                icon: Database,
+                badge: 'ADMIN',
+                badgeColor: 'bg-blue-50 text-blue-600 border border-blue-200'
               }
             ]
           : []),
@@ -196,8 +205,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         ))}
 
-        {/* Secondary Operational / Testing Tools (Simulator) */}
-        {isOpsLeadOrAdmin && (
+        {/* Secondary Operational / Testing Tools (Simulator - Admin Only) */}
+        {isAdmin && (
           <div className="pt-2 border-t border-slate-100 space-y-1">
             {!isCollapsed && (
               <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">

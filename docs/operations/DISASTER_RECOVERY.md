@@ -1,4 +1,4 @@
-# FleetIQ — Disaster Recovery & Business Continuity Plan
+# VEHYRON — Disaster Recovery & Business Continuity Plan
 
 **Document Version:** 1.0.0-PROD  
 **Specification:** Recovery Objectives, Backup Strategies, and Failover Runbooks
@@ -36,5 +36,5 @@
 
 ## 3. High Availability & Multi-AZ Deployment
 
-- **Container Statelessness:** FleetIQ backend pods are deployed across at least two Availability Zones (AZ-a and AZ-b) managed by an Application Load Balancer with health checks pointing to `/actuator/health`.
+- **Container Statelessness:** VEHYRON backend pods are deployed across at least two Availability Zones (AZ-a and AZ-b) managed by an Application Load Balancer with health checks pointing to `/actuator/health`.
 - **Primary-Replica Failover:** AWS RDS or Cloud SQL automated failover promotes the hot-standby replica within 60 seconds if the primary database host experiences hardware degradation.

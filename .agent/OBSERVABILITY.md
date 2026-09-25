@@ -1,4 +1,4 @@
-# FleetIQ — Observability & Telemetry
+# VEHYRON — Observability & Telemetry
 
 **Framework**: Spring Boot Actuator, Micrometer Tracing, OpenTelemetry, SLF4J / Logback  
 **Health Check Endpoints**: `/actuator/health`, `/actuator/info`, `/actuator/metrics`  
@@ -9,7 +9,7 @@
 ## 1. Structured Logging & MDC Trace Correlation
 - **Format**: SLF4J parameterized logging with contextual markers.
 - **Logback Pattern**:
-  `%5p [${spring.application.name:fleetiq-backend},%X{traceId:-},%X{spanId:-}]`
+  `%5p [${spring.application.name:vehyron-backend},%X{traceId:-},%X{spanId:-}]`
   Every log statement automatically includes the active OpenTelemetry 128-bit `traceId` and 64-bit `spanId`.
 - **Log Levels**:
   - `ERROR`: Unhandled exceptions, failed database transactions, unrecoverable system errors.
@@ -25,7 +25,7 @@
 - **Sampling Probability**: `1.0` (100% trace sampling across all incoming requests).
 - **Propagation**: W3C Trace Context and B3 supported via `management.tracing.propagation.type: W3C,B3`.
 - **HTTP Response Header (`TraceResponseFilter`)**:
-  - Every HTTP response returned by FleetIQ automatically includes the header `X-Trace-Id: <traceId>`.
+  - Every HTTP response returned by VEHYRON automatically includes the header `X-Trace-Id: <traceId>`.
   - When an upstream service or client passes a W3C `traceparent` (e.g., `00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01`), the backend preserves and propagates the 128-bit trace ID.
 - **Real-Time SSE Correlation (`SseEmitterService`)**:
   - Outgoing `DashboardEventDto` telemetry events automatically carry `traceId` and matching `correlationId`, allowing client UIs to correlate live push events with server log traces.

@@ -1,7 +1,7 @@
-# FleetIQ — External Telematics Integration Guide
+# VEHYRON — External Telematics Integration Guide
 
 ## 1. Overview
-External telemetry producers (OEM cloud gateways, Geotab/Samsara telematics webhooks, or IoT devices) can stream events directly into FleetIQ via the Ingestion API.
+External telemetry producers (OEM cloud gateways, Geotab/Samsara telematics webhooks, or IoT devices) can stream events directly into VEHYRON via the Ingestion API.
 
 ---
 

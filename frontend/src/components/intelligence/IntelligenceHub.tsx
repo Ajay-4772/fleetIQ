@@ -142,10 +142,10 @@ export const IntelligenceHub: React.FC<IntelligenceHubProps> = ({
 
           <div className="p-5 rounded-2xl bg-blue-50/50 border border-blue-100 space-y-2">
             <h4 className="text-xs font-bold uppercase tracking-wider text-blue-900">
-              FleetIQ Decision Authority Model
+              VEHYRON Decision Authority Model
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              In FleetIQ, deterministic safety rules remain <strong className="text-slate-900">authoritative</strong>. If an external AI decision service (Jev AI) is unreachable, times out, or returns a confidence score below threshold (0.80), the platform automatically transitions to <code className="text-amber-800 bg-amber-100/70 px-1.5 py-0.5 rounded font-mono font-bold">RULE_ENGINE_FALLBACK</code> and flags the item for operator review rather than failing the ingestion pipeline.
+              In VEHYRON, deterministic safety rules remain <strong className="text-slate-900">authoritative</strong>. If an external AI decision service (Jev AI) is unreachable, times out, or returns a confidence score below threshold (0.80), the platform automatically transitions to <code className="text-amber-800 bg-amber-100/70 px-1.5 py-0.5 rounded font-mono font-bold">RULE_ENGINE_FALLBACK</code> and flags the item for operator review rather than failing the ingestion pipeline.
             </p>
           </div>
         </div>

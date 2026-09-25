@@ -1,4 +1,4 @@
-# FleetIQ — Domain Knowledge Base
+# VEHYRON — Domain Knowledge Base
 
 **Domain Area**: Connected Vehicle Telematics, Multi-OEM Normalization & Intelligent Action Prioritization  
 **Verification Date**: September 25, 2026

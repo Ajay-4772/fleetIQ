@@ -1,4 +1,4 @@
-# FleetIQ — Application Functionality & Data Integrity Audit
+# VEHYRON — Application Functionality & Data Integrity Audit
 
 **Audit Date**: September 25, 2026  
 **Auditor**: Principal Software Architect + QA Engineer  
@@ -21,7 +21,7 @@
 | **Vehicle Profile Modal** | **REAL** | Backed by `GET /api/v1/vehicles/{id}` and telemetry history query. Displays battery degradation curve and active directives. | Fully functional; close button, telemetry graph, and DTC chips work. |
 | **Priority Operational Action Center** | **REAL** | Backed by `GET /api/v1/actions` and `PATCH /api/v1/actions/{id}/status`. Server-enforced RBAC blocks Viewers. | Functional mutations; human review queue and CSV export work. |
 | **AI Copilot Workspace** | **REAL** | Full-page workspace backed by `CopilotChatService`, `ChatConversationRepository`, and `ChatMessageRepository`. | Persistent conversation history and user isolation work. Visual layout was too small and contained marketing text. |
-| **AI Decisioning & RAG Retrieval** | **PARTIALLY REAL** | In-memory RAG grounding over FleetIQ architecture, maintenance glossary, and vehicle database. Cloud JEV inference is abstracted. | When cloud credentials are absent, system safely executes deterministic fallback. UI must not claim "zero hallucination". |
+| **AI Decisioning & RAG Retrieval** | **PARTIALLY REAL** | In-memory RAG grounding over VEHYRON architecture, maintenance glossary, and vehicle database. Cloud JEV inference is abstracted. | When cloud credentials are absent, system safely executes deterministic fallback. UI must not claim "zero hallucination". |
 | **User Directory (Admin)** | **REAL** | Backed by `/api/v1/admin/users/**` and `UserRepository`. Create user, role change, and status toggle work. | Works, but JWT filter was not querying active database status per request. |
 | **Security Audit Trail** | **REAL** | Backed by `user_audit_logs` table. Records user creation, deactivation, and role changes. | Needs authentication events (`LOGIN_SUCCESS`, `LOGIN_FAILURE`, `LOGOUT`). |
 | **Scenario Simulator** | **SIMULATED** | `SimulatorService.runScenario()` generates synthetic bursts and fault injections. | Legitimate developer/testing tool, but was incorrectly exposed in primary user navigation. |

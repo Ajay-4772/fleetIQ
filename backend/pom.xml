@@ -11,10 +11,10 @@
     </parent>
 
     <groupId>com.fleetiq</groupId>
-    <artifactId>fleetiq-backend</artifactId>
+    <artifactId>vehyron-backend</artifactId>
     <version>1.0.0</version>
-    <name>fleetiq-backend</name>
-    <description>FleetIQ Connected Vehicle Intelligence Platform</description>
+    <name>vehyron-backend</name>
+    <description>VEHYRON Connected Vehicle Intelligence Platform</description>
 
     <properties>
         <java.version>17</java.version>
@@ -102,6 +102,23 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+        <!-- Excel & CSV Ingestion: Apache POI & Commons CSV -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.10.0</version>
         </dependency>
 
         <!-- Testing -->

@@ -1,4 +1,4 @@
-# FleetIQ — Current State
+# VEHYRON — Current State
 
 **Last Updated**: September 25, 2026  
 **Milestone**: Complete Authentication, Authorization, RBAC, and Login/Signup UX Rebuild (COMPLETED & VERIFIED)
@@ -37,8 +37,8 @@
 ---
 
 ## 3. Active Frontend UI / UX State
-- **Original FleetIQ Enterprise Authentication UI**:
-  - Replaced the previous 2-card copied template with an authentic, unified FleetIQ enterprise authentication experience matching the operational dashboard identity.
+- **Original VEHYRON Enterprise Authentication UI**:
+  - Replaced the previous 2-card copied template with an authentic, unified VEHYRON enterprise authentication experience matching the operational dashboard identity.
   - Completely removed decorative background blobs, oversized container rounding, and marketing security claims ("Security Protocol: TLS 1.3 / JWT RBAC").
   - Removed "QUICK DEV CREDENTIALS" (`Admin`, `Operator`, `Viewer`) chips from the production UI.
   - Dedicated interactive views for Sign In, Request Access / Register, Forgot Password, and Reset Password.

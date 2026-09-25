@@ -1,4 +1,4 @@
-# FleetIQ — UI Component Inventory & Reusability Catalog
+# VEHYRON — UI Component Inventory & Reusability Catalog
 
 **Version**: 2.0.0  
 **Status**: AUDITED  

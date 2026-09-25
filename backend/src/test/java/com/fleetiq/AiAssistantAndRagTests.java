@@ -62,9 +62,29 @@ public class AiAssistantAndRagTests {
         assertNotNull(response.getRecommendedAction());
     }
 
+    @Autowired
+    private com.fleetiq.repository.VehicleRepository vehicleRepository;
+
     @Test
     @DisplayName("Case A5: Hybrid query combining live vehicle status and diagnostic reasoning")
     void testAssistantHybridVehicleQuery() {
+        if (vehicleRepository.findById("VH-1001").isEmpty()) {
+            com.fleetiq.model.Vehicle v = new com.fleetiq.model.Vehicle();
+            v.setId("VH-1001");
+            v.setVin("1HGCR2F83HA001001");
+            v.setMake("Toyota");
+            v.setModel("Camry");
+            v.setYear(2023);
+            v.setFuelType("Hybrid");
+            v.setStatus("ACTIVE");
+            v.setBatteryHealthPct(82.0);
+            v.setOilLifePct(12.0);
+            v.setTirePressurePsi(31.0);
+            v.setMileageKm(34000L);
+            v.setCreatedAt(java.time.Instant.now());
+            vehicleRepository.save(v);
+        }
+
         AssistantResponseDto response = assistantService.processQuestion("Why is VH-1001 high priority?");
         assertNotNull(response.getAnswer());
         assertTrue(response.getAnswer().contains("VH-1001"));

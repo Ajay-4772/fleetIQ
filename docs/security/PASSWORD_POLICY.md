@@ -1,4 +1,4 @@
-# FleetIQ — Enterprise Password Policy & Cryptographic Standard
+# VEHYRON — Enterprise Password Policy & Cryptographic Standard
 
 **Document Version:** 2.0.0-PROD  
 **Specification:** Credential Hashing, Complexity Standards, Brute-Force Defense, and Reset Lifecycle  
@@ -36,7 +36,7 @@ All user passwords created through self-registration (`/register`), administrati
 
 ## 3. Account Lockout & Brute-Force Protection
 
-FleetIQ protects credentials against automated stuffing and brute-force attacks at two distinct layers:
+VEHYRON protects credentials against automated stuffing and brute-force attacks at two distinct layers:
 
 ### 3.1. Network & IP Rate Limiting
 - Handled by `RateLimitingFilter.java` using a sliding window token-bucket algorithm.
@@ -59,7 +59,7 @@ FleetIQ protects credentials against automated stuffing and brute-force attacks 
 sequenceDiagram
     autonumber
     actor User as Fleet User
-    participant Client as FleetIQ Web Client
+    participant Client as VEHYRON Web Client
     participant Auth as AuthService (Spring Boot)
     participant DB as PostgreSQL Database
 

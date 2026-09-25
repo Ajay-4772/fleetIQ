@@ -273,8 +273,6 @@ export const UserManagementPanel: React.FC = () => {
                         >
                           <option value="ROLE_ADMIN">ROLE_ADMIN</option>
                           <option value="ROLE_OPERATOR">ROLE_OPERATOR</option>
-                          <option value="ROLE_ANALYST">ROLE_ANALYST</option>
-                          <option value="ROLE_VIEWER">ROLE_VIEWER</option>
                         </select>
                       </td>
                       <td className="py-3.5 px-5">
@@ -427,7 +425,7 @@ export const UserManagementPanel: React.FC = () => {
                   required
                   value={createForm.email}
                   onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                  placeholder="jdoe@fleetiq.internal"
+                  placeholder="jdoe@vehyron.internal"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-900"
                 />
               </div>
@@ -451,10 +449,8 @@ export const UserManagementPanel: React.FC = () => {
                   onChange={(e) => setCreateForm({ ...createForm, role: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-900 font-semibold"
                 >
-                  <option value="ROLE_ADMIN">ROLE_ADMIN — Full System Access & User Admin</option>
-                  <option value="ROLE_OPERATOR">ROLE_OPERATOR — Operations, Actions & Telematics</option>
-                  <option value="ROLE_ANALYST">ROLE_ANALYST — Intelligence, Analytics & Reports</option>
-                  <option value="ROLE_VIEWER">ROLE_VIEWER — Read-Only Fleet Access</option>
+                  <option value="ROLE_ADMIN">ROLE_ADMIN — Full System Access & Data Ingestion</option>
+                  <option value="ROLE_OPERATOR">ROLE_OPERATOR — Operations, Alerts & Telemetry</option>
                 </select>
               </div>
 

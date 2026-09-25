@@ -29,6 +29,9 @@ public class DataInitializer implements CommandLineRunner {
     private final ObjectMapper objectMapper;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
+    @org.springframework.beans.factory.annotation.Value("${vehyron.seed.enabled:${fleetiq.seed.enabled:false}}")
+    private boolean seedEnabled;
+
     public DataInitializer(VehicleRepository vehicleRepository,
                            UserRepository userRepository,
                            FleetSimulatorService simulatorService,
@@ -43,29 +46,37 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Seed default users if empty
+        // Seed initial platform governance accounts if empty
         if (userRepository.count() == 0) {
-            log.info("Users table is empty. Initializing default role-based accounts...");
-            User admin = new com.fleetiq.model.User("admin", passwordEncoder.encode("Admin@FleetIQ2026"), "System Administrator", "admin@fleetiq.internal", com.fleetiq.model.Role.ROLE_ADMIN, "FleetIQ Core Ops");
+            log.info("Users table is empty. Initializing VEHYRON dual-role baseline accounts...");
+            User admin = new com.fleetiq.model.User(
+                    "admin",
+                    passwordEncoder.encode("Admin@Vehyron2026"),
+                    "VEHYRON Administrator",
+                    "admin@vehyron.internal",
+                    com.fleetiq.model.Role.ROLE_ADMIN,
+                    "VEHYRON Platform Operations"
+            );
             admin.setEmailVerified(true);
             userRepository.save(admin);
 
-            User opsLead = new com.fleetiq.model.User("ops_lead", passwordEncoder.encode("Ops@FleetIQ2026"), "Operations Lead", "ops@fleetiq.internal", com.fleetiq.model.Role.ROLE_OPERATIONS_LEAD, "FleetIQ Core Ops");
-            opsLead.setEmailVerified(true);
-            userRepository.save(opsLead);
-
-            User operator = new com.fleetiq.model.User("operator", passwordEncoder.encode("Operator@FleetIQ2026"), "Fleet Dispatcher", "operator@fleetiq.internal", com.fleetiq.model.Role.ROLE_OPERATOR, "FleetIQ Dispatch");
+            User operator = new com.fleetiq.model.User(
+                    "operator",
+                    passwordEncoder.encode("Operator@Vehyron2026"),
+                    "Fleet Operations Controller",
+                    "operator@vehyron.internal",
+                    com.fleetiq.model.Role.ROLE_OPERATOR,
+                    "VEHYRON Connected Dispatch"
+            );
             operator.setEmailVerified(true);
             userRepository.save(operator);
 
-            User viewer = new com.fleetiq.model.User("viewer", passwordEncoder.encode("Viewer@FleetIQ2026"), "Fleet Analyst", "viewer@fleetiq.internal", com.fleetiq.model.Role.ROLE_VIEWER, "FleetIQ Analytics");
-            viewer.setEmailVerified(true);
-            userRepository.save(viewer);
-            log.info("Initialized 4 default user accounts (admin, ops_lead, operator, viewer).");
+            log.info("Initialized 2 core role accounts: admin (ROLE_ADMIN) and operator (ROLE_OPERATOR).");
         }
 
-        if (vehicleRepository.count() == 0) {
-            log.info("Vehicle table is empty. Initializing synthetic vehicle fleet from seed-vehicles.json...");
+        // Vehicle Data: Only seed if explicitly enabled via vehyron.seed.enabled=true (isolated dev/test profile)
+        if (seedEnabled && vehicleRepository.count() == 0) {
+            log.info("Synthetic seed profile enabled. Initializing vehicle fleet from seed-vehicles.json for local evaluation...");
             try {
                 ClassPathResource resource = new ClassPathResource("seed-vehicles.json");
                 if (resource.exists()) {
@@ -92,17 +103,14 @@ public class DataInitializer implements CommandLineRunner {
                             }
                             vehicleRepository.save(v);
                         }
-                        log.info("Successfully seeded {} vehicles into database.", vehicleRepository.count());
+                        log.info("Successfully seeded {} vehicles into database for local evaluation.", vehicleRepository.count());
                     }
                 }
             } catch (Exception e) {
                 log.error("Failed to seed initial vehicles: {}", e.getMessage(), e);
             }
-
-            // Generate initial mixed fleet scenario
-            log.info("Generating baseline demonstration fleet scenario...");
-            simulatorService.runScenario("mixed_fleet", null);
-            log.info("Baseline demonstration scenario initialized.");
+        } else {
+            log.info("VEHYRON production zero-static-data mode active: Database contains {} live vehicles.", vehicleRepository.count());
         }
     }
 }

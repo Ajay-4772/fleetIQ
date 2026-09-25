@@ -1,4 +1,4 @@
-# FleetIQ — Production Readiness Audit & Verification Report
+# VEHYRON — Production Readiness Audit & Verification Report
 
 **Audit Date:** September 25, 2026  
 **Version:** 2.0.0-PROD-AUDIT  
@@ -29,7 +29,7 @@
 | **TypeSpace AI** | NON-EXISTENT | **NOT IMPLEMENTED / OMITTED** |
 | **Distributed Redis Cluster** | ARCHITECTED | **PLANNED FOR MULTI-NODE STAGE** |
 
-**Overall Platform Assessment:** **PRODUCTION READY FOR STANDALONE ENTERPRISE OPERATIONS & DEPLOYMENT**. Dual-token authentication, real-time zero-trust RBAC, account lockout, audit logging, and original FleetIQ enterprise UX are completely verified. Real cloud LLM inference requires insertion of corporate API credentials into `FLEETIQ_AI_API_KEY`.
+**Overall Platform Assessment:** **PRODUCTION READY FOR STANDALONE ENTERPRISE OPERATIONS & DEPLOYMENT**. Dual-token authentication, real-time zero-trust RBAC, account lockout, audit logging, and original VEHYRON enterprise UX are completely verified. Real cloud LLM inference requires insertion of corporate API credentials into `FLEETIQ_AI_API_KEY`.
 
 ---
 
@@ -53,7 +53,7 @@
    - Single-use, 1-hour expiring password reset tokens that cascade-revoke active sessions upon completion.
 6. **Tiered Rate Limiter (`RateLimitingFilter.java`):** 15 req/min on `/auth/**`, 40 req/min on `/assistant/**`, 300 req/min on `/telemetry/**`, 600 req/min on general routes. Tested via `ErrorHandlingAndRateLimitingTests.java`.
 7. **Unified Error Handling (`GlobalExceptionHandler.java`):** Emits structured `ApiErrorResponse` JSON with correlation IDs (`traceId`). Zero stack traces, SQL errors, or class paths are leaked to external callers.
-8. **Original FleetIQ Enterprise Authentication UI (`LoginPage.tsx`):**
+8. **Original VEHYRON Enterprise Authentication UI (`LoginPage.tsx`):**
    - Completely replaced previous copied template with an authentic single-card enterprise layout matching the operations dashboard identity.
    - Purged decorative waves, floating SVG blobs, oversized container rounding, and internal marketing claims ("Security Protocol: TLS 1.3 / JWT RBAC").
    - Purged "QUICK DEV CREDENTIALS" chips from production UI.

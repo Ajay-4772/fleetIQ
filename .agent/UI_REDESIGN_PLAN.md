@@ -1,4 +1,4 @@
-# FleetIQ — UI/UX Production Redesign & Hardening Plan
+# VEHYRON — UI/UX Production Redesign & Hardening Plan
 
 **Version**: 2.0.0  
 **Status**: APPROVED FOR EXECUTION  

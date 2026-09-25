@@ -1,4 +1,4 @@
-# FleetIQ — Security Architecture Specification
+# VEHYRON — Security Architecture Specification
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Enterprise Security Baseline  
@@ -8,7 +8,7 @@
 
 ## 1. Security Architecture Principles
 
-FleetIQ implements a defense-in-depth architecture designed for zero-trust multi-OEM telematics operations. Security controls are enforced at network boundaries, application filters, service layers, and database transactions.
+VEHYRON implements a defense-in-depth architecture designed for zero-trust multi-OEM telematics operations. Security controls are enforced at network boundaries, application filters, service layers, and database transactions.
 
 ```
 [ TLS 1.3 Termination / WAF ]

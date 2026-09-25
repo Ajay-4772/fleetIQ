@@ -1,4 +1,4 @@
-# FleetIQ — Security Engineering & Hardening
+# VEHYRON — Security Engineering & Hardening
 
 **Security Baseline**: Production Grade (Enterprise Fleet Intelligence)  
 **Authentication Standard**: Dual-Token (Stateless 15-min HMAC-SHA256 JWT Access Token + Stateful 7-day Rotatable UUID Refresh Token)  

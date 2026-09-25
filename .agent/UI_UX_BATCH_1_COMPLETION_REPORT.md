@@ -1,4 +1,4 @@
-# FleetIQ — UI/UX Batch 1 Screenshot Audit & Hardening Completion Report
+# VEHYRON — UI/UX Batch 1 Screenshot Audit & Hardening Completion Report
 
 **Audit Batch**: Batch 1  
 **Execution Date**: September 25, 2026  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-This report documents the systematic audit, architectural hardening, and verification of **Batch 1 UI screenshots** for FleetIQ. The objective was to evolve FleetIQ from an AI-template/vibe-coded prototype into a **production-grade enterprise fleet intelligence platform**.
+This report documents the systematic audit, architectural hardening, and verification of **Batch 1 UI screenshots** for VEHYRON. The objective was to evolve VEHYRON from an AI-template/vibe-coded prototype into a **production-grade enterprise fleet intelligence platform**.
 
 All 25 tracked issues (UI-001 through UI-025) have been remediated at root-cause level, backed by real database state, server-authoritative RBAC, clean typography, low visual noise, and verified via end-to-end browser testing and screenshot captures.
 

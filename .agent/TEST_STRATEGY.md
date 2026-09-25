@@ -1,4 +1,4 @@
-# FleetIQ — Testing Strategy & Quality Assurance
+# VEHYRON — Testing Strategy & Quality Assurance
 
 **Target Frameworks**: JUnit 5, Mockito 5, Spring Boot Starter Test, Spring Security Test  
 **Active Test Suite**: 8 Test Classes, 42 Tests, 100% Pass Rate  

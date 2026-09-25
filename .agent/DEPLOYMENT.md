@@ -1,4 +1,4 @@
-# FleetIQ — Deployment & Release Strategy
+# VEHYRON — Deployment & Release Strategy
 
 **Target Platforms**: Docker, Docker Compose, Linux Container Environments  
 **Orchestration**: `docker-compose.yml` (multi-container: PostgreSQL, Backend, Frontend)
@@ -6,17 +6,17 @@
 ---
 
 ## 1. Container Architecture
-- **PostgreSQL Service (`fleetiq-postgres`)**:
+- **PostgreSQL Service (`vehyron-postgres`)**:
   - Image: `postgres:15-alpine`
   - Port: `5432:5432`
   - Healthcheck: `pg_isready -U fleetiq_user -d fleetiq`
   - Volume: `postgres_data` persistent volume.
-- **Backend Service (`fleetiq-backend`)**:
+- **Backend Service (`vehyron-backend`)**:
   - Multi-stage Docker build producing a lightweight JRE 17 runtime container.
   - Environment: `SPRING_PROFILES_ACTIVE=postgres`, connected to database container via internal Docker network.
   - Port: `8080:8080`
   - Startup Dependency: Waits on `postgres` service condition `service_healthy`.
-- **Frontend Service (`fleetiq-frontend`)**:
+- **Frontend Service (`vehyron-frontend`)**:
   - Multi-stage build (Node build -> Nginx alpine runtime).
   - Port: `5173:80` (or `80:80` in production reverse proxy configuration).
   - Routes API calls to backend container.
@@ -52,7 +52,7 @@ curl -s http://localhost:8080/actuator/health | grep UP
 curl -I http://localhost:5173
 
 # 4. View container logs:
-docker-compose logs -f fleetiq-backend
+docker-compose logs -f vehyron-backend
 ```
 
 ---

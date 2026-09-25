@@ -1,4 +1,4 @@
-# FleetIQ — Current System & Production Readiness Audit
+# VEHYRON — Current System & Production Readiness Audit
 
 **Audit Date**: September 25, 2026  
 **Auditor**: Principal Software Architect & Lead Systems Engineer  
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This audit performs an evidence-based inspection of the actual FleetIQ codebase across the backend, frontend, database, AI/RAG subsystems, security, operations, and deployment tooling. No capability is claimed unless verified directly in source code.
+This audit performs an evidence-based inspection of the actual VEHYRON codebase across the backend, frontend, database, AI/RAG subsystems, security, operations, and deployment tooling. No capability is claimed unless verified directly in source code.
 
 ---
 
@@ -33,7 +33,7 @@ This audit performs an evidence-based inspection of the actual FleetIQ codebase 
 | **Auth & Security** | JWT Authentication | **IMPLEMENTED** | `JwtTokenProvider.java`, `JwtAuthenticationFilter.java` validating Bearer tokens |
 | **Auth & Security** | Ingestion API Key Filter | **IMPLEMENTED** | `ApiKeyAuthenticationFilter.java` (`X-API-Key` header enforcement) |
 | **Auth & Security** | Password Hashing | **IMPLEMENTED** | BCrypt password encoder in `SecurityConfig.java` |
-| **Auth & Security** | Demo Credentials in Backend | **HARDCODED** | `DataInitializer.java` seeds 4 hardcoded accounts (`Admin@FleetIQ2026`, etc.) |
+| **Auth & Security** | Demo Credentials in Backend | **HARDCODED** | `DataInitializer.java` seeds 4 hardcoded accounts (`Admin@VEHYRON2026`, etc.) |
 | **Auth & Security** | Frontend Auto-Login & Hardcoded Credentials | **DEMO / INSECURE** | `AuthContext.tsx` contains hardcoded `DEMO_CREDENTIALS` and auto-logs in as `ops_lead` |
 | **Auth & Security** | User Management (Admin Portal) | **MISSING** | No endpoints or UI to create, deactivate, search, or assign roles to portal users |
 | **Auth & Security** | RBAC Enforcement | **PARTIALLY IMPLEMENTED**| Backend enforces roles on `/api/v1/actions` and `/api/v1/system`, but no user admin RBAC |

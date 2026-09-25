@@ -1,4 +1,4 @@
-# FleetIQ — Rate Limiting & Denial-of-Service Defense
+# VEHYRON — Rate Limiting & Denial-of-Service Defense
 
 **Document Version:** 1.0.0-PROD  
 **Specification:** Ingestion Protection, AI Cost Controls, and API Throttling
@@ -7,7 +7,7 @@
 
 ## 1. Overview & Architectural Motivation
 
-To protect FleetIQ against brute-force authentication attacks, accidental telemetry floods, and excessive external AI inference costs, incoming requests pass through `RateLimitingFilter` prior to controller invocation.
+To protect VEHYRON against brute-force authentication attacks, accidental telemetry floods, and excessive external AI inference costs, incoming requests pass through `RateLimitingFilter` prior to controller invocation.
 
 Requests exceeding defined window thresholds receive an **HTTP 429 Too Many Requests** response formatted in compliant `ApiErrorResponse` JSON with a `Retry-After: 60` HTTP header.
 

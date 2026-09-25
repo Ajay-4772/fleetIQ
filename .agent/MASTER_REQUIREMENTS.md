@@ -1,4 +1,4 @@
-# FleetIQ — Master Requirements Specification
+# VEHYRON — Master Requirements Specification
 
 **Document Version**: 2.0.0-PROD  
 **Status**: ACTIVE / CANONICAL  
@@ -8,7 +8,7 @@
 ---
 
 ## 1. Product Requirements
-- **PRD-01**: FleetIQ must function as an enterprise-grade connected vehicle intelligence platform providing real-time fleet health monitoring, predictive maintenance alerts, and prioritized operational action directives.
+- **PRD-01**: VEHYRON must function as an enterprise-grade connected vehicle intelligence platform providing real-time fleet health monitoring, predictive maintenance alerts, and prioritized operational action directives.
 - **PRD-02**: The platform must support multiple commercial automotive and heavy-duty OEMs through decoupled telemetry normalization adapters.
 - **PRD-03**: All operational decisions must provide clear financial impact attribution (downtime risk cost, critical failure prevention ROI).
 - **PRD-04**: The system must operate reliably 24/7 with zero dependence on experimental AI availability.
@@ -36,7 +36,7 @@
 - **AUT-02**: Implement a formal Login / Logout authentication flow backed by bcrypt password verification and cryptographically signed JWT tokens.
 - **AUT-03**: Support JWT token expiration and user account status verification (`enabled: true`).
 - **AUT-04**: Separate authentication credentials strictly across Development, Staging, and Production environments via environment variables.
-- **AUT-05**: Original FleetIQ Enterprise Authentication UI: Custom, professional single-card layout matching the operations dashboard identity; zero cloning/copying of reference templates; zero decorative waves, blobs, or oversized tablet rounding.
+- **AUT-05**: Original VEHYRON Enterprise Authentication UI: Custom, professional single-card layout matching the operations dashboard identity; zero cloning/copying of reference templates; zero decorative waves, blobs, or oversized tablet rounding.
 - **AUT-06**: Strict Removal of Security Protocol Marketing Claims: No internal implementation details displayed on UI ("Security Protocol: TLS 1.3 / JWT RBAC", deterministic fallback, internal architecture labels).
 - **AUT-07**: Complete Removal of Quick Dev Credentials from Production UI: Dev chips (`Admin`, `Operator`, `Viewer`) purged from production view.
 - **AUT-08**: Dual-Token Architecture: Short-lived 15-minute stateless HMAC-SHA256 JWT access token paired with stateful 7-day rotatable refresh token persisted in PostgreSQL.

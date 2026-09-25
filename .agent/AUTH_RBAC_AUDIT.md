@@ -1,4 +1,4 @@
-# FleetIQ — Authentication & RBAC Architecture Audit
+# VEHYRON — Authentication & RBAC Architecture Audit
 
 **Audit Date**: September 25, 2026  
 **Auditor**: Principal Security Engineer + Backend Architect  

@@ -1,4 +1,4 @@
-# FleetIQ — Database Operations & Migration Handover
+# VEHYRON — Database Operations & Migration Handover
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Database Architecture & Schema Governance  
@@ -8,7 +8,7 @@
 
 ## 1. Database Engine & Schema Governance
 
-FleetIQ exclusively utilizes **PostgreSQL 15+** with versioned, reproducible Flyway migration scripts. In-memory H2 is retained only for lightning-fast, zero-dependency unit tests during `mvn test`.
+VEHYRON exclusively utilizes **PostgreSQL 15+** with versioned, reproducible Flyway migration scripts. In-memory H2 is retained only for lightning-fast, zero-dependency unit tests during `mvn test`.
 
 ### Migration Scripts Location
 All schema definitions reside in `backend/src/main/resources/db/migration/`:

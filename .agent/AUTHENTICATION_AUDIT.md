@@ -1,4 +1,4 @@
-# FleetIQ — Complete Authentication & Authorization Security Audit
+# VEHYRON — Complete Authentication & Authorization Security Audit
 
 **Audit Date:** September 2026  
 **Auditor:** Principal Software Architect & Lead Security Engineer  
@@ -53,7 +53,7 @@
 1. **Quick Dev Credentials**:
    * The login interface displayed "QUICK DEV CREDENTIALS" chips (`Admin`, `Operator`, `Viewer`) with hardcoded pre-fill credentials in the production component.
 2. **Copied UI Design**:
-   * The login UI was an imitation of an external two-card template with decorative SVG blobs, not matching FleetIQ's enterprise operational dashboard aesthetic.
+   * The login UI was an imitation of an external two-card template with decorative SVG blobs, not matching VEHYRON's enterprise operational dashboard aesthetic.
 
 ---
 
@@ -79,7 +79,7 @@
 | **SEC-03** | Registration | No server-side registration endpoint. Public self-signup must enforce default restricted role (`ROLE_VIEWER`). | High | Implement `POST /api/v1/auth/register` with strict validation, preventing role escalation. |
 | **SEC-04** | Password Reset | No secure reset token mechanism. Users cannot reset forgotten passwords securely. | High | Implement `PasswordResetToken` table, `/forgot-password`, and `/reset-password` endpoints. |
 | **SEC-05** | UI Credentials | Hardcoded quick dev credentials rendered on the production login screen. | Critical | Remove quick credentials completely from production UI; isolate test fixtures to tests. |
-| **SEC-06** | UI Aesthetic | Vibe-coded, copied two-card layout with decorative blobs instead of authentic FleetIQ enterprise theme. | Medium | Redesign original single-portal enterprise layout adhering to FleetIQ design tokens. |
+| **SEC-06** | UI Aesthetic | Vibe-coded, copied two-card layout with decorative blobs instead of authentic VEHYRON enterprise theme. | Medium | Redesign original single-portal enterprise layout adhering to VEHYRON design tokens. |
 | **SEC-07** | Password Policy | No server-side enforcement of password complexity (minimum length, uppercase, numbers, symbols). | Medium | Implement `PasswordPolicyValidator` enforcing enterprise complexity rules. |
 | **SEC-08** | Brute Force Protection | Account lockout mechanism missing after repeated failed login attempts. | Medium | Track `failed_attempts` and `locked_until` in `User` entity. |
 
@@ -105,5 +105,5 @@
 3. **Frontend Authentication Architecture**:
    * Update `AuthContext.tsx` with full session state lifecycle (`UNAUTHENTICATED`, `AUTHENTICATING`, `AUTHENTICATED`, `SESSION_EXPIRED`, `ACCOUNT_DISABLED`, `LOGGING_OUT`).
    * Implement automatic token refresh on expiry and token rotation.
-   * Completely rebuild `LoginPage.tsx` into an authentic, calm, enterprise-grade FleetIQ authentication portal supporting Sign In, Register, Forgot Password, and Reset Password views with comprehensive error and loading states.
+   * Completely rebuild `LoginPage.tsx` into an authentic, calm, enterprise-grade VEHYRON authentication portal supporting Sign In, Register, Forgot Password, and Reset Password views with comprehensive error and loading states.
    * Remove all decorative background blobs and quick-dev credentials from production UI.

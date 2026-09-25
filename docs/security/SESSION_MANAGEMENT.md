@@ -1,4 +1,4 @@
-# FleetIQ — Enterprise Session Management Specification
+# VEHYRON — Enterprise Session Management Specification
 
 **Document Version:** 2.0.0-PROD  
 **Specification:** Dual-Token Session Lifecycle, Token Rotation, Stateful Revocation, and Invalidation  
@@ -8,7 +8,7 @@
 
 ## 1. Session Architecture Overview
 
-FleetIQ implements a hybrid session architecture combining the scalability of stateless JWT access tokens with the granular control of stateful, rotatable refresh tokens stored in PostgreSQL.
+VEHYRON implements a hybrid session architecture combining the scalability of stateless JWT access tokens with the granular control of stateful, rotatable refresh tokens stored in PostgreSQL.
 
 ```
 +-----------------------------------------------------------------------------------+
@@ -84,7 +84,7 @@ FleetIQ implements a hybrid session architecture combining the scalability of st
 
 ## 4. Concurrent Sessions & Multi-Device Governance
 
-- FleetIQ supports concurrent sessions across multiple devices.
+- VEHYRON supports concurrent sessions across multiple devices.
 - Each device/browser login establishes an independent `RefreshToken` record tied to the user's `user_id`.
 - Revoking a specific session invalidates only that device's token.
 - Changing a password or administrative deactivation performs a cascade revocation of **all** refresh tokens belonging to the user.

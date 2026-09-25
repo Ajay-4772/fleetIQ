@@ -1,4 +1,4 @@
-# FleetIQ — Operations & Site Reliability Engineering Guide
+# VEHYRON — Operations & Site Reliability Engineering Guide
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** SRE Operational Guide  
@@ -8,7 +8,7 @@
 
 ## 1. Health Checks & Readiness Probes
 
-FleetIQ exposes Spring Boot Actuator endpoints for container orchestrators and synthetic uptime monitors:
+VEHYRON exposes Spring Boot Actuator endpoints for container orchestrators and synthetic uptime monitors:
 - **`GET /actuator/health`:** Overall system health.
 - **`GET /actuator/health/liveness`:** Verifies JVM process is responsive; failure triggers container restart.
 - **`GET /actuator/health/readiness`:** Verifies PostgreSQL database connectivity and Flyway migration state; failure removes pod from load balancer routing.

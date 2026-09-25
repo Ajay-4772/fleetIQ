@@ -1,4 +1,4 @@
-# FleetIQ — Enterprise Error Handling & Fault Taxonomy
+# VEHYRON — Enterprise Error Handling & Fault Taxonomy
 
 **Document Version:** 1.0.0-PROD  
 **Specification:** API Error Contracts, Status Codes, and Leakage Prevention
@@ -7,7 +7,7 @@
 
 ## 1. Global Error Architecture
 
-FleetIQ routes all unhandled runtime exceptions through `GlobalExceptionHandler` (`@RestControllerAdvice`). The application strictly prohibits returning stack traces, SQL syntax exceptions, database connection strings, or server filesystem paths to external clients.
+VEHYRON routes all unhandled runtime exceptions through `GlobalExceptionHandler` (`@RestControllerAdvice`). The application strictly prohibits returning stack traces, SQL syntax exceptions, database connection strings, or server filesystem paths to external clients.
 
 ### Standardized Error Contract (`ApiErrorResponse`)
 Every error response is returned with `Content-Type: application/json` conforming to this schema:
@@ -38,5 +38,5 @@ Every error response is returned with `Content-Type: application/json` conformin
 | **409** | `CONFLICT` | Attempting to create duplicate username or conflicting state transition. | Use unique identifier. |
 | **422** | `UNPROCESSABLE_ENTITY` | Telematics sensor readings violate physical invariants (e.g. speed < 0 km/h). | Check OEM sensor telemetry feed calibration. |
 | **429** | `TOO_MANY_REQUESTS` | IP or account exceeded route tier rate limit. | Wait for duration specified in `Retry-After` header. |
-| **500** | `INTERNAL_SERVER_ERROR` | Unexpected backend runtime fault. Stack trace logged server-side only. | Provide `correlationId` to FleetIQ Operations Support. |
+| **500** | `INTERNAL_SERVER_ERROR` | Unexpected backend runtime fault. Stack trace logged server-side only. | Provide `correlationId` to VEHYRON Operations Support. |
 | **503** | `SERVICE_UNAVAILABLE` | Database migration in progress or dependent broker temporarily unreachable. | Retry request after short exponential backoff. |

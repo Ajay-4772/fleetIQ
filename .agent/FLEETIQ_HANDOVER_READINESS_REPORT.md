@@ -1,4 +1,4 @@
-# FleetIQ — Company Handover Readiness Report
+# VEHYRON — Company Handover Readiness Report
 
 **Handover Date:** 2026-09-25  
 **Product Version:** 1.0.0-PROD  
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary & Verification Matrix
 
-FleetIQ has been transformed from an AI coding prototype into an independent, production-grade enterprise software product ready for formal corporate handover.
+VEHYRON has been transformed from an AI coding prototype into an independent, production-grade enterprise software product ready for formal corporate handover.
 
 | Handover Dimension | Status | Verification Evidence |
 | :--- | :---: | :--- |

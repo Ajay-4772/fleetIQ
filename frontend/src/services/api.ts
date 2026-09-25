@@ -20,23 +20,25 @@ import {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-// Token management in localStorage
-let currentToken: string | null = localStorage.getItem('fleetiq_auth_token') || null;
-let currentRefreshToken: string | null = localStorage.getItem('fleetiq_refresh_token') || null;
+// Token management in localStorage with backward-compatible migration
+let currentToken: string | null = localStorage.getItem('vehyron_auth_token') || localStorage.getItem('fleetiq_auth_token') || null;
+let currentRefreshToken: string | null = localStorage.getItem('vehyron_refresh_token') || localStorage.getItem('fleetiq_refresh_token') || null;
 
 export const setAuthToken = (token: string | null, refreshToken?: string | null) => {
   currentToken = token;
   if (token) {
-    localStorage.setItem('fleetiq_auth_token', token);
+    localStorage.setItem('vehyron_auth_token', token);
   } else {
+    localStorage.removeItem('vehyron_auth_token');
     localStorage.removeItem('fleetiq_auth_token');
   }
 
   if (refreshToken !== undefined) {
     currentRefreshToken = refreshToken;
     if (refreshToken) {
-      localStorage.setItem('fleetiq_refresh_token', refreshToken);
+      localStorage.setItem('vehyron_refresh_token', refreshToken);
     } else {
+      localStorage.removeItem('vehyron_refresh_token');
       localStorage.removeItem('fleetiq_refresh_token');
     }
   }
@@ -73,11 +75,11 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export const api = {
   // Authentication
-  login: (username: string, password: string): Promise<LoginResponse> =>
+  login: (username: string, password: string, requestedRole?: string): Promise<LoginResponse> =>
     fetch(`${BASE_URL}/api/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username, password, requestedRole })
     })
       .then(handleResponse<LoginResponse>)
       .then((res) => {
@@ -376,5 +378,98 @@ export const api = {
   getAdminAuditLogs: (): Promise<import('../types').UserAuditLog[]> =>
     fetch(`${BASE_URL}/api/v1/admin/users/audit`, {
       headers: authHeaders()
-    }).then(handleResponse<import('../types').UserAuditLog[]>)
+    }).then(handleResponse<import('../types').UserAuditLog[]>),
+
+  // Ingestion & Data Sources Management
+  getIngestionSources: (): Promise<import('../types').DataSource[]> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/sources`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').DataSource[]>),
+
+  createIngestionSource: (data: Partial<import('../types').DataSource>): Promise<import('../types').DataSource> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/sources`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(data)
+    }).then(handleResponse<import('../types').DataSource>),
+
+  updateIngestionSource: (id: string, data: Partial<import('../types').DataSource>): Promise<import('../types').DataSource> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/sources/${id}`, {
+      method: 'PUT',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify(data)
+    }).then(handleResponse<import('../types').DataSource>),
+
+  deleteIngestionSource: (id: string): Promise<void> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/sources/${id}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    }).then(() => {}),
+
+  testIngestionSource: (id: string): Promise<{ sourceId: string; connected: boolean; message: string }> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/sources/${id}/test`, {
+      method: 'POST',
+      headers: authHeaders()
+    }).then(handleResponse<{ sourceId: string; connected: boolean; message: string }>),
+
+  startIngestionSource: (id: string): Promise<import('../types').DataSource> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/sources/${id}/start`, {
+      method: 'POST',
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').DataSource>),
+
+  stopIngestionSource: (id: string): Promise<import('../types').DataSource> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/sources/${id}/stop`, {
+      method: 'POST',
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').DataSource>),
+
+  previewUpload: (file: File): Promise<any> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return fetch(`${BASE_URL}/api/v1/ingestion/upload/preview`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: formData
+    }).then(handleResponse<any>);
+  },
+
+  uploadDataset: (file: File, mapping?: Record<string, string>): Promise<import('../types').IngestionJob> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (mapping) {
+      formData.append('mapping', JSON.stringify(mapping));
+    }
+    return fetch(`${BASE_URL}/api/v1/ingestion/upload`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: formData
+    }).then(handleResponse<import('../types').IngestionJob>);
+  },
+
+  getIngestionJobs: (): Promise<import('../types').IngestionJob[]> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/jobs`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').IngestionJob[]>),
+
+  getIngestionQualityMetrics: (): Promise<import('../types').DataQualityMetrics> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/quality`, {
+      headers: authHeaders()
+    }).then(handleResponse<import('../types').DataQualityMetrics>),
+
+  getRawRecords: (): Promise<any[]> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/raw-records`, {
+      headers: authHeaders()
+    }).then(handleResponse<any[]>),
+
+  retryRawRecord: (recordId: number): Promise<any> =>
+    fetch(`${BASE_URL}/api/v1/ingestion/retry/${recordId}`, {
+      method: 'POST',
+      headers: authHeaders()
+    }).then(handleResponse<any>),
+
+  getSystemStatus: (): Promise<any> =>
+    fetch(`${BASE_URL}/api/v1/system/status`, {
+      headers: authHeaders()
+    }).then(handleResponse<any>)
 };

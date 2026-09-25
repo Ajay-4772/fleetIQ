@@ -1,4 +1,4 @@
-# FleetIQ — Production Deployment & Infrastructure Guide
+# VEHYRON — Production Deployment & Infrastructure Guide
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** DevOps / Infrastructure  
@@ -8,7 +8,7 @@
 
 ## 1. Environment Configurations
 
-FleetIQ maintains strict environment segregation:
+VEHYRON maintains strict environment segregation:
 
 | Property | Development | Staging | Production |
 | :--- | :--- | :--- | :--- |
@@ -25,10 +25,10 @@ FleetIQ maintains strict environment segregation:
 ### Multi-Stage Container Builds
 ```bash
 # Build Backend Container Image
-docker build -t [REGISTRY_HOST]/fleetiq-backend:1.0.0 -f backend/Dockerfile backend/
+docker build -t [REGISTRY_HOST]/vehyron-backend:1.0.0 -f backend/Dockerfile backend/
 
 # Build Frontend Container Image (Vite static assets served by Nginx Alpine)
-docker build -t [REGISTRY_HOST]/fleetiq-frontend:1.0.0 -f frontend/Dockerfile frontend/
+docker build -t [REGISTRY_HOST]/vehyron-frontend:1.0.0 -f frontend/Dockerfile frontend/
 ```
 
 ### Full-Stack Docker Compose Deployment
@@ -38,7 +38,7 @@ docker compose up -d --build
 
 # Verify container health
 docker compose ps
-docker compose logs -f fleetiq-backend
+docker compose logs -f vehyron-backend
 ```
 
 ---

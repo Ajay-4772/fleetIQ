@@ -1,7 +1,7 @@
-# FleetIQ — Retrieval-Augmented Generation (RAG) Architecture
+# VEHYRON — Retrieval-Augmented Generation (RAG) Architecture
 
-## 1. Purpose of RAG in FleetIQ
-In FleetIQ, the RAG layer is strictly dedicated to **technical knowledge retrieval**. It provides domain context that cannot be derived solely from relational telemetry records:
+## 1. Purpose of RAG in VEHYRON
+In VEHYRON, the RAG layer is strictly dedicated to **technical knowledge retrieval**. It provides domain context that cannot be derived solely from relational telemetry records:
 - Standard Diagnostic Trouble Code (DTC) explanations (SAE J2012 standards).
 - OEM telemetry schema documentation (Toyota, Ford, BMW, Tesla).
 - Thresholds and calculation formulas used by the rule engine.
@@ -43,5 +43,5 @@ Markdown Documents (src/main/resources/knowledge/*.md)
 
 To adhere strictly to licensing and privacy guidelines:
 1. **No Confidential Data in RAG**: Private personal information, customer proprietary fleet metrics, passwords, and external API keys are **never** indexed into RAG.
-2. **Open-Standard Knowledge Only**: Knowledge documents are derived exclusively from public automotive standards (OBD-II, SAE J1939, SAE J2012) and synthetic FleetIQ architecture documentation.
-3. **Pluggable Vector Storage**: FleetIQ includes a zero-dependency lexical/semantic in-memory retriever by default, with an optional native PostgreSQL `pgvector` migration profile for production scale.
+2. **Open-Standard Knowledge Only**: Knowledge documents are derived exclusively from public automotive standards (OBD-II, SAE J1939, SAE J2012) and synthetic VEHYRON architecture documentation.
+3. **Pluggable Vector Storage**: VEHYRON includes a zero-dependency lexical/semantic in-memory retriever by default, with an optional native PostgreSQL `pgvector` migration profile for production scale.

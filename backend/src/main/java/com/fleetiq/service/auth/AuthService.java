@@ -124,7 +124,22 @@ public class AuthService {
                     "Authentication rejected: user account is deactivated",
                     ip
             ));
-            throw new DisabledException("Account has been deactivated. Please contact your FleetIQ Administrator.");
+            throw new DisabledException("Account has been deactivated. Please contact your VEHYRON Administrator.");
+        }
+
+        // Verify selected account role matches the authenticated database role
+        if (request.getRequestedRole() != null && !request.getRequestedRole().isBlank()) {
+            Role requested = Role.fromString(request.getRequestedRole());
+            if (user.getRole() != requested) {
+                auditLogRepository.save(new UserAuditLog(
+                        user.getUsername(),
+                        "LOGIN_ROLE_MISMATCH",
+                        user.getUsername(),
+                        "Authentication rejected: requested role " + requested + " does not match actual role " + user.getRole(),
+                        ip
+                ));
+                throw new BadCredentialsException("The selected account type does not match your account.");
+            }
         }
 
         // Reset failed attempts upon successful login
@@ -176,19 +191,27 @@ public class AuthService {
         String email = request.getEmail().trim().toLowerCase();
 
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username '" + username + "' is already registered in FleetIQ");
+            throw new IllegalArgumentException("Username '" + username + "' is already registered in VEHYRON");
         }
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Corporate email '" + email + "' is already registered");
         }
 
-        // Public registration assigns strictly restricted ROLE_VIEWER
+        // Public registration assigns strictly ROLE_OPERATOR
+        // Requested ADMIN role requires administrative approval
+        Role assignedRole = Role.ROLE_OPERATOR;
+        String requested = request.getRequestedRole() != null ? request.getRequestedRole().trim() : "OPERATOR";
+        String auditDetail = "Self-service registration completed with default role ROLE_OPERATOR";
+        if (requested.equalsIgnoreCase("ADMIN") || requested.equalsIgnoreCase("ROLE_ADMIN")) {
+            auditDetail += " (Requested role ADMIN is pending administrator approval)";
+        }
+
         User user = new User(
                 username,
                 passwordEncoder.encode(request.getPassword()),
                 request.getFullName().trim(),
                 email,
-                Role.ROLE_VIEWER,
+                assignedRole,
                 request.getOrganization() != null ? request.getOrganization().trim() : null
         );
 
@@ -198,7 +221,7 @@ public class AuthService {
                 saved.getUsername(),
                 "USER_REGISTERED",
                 saved.getUsername(),
-                "Self-service registration completed with default role ROLE_VIEWER",
+                auditDetail,
                 ip
         ));
 

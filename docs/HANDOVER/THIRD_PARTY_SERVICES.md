@@ -1,4 +1,4 @@
-# FleetIQ — Third-Party Services & Integration Inventory
+# VEHYRON — Third-Party Services & Integration Inventory
 
 **Document Version:** 1.0.0-PROD  
 **Classification:** Procurement & Service Governance  

@@ -104,7 +104,7 @@ export const SimulatorControlPanel: React.FC<SimulatorControlPanelProps> = ({ on
             </div>
             <div>
               <h3 className="text-sm font-bold text-slate-900 tracking-tight">Deterministic Demonstration Scenarios</h3>
-              <p className="text-xs text-slate-400 font-medium">Inject reproducible multi-OEM telemetry scenarios into FleetIQ</p>
+              <p className="text-xs text-slate-400 font-medium">Inject reproducible multi-OEM telemetry scenarios into VEHYRON</p>
             </div>
           </div>
 

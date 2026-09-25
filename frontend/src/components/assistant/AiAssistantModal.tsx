@@ -38,7 +38,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
       const res = await api.queryAssistant(textToAsk.trim());
       setResponse(res);
     } catch (err: any) {
-      setError(err.message || 'Failed to reach FleetIQ Assistant');
+      setError(err.message || 'Failed to reach VEHYRON Assistant');
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-900">FleetIQ Intelligence Copilot</h3>
+                <h3 className="text-sm font-bold text-slate-900">VEHYRON Intelligence Copilot</h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
                   Grounded AI
                 </span>
