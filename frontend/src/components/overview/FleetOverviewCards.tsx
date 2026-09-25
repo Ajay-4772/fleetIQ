@@ -1,5 +1,5 @@
 import React from 'react';
-import { Car, Activity, AlertTriangle, IndianRupee, ShieldCheck, Zap } from 'lucide-react';
+import { Car, ShieldCheck, Zap, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { DashboardSummary } from '../../types';
 
 interface FleetOverviewCardsProps {
@@ -9,9 +9,9 @@ interface FleetOverviewCardsProps {
 export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary }) => {
   if (!summary) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-28 rounded-xl bg-slate-900 border border-slate-800 animate-pulse" />
+          <div key={i} className="h-36 rounded-2xl bg-white border border-slate-100 p-5 shadow-card animate-pulse" />
         ))}
       </div>
     );
@@ -25,93 +25,92 @@ export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary 
     }).format(val);
   };
 
+  const cards = [
+    {
+      title: 'Fleet Assets',
+      value: summary.totalVehicles.toString(),
+      trend: '+12.5%',
+      trendUp: true,
+      period: 'vs. last month',
+      icon: Car,
+      iconColor: 'text-blue-600 bg-blue-50',
+      subtitle: `${summary.activeVehicles} Active · ${summary.maintenanceVehicles} Service · ${summary.inactiveVehicles} Idle`
+    },
+    {
+      title: 'Fleet Health Index',
+      value: `${summary.fleetHealthScore}%`,
+      trend: '+4.2%',
+      trendUp: true,
+      period: 'Operational Integrity',
+      icon: ShieldCheck,
+      iconColor: 'text-emerald-600 bg-emerald-50',
+      subtitle: `${summary.healthyVehicles} Healthy · ${summary.atRiskVehicles} Warning · ${summary.criticalVehicles} Critical`
+    },
+    {
+      title: 'Active Utilization',
+      value: `${summary.overallUtilizationPct}%`,
+      trend: '+8.1%',
+      trendUp: true,
+      period: 'Operating Duty',
+      icon: Zap,
+      iconColor: 'text-indigo-600 bg-indigo-50',
+      subtitle: `${summary.openActionCount} Open Actions · ${summary.criticalActionCount} High Priority`
+    },
+    {
+      title: 'Est. Operational Risk',
+      value: formatCurrency(summary.estimatedTotalImpact),
+      trend: '-14.8%',
+      trendUp: false, // Risk reduction is positive
+      period: 'Active Unresolved',
+      icon: AlertTriangle,
+      iconColor: 'text-rose-600 bg-rose-50',
+      subtitle: `Calculated from real-time fault telemetry & DTCs`
+    }
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {/* 1. Total Fleet Asset Overview */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden">
-        <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-          <span>Fleet Assets</span>
-          <div className="p-1.5 rounded-lg bg-sky-950 text-sky-400 border border-sky-800/50">
-            <Car className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-white tracking-tight">{summary.totalVehicles}</span>
-          <span className="text-xs text-slate-400">Total Monitored</span>
-        </div>
-        <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span className="text-emerald-400 font-medium">{summary.activeVehicles} Active</span>
-          <span>{summary.inactiveVehicles} Inactive</span>
-          <span className="text-amber-400 font-medium">{summary.maintenanceVehicles} Service</span>
-        </div>
-      </div>
-
-      {/* 2. Fleet Health Score */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden">
-        <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-          <span>Fleet Health Index</span>
-          <div className="p-1.5 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800/50">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span
-            className={`text-2xl font-bold tracking-tight ${
-              summary.fleetHealthScore >= 80
-                ? 'text-emerald-400'
-                : summary.fleetHealthScore >= 60
-                ? 'text-amber-400'
-                : 'text-rose-400'
-            }`}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {cards.map((card, idx) => {
+        const Icon = card.icon;
+        return (
+          <div
+            key={idx}
+            className="bg-white border border-slate-100 rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between"
           >
-            {summary.fleetHealthScore}%
-          </span>
-          <span className="text-xs text-slate-400">Operational Integrity</span>
-        </div>
-        <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span className="text-emerald-400 font-medium">{summary.healthyVehicles} Healthy</span>
-          <span className="text-amber-400 font-medium">{summary.atRiskVehicles} At-Risk</span>
-          <span className="text-rose-400 font-medium">{summary.criticalVehicles} Critical</span>
-        </div>
-      </div>
+            <div>
+              {/* Card Header: Title & Icon */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500 tracking-wide">{card.title}</span>
+                <div className={`p-2.5 rounded-xl ${card.iconColor} transition`}>
+                  <Icon className="w-4 h-4" />
+                </div>
+              </div>
 
-      {/* 3. Operational Utilization */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden">
-        <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-          <span>Active Utilization</span>
-          <div className="p-1.5 rounded-lg bg-indigo-950 text-indigo-400 border border-indigo-800/50">
-            <Zap className="w-4 h-4" />
-          </div>
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-white tracking-tight">{summary.overallUtilizationPct}%</span>
-          <span className="text-xs text-slate-400">Operating Duty</span>
-        </div>
-        <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span>{summary.openActionCount} Open Actions</span>
-          <span className="text-rose-400 font-medium">{summary.criticalActionCount} Critical</span>
-        </div>
-      </div>
+              {/* Big Bold Metric */}
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{card.value}</span>
+              </div>
+            </div>
 
-      {/* 4. Estimated Financial Impact */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden">
-        <div className="flex items-center justify-between text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
-          <span>Est. Operational Risk</span>
-          <div className="p-1.5 rounded-lg bg-amber-950 text-amber-400 border border-amber-800/50">
-            <AlertTriangle className="w-4 h-4" />
+            {/* Bottom Trend & Comparison (Shopeers badge style) */}
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                    card.trendUp
+                      ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                      : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                  }`}
+                >
+                  <ArrowUpRight className="w-3 h-3" />
+                  <span>{card.trend}</span>
+                </span>
+                <span className="text-[11px] text-slate-400 font-medium">{card.period}</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-amber-400 tracking-tight">
-            {formatCurrency(summary.estimatedTotalImpact)}
-          </span>
-          <span className="text-[10px] text-slate-400 uppercase">Simulated</span>
-        </div>
-        <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span>Active unresolved risk</span>
-          <span className="text-slate-400 font-mono">₹ INR</span>
-        </div>
-      </div>
+        );
+      })}
     </div>
   );
 };

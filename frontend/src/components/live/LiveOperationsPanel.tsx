@@ -23,33 +23,33 @@ export const LiveOperationsPanel: React.FC<LiveOperationsPanelProps> = ({ events
   const getSeverityBadge = (sev: string) => {
     switch (sev) {
       case 'CRITICAL':
-        return 'bg-rose-500/20 text-rose-400 border-rose-500/40';
+        return 'bg-rose-50 text-rose-700 border border-rose-200';
       case 'HIGH':
-        return 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+        return 'bg-amber-50 text-amber-700 border border-amber-200';
       case 'MEDIUM':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40';
+        return 'bg-yellow-50 text-yellow-800 border border-yellow-200';
       default:
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+        return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
     }
   };
 
   const getSourceBadge = (source: string) => {
-    if (source.includes('TOYOTA')) return 'text-red-400 border-red-800/60 bg-red-950/40';
-    if (source.includes('FORD')) return 'text-blue-400 border-blue-800/60 bg-blue-950/40';
-    if (source.includes('BMW')) return 'text-cyan-400 border-cyan-800/60 bg-cyan-950/40';
-    return 'text-purple-400 border-purple-800/60 bg-purple-950/40';
+    if (source.includes('TOYOTA')) return 'text-red-700 border-red-200 bg-red-50';
+    if (source.includes('FORD')) return 'text-blue-700 border-blue-200 bg-blue-50';
+    if (source.includes('BMW')) return 'text-sky-700 border-sky-200 bg-sky-50';
+    return 'text-purple-700 border-purple-200 bg-purple-50';
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+    <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-all duration-300 space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-sky-950 text-sky-400 border border-sky-800/60">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
             <Radio className="w-4 h-4 animate-pulse" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Live Telemetry & Event Stream</h3>
-            <p className="text-xs text-slate-400">Continuous normalized multi-OEM vehicle operational signals</p>
+            <h3 className="text-sm font-bold text-slate-900 tracking-tight">Live Telemetry & Event Stream</h3>
+            <p className="text-xs text-slate-400 font-medium">Continuous normalized multi-OEM vehicle operational signals</p>
           </div>
         </div>
 
@@ -60,13 +60,13 @@ export const LiveOperationsPanel: React.FC<LiveOperationsPanelProps> = ({ events
             placeholder="Search Vehicle ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500 text-xs w-36 font-mono"
+            className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 text-xs w-36 font-mono"
           />
 
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-xs focus:outline-none focus:border-sky-500"
+            className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-medium focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical Only</option>
@@ -78,7 +78,7 @@ export const LiveOperationsPanel: React.FC<LiveOperationsPanelProps> = ({ events
           <select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-xs focus:outline-none focus:border-sky-500"
+            className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-medium focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Sources</option>
             <option value="TOYOTA">Toyota</option>
@@ -89,7 +89,7 @@ export const LiveOperationsPanel: React.FC<LiveOperationsPanelProps> = ({ events
 
           <button
             onClick={onClear}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition"
+            className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200/80 transition"
             title="Clear Stream History"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -98,23 +98,23 @@ export const LiveOperationsPanel: React.FC<LiveOperationsPanelProps> = ({ events
       </div>
 
       {/* Stream Table */}
-      <div className="overflow-x-auto rounded-lg border border-slate-800 max-h-[460px] overflow-y-auto">
+      <div className="overflow-x-auto rounded-xl border border-slate-100 max-h-[460px] overflow-y-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider font-semibold sticky top-0 z-10 border-b border-slate-800">
+          <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-bold sticky top-0 z-10 border-b border-slate-100">
             <tr>
-              <th className="py-2.5 px-3">Time</th>
-              <th className="py-2.5 px-3">Vehicle</th>
-              <th className="py-2.5 px-3">Source Adapter</th>
-              <th className="py-2.5 px-3">Event Type</th>
-              <th className="py-2.5 px-3">Severity</th>
-              <th className="py-2.5 px-3">Recommended Operational Action</th>
-              <th className="py-2.5 px-3 text-right">Est. Risk</th>
+              <th className="py-3 px-3.5">Time</th>
+              <th className="py-3 px-3.5">Vehicle</th>
+              <th className="py-3 px-3.5">Source Adapter</th>
+              <th className="py-3 px-3.5">Event Type</th>
+              <th className="py-3 px-3.5">Severity</th>
+              <th className="py-3 px-3.5">Operational Directive</th>
+              <th className="py-3 px-3.5 text-right">Est. Risk</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 font-mono">
+          <tbody className="divide-y divide-slate-100 font-sans">
             {filteredEvents.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-slate-500 font-sans text-xs">
+                <td colSpan={7} className="py-12 text-center text-slate-400 font-sans text-xs">
                   Waiting for incoming vehicle events from simulator or OEM ingestion...
                 </td>
               </tr>
@@ -122,32 +122,32 @@ export const LiveOperationsPanel: React.FC<LiveOperationsPanelProps> = ({ events
               filteredEvents.map((evt, idx) => (
                 <tr
                   key={idx}
-                  className="hover:bg-slate-800/40 transition group cursor-pointer"
+                  className="hover:bg-slate-50/80 transition group cursor-pointer"
                   onClick={() => onSelectVehicle && onSelectVehicle(evt.vehicleId)}
                 >
-                  <td className="py-2.5 px-3 text-slate-400 text-[11px] whitespace-nowrap">
+                  <td className="py-3 px-3.5 text-slate-400 text-[11px] whitespace-nowrap font-mono">
                     {evt.timestamp ? evt.timestamp.substring(11, 19) : '--:--:--'}
                   </td>
-                  <td className="py-2.5 px-3 font-semibold text-white group-hover:text-sky-400 transition">
+                  <td className="py-3 px-3.5 font-bold font-mono text-slate-900 group-hover:text-blue-600 transition">
                     {evt.vehicleId}
                   </td>
-                  <td className="py-2.5 px-3 whitespace-nowrap">
-                    <span className={`px-2 py-0.5 rounded text-[10px] border font-bold ${getSourceBadge(evt.source)}`}>
+                  <td className="py-3 px-3.5 whitespace-nowrap">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] border font-bold ${getSourceBadge(evt.source)}`}>
                       {evt.source.replace('SIMULATED_', '')}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 font-sans font-medium text-slate-200">
+                  <td className="py-3 px-3.5 font-semibold text-slate-800">
                     {evt.eventType.replace('_', ' ')}
                   </td>
-                  <td className="py-2.5 px-3 whitespace-nowrap">
-                    <span className={`px-2 py-0.5 rounded text-[10px] border font-bold ${getSeverityBadge(evt.severity)}`}>
+                  <td className="py-3 px-3.5 whitespace-nowrap">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getSeverityBadge(evt.severity)}`}>
                       {evt.severity}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 font-sans text-slate-300 max-w-xs truncate" title={evt.recommendedAction}>
+                  <td className="py-3 px-3.5 text-slate-600 max-w-xs truncate font-medium" title={evt.recommendedAction}>
                     {evt.recommendedAction || 'Normal operational telemetry logged'}
                   </td>
-                  <td className="py-2.5 px-3 text-right font-semibold text-slate-200">
+                  <td className="py-3 px-3.5 text-right font-bold text-slate-900 font-mono">
                     {evt.estimatedImpact > 0 ? `₹${Math.round(evt.estimatedImpact).toLocaleString('en-IN')}` : '—'}
                   </td>
                 </tr>

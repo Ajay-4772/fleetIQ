@@ -46,9 +46,10 @@ public class DashboardAggregationService {
 
         // Health categorizations
         long criticalCount = actionRepository.countByPriorityAndStatus("CRITICAL", "OPEN");
-        long atRiskVehicles = vehicleRepository.countByOilLifePctLessThanEqual(15.0) +
-                vehicleRepository.countByBatteryHealthPctLessThanEqual(75.0);
-        long healthyVehicles = Math.max(0, totalVehicles - criticalCount - atRiskVehicles);
+        long criticalVehicles = Math.min(totalVehicles, maintenanceVehicles > 0 ? maintenanceVehicles : (criticalCount > 0 ? Math.min(totalVehicles, (long) Math.ceil(criticalCount / 10.0)) : 0));
+        long atRiskVehicles = Math.min(totalVehicles - criticalVehicles, vehicleRepository.countByOilLifePctLessThanEqual(15.0) +
+                vehicleRepository.countByBatteryHealthPctLessThanEqual(75.0));
+        long healthyVehicles = Math.max(0, totalVehicles - criticalVehicles - atRiskVehicles);
 
         double healthScore = totalVehicles > 0 ? (double) healthyVehicles / totalVehicles * 100.0 : 100.0;
         double utilization = totalVehicles > 0 ? (double) activeVehicles / totalVehicles * 100.0 : 0.0;
@@ -66,7 +67,7 @@ public class DashboardAggregationService {
                 maintenanceVehicles,
                 healthyVehicles,
                 atRiskVehicles,
-                criticalCount,
+                criticalVehicles,
                 Math.round(healthScore * 10.0) / 10.0,
                 Math.round(utilization * 10.0) / 10.0,
                 openActions,
@@ -79,7 +80,10 @@ public class DashboardAggregationService {
         long total = vehicleRepository.count();
         if (total == 0) total = 1;
 
-        long critical = actionRepository.countByPriorityAndStatus("CRITICAL", "OPEN");
+        long maintenanceVehicles = vehicleRepository.countByStatus("MAINTENANCE");
+        long criticalCount = actionRepository.countByPriorityAndStatus("CRITICAL", "OPEN");
+        long critical = Math.min(total, maintenanceVehicles > 0 ? maintenanceVehicles : (criticalCount > 0 ? Math.min(total, (long) Math.ceil(criticalCount / 10.0)) : 0));
+
         long maintenanceDue = vehicleRepository.countByOilLifePctLessThanEqual(10.0);
         long batteryWarnings = vehicleRepository.countByBatteryHealthPctLessThanEqual(75.0);
         long tirePressureWarnings = vehicleRepository.countByTirePressurePsiLessThanEqual(28.0);
@@ -87,7 +91,7 @@ public class DashboardAggregationService {
         long excessiveIdle = eventRepository.countByEventType("EXCESSIVE_IDLE");
         long lowUtilization = vehicleRepository.countByStatus("INACTIVE");
 
-        long atRisk = maintenanceDue + batteryWarnings + tirePressureWarnings;
+        long atRisk = Math.min(total - critical, maintenanceDue + batteryWarnings + tirePressureWarnings);
         long healthy = Math.max(0, total - critical - atRisk);
 
         return new FleetHealthDto(
