@@ -52,6 +52,7 @@ public class AiAssistantService {
     }
 
     public AssistantResponseDto processQuestion(String question) {
+        log.info("Processing AI Assistant query: {}", question);
         if (question == null || question.isBlank()) {
             return new AssistantResponseDto(
                     "Please provide a question regarding fleet telemetry, active work orders, or diagnostic fault codes.",
@@ -150,6 +151,13 @@ public class AiAssistantService {
         sb.append(String.format("- **Tire Pressure**: %.1f PSI\n\n", v.getTirePressurePsi() != null ? v.getTirePressurePsi() : 33.0));
 
         String recommended = "No active work orders. Continue routine operating schedule.";
+        List<Decision> decisions = decisionRepository.findByVehicleIdOrderByCreatedAtDesc(vehicleId);
+        if (!decisions.isEmpty()) {
+            Decision latest = decisions.get(0);
+            sb.append(String.format("- **Latest Decision Engine**: %s (Confidence: %.0f%%)\n",
+                    latest.getDecisionSource(), latest.getConfidence() * 100));
+        }
+
         if (!actions.isEmpty()) {
             ActionItem topAction = actions.get(0);
             sb.append(String.format("### Active Action Order: %s\n", topAction.getActionId()));
