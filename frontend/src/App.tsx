@@ -89,9 +89,9 @@ const FleetIQDashboard: React.FC = () => {
   // Auth Guard
   if (isAuthLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 text-slate-300 font-sans">
-        <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-xs font-semibold tracking-wider uppercase text-slate-400">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-slate-700 font-sans">
+        <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-xs font-semibold tracking-wider uppercase text-slate-500">
           Initializing Secure Session & RBAC Tokens...
         </p>
       </div>

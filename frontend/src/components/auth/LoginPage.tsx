@@ -154,9 +154,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
     setIsSubmitting(true);
     try {
       const res = await forgotPassword(forgotEmail.trim());
-      setForgotSuccess(res.message);
+      setForgotSuccess(res.message || 'Instructions have been dispatched to your email.');
     } catch (err: any) {
-      setFormError(err.message || 'Unable to process request.');
+      setFormError(err.message || 'Failed to submit reset request.');
     } finally {
       setIsSubmitting(false);
     }
@@ -169,12 +169,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
     clearError();
 
     if (!resetToken.trim() || !resetNewPassword || !resetConfirmPassword) {
-      setFormError('Please provide the reset token and your new password.');
+      setFormError('Please complete all reset fields.');
       return;
     }
 
     if (resetNewPassword !== resetConfirmPassword) {
-      setFormError('Passwords do not match.');
+      setFormError('New passwords do not match.');
       return;
     }
 
@@ -190,12 +190,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
         newPassword: resetNewPassword,
         confirmPassword: resetConfirmPassword
       });
-      setResetSuccess(res.message);
+      setResetSuccess(res.message || 'Password successfully updated.');
       setTimeout(() => {
         switchView('login');
-      }, 3000);
+      }, 2500);
     } catch (err: any) {
-      setFormError(err.message || 'Password reset failed. The token may be expired or invalid.');
+      setFormError(err.message || 'Failed to reset password.');
     } finally {
       setIsSubmitting(false);
     }
@@ -204,39 +204,45 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
   const displayError = formError || authError;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50/50 via-slate-50 to-slate-100/80 text-slate-900 flex flex-col justify-between font-sans selection:bg-blue-600 selection:text-white relative">
       {/* Top Corporate Header */}
-      <header className="px-6 sm:px-12 py-5 flex items-center justify-between border-b border-slate-800 bg-slate-950/60 backdrop-blur-sm">
+      <header className="px-6 sm:px-12 py-4 flex items-center justify-between border-b border-slate-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-10 shadow-2xs">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-xs">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/20">
             <Shield className="w-4 h-4 text-white" aria-hidden="true" />
           </div>
           <div>
-            <span className="font-bold text-base tracking-tight text-white">FleetIQ</span>
-            <span className="text-[11px] font-semibold text-slate-400 ml-2.5 hidden sm:inline">
+            <span className="font-extrabold text-base tracking-tight text-slate-900">FleetIQ</span>
+            <span className="text-[11px] font-semibold text-slate-500 ml-2.5 hidden sm:inline">
               Connected Vehicle Intelligence
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-600 bg-white px-3 py-1.5 rounded-full border border-slate-200/80 shadow-2xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
           <span>Operations Center</span>
         </div>
       </header>
 
       {/* Main Authentication Container */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 my-6">
-        <div className="w-full max-w-md bg-slate-950 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 my-8">
+        <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-xl shadow-slate-200/60 space-y-6">
           {/* Header Title Section */}
           <div className="space-y-1.5 text-center">
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-3 text-blue-600 shadow-2xs">
+              {activeView === 'login' && <UserIcon className="w-6 h-6" />}
+              {activeView === 'register' && <Building className="w-6 h-6" />}
+              {activeView === 'forgot' && <Mail className="w-6 h-6" />}
+              {activeView === 'reset' && <KeyRound className="w-6 h-6" />}
+            </div>
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900">
               {activeView === 'login' && 'Sign in to FleetIQ'}
               {activeView === 'register' && 'Request Enterprise Access'}
               {activeView === 'forgot' && 'Reset Account Password'}
               {activeView === 'reset' && 'Set New Password'}
             </h1>
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+            <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
               {activeView === 'login' && 'Enter your credentials to access telematics streams and fleet operations.'}
               {activeView === 'register' && 'Register your corporate profile for multi-OEM telemetry authorization.'}
               {activeView === 'forgot' && 'Enter your corporate email to receive a secure authorization reset token.'}
@@ -248,10 +254,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
           {displayError && (
             <div
               role="alert"
-              className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-xs text-rose-300 flex items-start gap-2.5"
+              className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2.5 shadow-2xs"
             >
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" aria-hidden="true" />
-              <span className="leading-snug">{displayError}</span>
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" aria-hidden="true" />
+              <span className="leading-snug font-medium">{displayError}</span>
             </div>
           )}
 
@@ -259,11 +265,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
           {activeView === 'login' && (
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
-                <label htmlFor="login-username" className="block text-xs font-medium text-slate-300 mb-1.5">
+                <label htmlFor="login-username" className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Corporate Email or Username
                 </label>
                 <div className="relative">
-                  <UserIcon className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" aria-hidden="true" />
+                  <UserIcon className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" aria-hidden="true" />
                   <input
                     id="login-username"
                     name="username"
@@ -273,26 +279,26 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
                     placeholder="e.g. admin@fleetiq.internal or dispatcher_dave"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-white placeholder-slate-500 transition"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400 transition"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="login-password" className="text-xs font-medium text-slate-300">
+                  <label htmlFor="login-password" className="text-xs font-semibold text-slate-700">
                     Security Password
                   </label>
                   <button
                     type="button"
                     onClick={() => switchView('forgot')}
-                    className="text-[11px] text-blue-400 hover:text-blue-300 transition"
+                    className="text-[11px] text-blue-600 hover:text-blue-700 font-semibold transition"
                   >
                     Forgot password?
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" aria-hidden="true" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" aria-hidden="true" />
                   <input
                     id="login-password"
                     name="password"
@@ -302,12 +308,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-white placeholder-slate-500 transition"
+                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400 transition"
                   />
                   <button
                     type="button"
                     onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200 transition"
+                    className="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 transition p-0.5"
                     aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
                   >
                     {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -315,13 +321,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-0.5 text-xs text-slate-400">
+              <div className="flex items-center justify-between pt-0.5 text-xs text-slate-600">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 rounded bg-white border-slate-300 text-blue-600 focus:ring-blue-500/20"
                   />
                   <span>Keep session active</span>
                 </label>
@@ -330,7 +336,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
@@ -345,13 +351,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                 )}
               </button>
 
-              <div className="pt-4 border-t border-slate-800 text-center">
-                <p className="text-xs text-slate-400">
+              <div className="pt-4 border-t border-slate-100 text-center">
+                <p className="text-xs text-slate-500">
                   Need platform access?{' '}
                   <button
                     type="button"
                     onClick={() => switchView('register')}
-                    className="text-blue-400 hover:text-blue-300 font-semibold transition"
+                    className="text-blue-600 hover:text-blue-700 font-semibold transition hover:underline"
                   >
                     Request an account
                   </button>
@@ -364,11 +370,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
           {activeView === 'register' && (
             <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
               <div>
-                <label htmlFor="reg-fullname" className="block text-xs font-medium text-slate-300 mb-1">
+                <label htmlFor="reg-fullname" className="block text-xs font-semibold text-slate-700 mb-1">
                   Full Name
                 </label>
                 <div className="relative">
-                  <UserIcon className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <UserIcon className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                   <input
                     id="reg-fullname"
                     type="text"
@@ -377,17 +383,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     value={regFullName}
                     onChange={(e) => setRegFullName(e.target.value)}
                     placeholder="Jane Doe"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="reg-email" className="block text-xs font-medium text-slate-300 mb-1">
+                <label htmlFor="reg-email" className="block text-xs font-semibold text-slate-700 mb-1">
                   Corporate Email
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                   <input
                     id="reg-email"
                     type="email"
@@ -396,14 +402,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
                     placeholder="jane.doe@enterprise.com"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="reg-username" className="block text-xs font-medium text-slate-300 mb-1">
+                  <label htmlFor="reg-username" className="block text-xs font-semibold text-slate-700 mb-1">
                     Username
                   </label>
                   <input
@@ -414,33 +420,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     value={regUsername}
                     onChange={(e) => setRegUsername(e.target.value)}
                     placeholder="jdoe_ops"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                   />
                 </div>
                 <div>
-                  <label htmlFor="reg-org" className="block text-xs font-medium text-slate-300 mb-1">
+                  <label htmlFor="reg-org" className="block text-xs font-semibold text-slate-700 mb-1">
                     Organization
                   </label>
                   <div className="relative">
-                    <Building className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+                    <Building className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                     <input
                       id="reg-org"
                       type="text"
                       value={regOrganization}
                       onChange={(e) => setRegOrganization(e.target.value)}
                       placeholder="Fleet Logistics Inc"
-                      className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                      className="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label htmlFor="reg-password" className="block text-xs font-medium text-slate-300 mb-1">
+                <label htmlFor="reg-password" className="block text-xs font-semibold text-slate-700 mb-1">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
                   <input
                     id="reg-password"
                     type={showRegPassword ? 'text' : 'password'}
@@ -449,12 +455,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
                     placeholder="Min 8 chars, 1 uppercase, 1 digit, 1 symbol"
-                    className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                    className="w-full pl-9 pr-10 py-2 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegPassword(!showRegPassword)}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-200"
+                    className="absolute right-3 top-2 text-slate-400 hover:text-slate-600 p-0.5"
                   >
                     {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   </button>
@@ -462,7 +468,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
               </div>
 
               <div>
-                <label htmlFor="reg-confirm-password" className="block text-xs font-medium text-slate-300 mb-1">
+                <label htmlFor="reg-confirm-password" className="block text-xs font-semibold text-slate-700 mb-1">
                   Confirm Password
                 </label>
                 <input
@@ -473,25 +479,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                   value={regConfirmPassword}
                   onChange={(e) => setRegConfirmPassword(e.target.value)}
                   placeholder="Repeat security password"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
               <div className="pt-1">
-                <label className="flex items-start gap-2 text-[11px] text-slate-400 cursor-pointer select-none">
+                <label className="flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     required
                     checked={regTermsAccepted}
                     onChange={(e) => setRegTermsAccepted(e.target.checked)}
-                    className="w-3.5 h-3.5 mt-0.5 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 mt-0.5 rounded bg-white border-slate-300 text-blue-600 focus:ring-blue-500/20"
                   />
                   <span>
                     I accept the{' '}
                     <button
                       type="button"
                       onClick={() => onOpenLegal && onOpenLegal('terms')}
-                      className="text-blue-400 hover:underline"
+                      className="text-blue-600 hover:underline font-semibold"
                     >
                       Terms of Service
                     </button>{' '}
@@ -499,7 +505,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     <button
                       type="button"
                       onClick={() => onOpenLegal && onOpenLegal('privacy')}
-                      className="text-blue-400 hover:underline"
+                      className="text-blue-600 hover:underline font-semibold"
                     >
                       Privacy Policy
                     </button>
@@ -511,7 +517,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer mt-2"
+                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer mt-2"
               >
                 {isSubmitting ? (
                   <>
@@ -526,13 +532,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                 )}
               </button>
 
-              <div className="pt-3 border-t border-slate-800 text-center">
-                <p className="text-xs text-slate-400">
+              <div className="pt-3 border-t border-slate-100 text-center">
+                <p className="text-xs text-slate-500">
                   Already registered?{' '}
                   <button
                     type="button"
                     onClick={() => switchView('login')}
-                    className="text-blue-400 hover:text-blue-300 font-semibold transition"
+                    className="text-blue-600 hover:text-blue-700 font-semibold transition hover:underline"
                   >
                     Return to Sign In
                   </button>
@@ -545,24 +551,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
           {activeView === 'forgot' && (
             <div className="space-y-4">
               {forgotSuccess ? (
-                <div className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-800/80 text-xs text-emerald-300 space-y-2">
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-2 shadow-2xs">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="font-bold">Instructions Dispatched</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="font-bold text-emerald-900">Instructions Dispatched</span>
                   </div>
-                  <p className="text-[11px] text-emerald-400 leading-relaxed">{forgotSuccess}</p>
+                  <p className="text-[11px] text-emerald-700 leading-relaxed">{forgotSuccess}</p>
                   <div className="pt-2 flex items-center justify-between">
                     <button
                       type="button"
                       onClick={() => switchView('reset')}
-                      className="text-blue-400 hover:underline text-xs font-semibold"
+                      className="text-blue-600 hover:underline text-xs font-semibold"
                     >
                       I have a reset token &rarr;
                     </button>
                     <button
                       type="button"
                       onClick={() => switchView('login')}
-                      className="text-slate-400 hover:text-white text-xs"
+                      className="text-slate-500 hover:text-slate-800 text-xs font-medium"
                     >
                       Back to Sign In
                     </button>
@@ -571,11 +577,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
               ) : (
                 <form onSubmit={handleForgotSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="forgot-email" className="block text-xs font-medium text-slate-300 mb-1.5">
+                    <label htmlFor="forgot-email" className="block text-xs font-semibold text-slate-700 mb-1.5">
                       Corporate Registered Email
                     </label>
                     <div className="relative">
-                      <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
                       <input
                         id="forgot-email"
                         type="email"
@@ -584,7 +590,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
                         placeholder="e.g. operator@fleetiq.internal"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                       />
                     </div>
                   </div>
@@ -592,7 +598,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
@@ -611,7 +617,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     <button
                       type="button"
                       onClick={() => switchView('login')}
-                      className="flex items-center gap-1.5 text-slate-400 hover:text-white transition"
+                      className="flex items-center gap-1.5 text-slate-500 hover:text-slate-800 font-medium transition"
                     >
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>Back to Sign In</span>
@@ -619,7 +625,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     <button
                       type="button"
                       onClick={() => switchView('reset')}
-                      className="text-blue-400 hover:text-blue-300 font-medium"
+                      className="text-blue-600 hover:text-blue-700 font-semibold hover:underline"
                     >
                       Already have a token?
                     </button>
@@ -633,22 +639,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
           {activeView === 'reset' && (
             <div className="space-y-4">
               {resetSuccess ? (
-                <div className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-800/80 text-xs text-emerald-300 space-y-2">
+                <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-2 shadow-2xs">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="font-bold">Password Updated</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="font-bold text-emerald-900">Password Updated</span>
                   </div>
-                  <p className="text-[11px] text-emerald-400 leading-relaxed">{resetSuccess}</p>
-                  <p className="text-[11px] text-slate-400 pt-1">Redirecting to sign-in portal...</p>
+                  <p className="text-[11px] text-emerald-700 leading-relaxed">{resetSuccess}</p>
+                  <p className="text-[11px] text-slate-500 pt-1">Redirecting to sign-in portal...</p>
                 </div>
               ) : (
                 <form onSubmit={handleResetSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="reset-token" className="block text-xs font-medium text-slate-300 mb-1.5">
+                    <label htmlFor="reset-token" className="block text-xs font-semibold text-slate-700 mb-1.5">
                       Password Reset Token
                     </label>
                     <div className="relative">
-                      <KeyRound className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                      <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
                       <input
                         id="reset-token"
                         type="text"
@@ -656,17 +662,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                         value={resetToken}
                         onChange={(e) => setResetToken(e.target.value)}
                         placeholder="Paste single-use token"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none font-mono text-xs text-white placeholder-slate-500"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 font-mono text-xs text-slate-900 placeholder-slate-400"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="reset-new-password" className="block text-xs font-medium text-slate-300 mb-1.5">
+                    <label htmlFor="reset-new-password" className="block text-xs font-semibold text-slate-700 mb-1.5">
                       New Password
                     </label>
                     <div className="relative">
-                      <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
                       <input
                         id="reset-new-password"
                         type={showResetPassword ? 'text' : 'password'}
@@ -674,12 +680,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                         value={resetNewPassword}
                         onChange={(e) => setResetNewPassword(e.target.value)}
                         placeholder="Min 8 chars, 1 uppercase, 1 digit, 1 symbol"
-                        className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                        className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                       />
                       <button
                         type="button"
                         onClick={() => setShowResetPassword(!showResetPassword)}
-                        className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-200"
+                        className="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 p-0.5"
                       >
                         {showResetPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -687,7 +693,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                   </div>
 
                   <div>
-                    <label htmlFor="reset-confirm-password" className="block text-xs font-medium text-slate-300 mb-1.5">
+                    <label htmlFor="reset-confirm-password" className="block text-xs font-semibold text-slate-700 mb-1.5">
                       Confirm New Password
                     </label>
                     <input
@@ -697,14 +703,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                       value={resetConfirmPassword}
                       onChange={(e) => setResetConfirmPassword(e.target.value)}
                       placeholder="Repeat new password"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none text-xs text-white placeholder-slate-500"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600/15 text-xs text-slate-900 placeholder-slate-400"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
@@ -723,7 +729,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
                     <button
                       type="button"
                       onClick={() => switchView('login')}
-                      className="text-xs text-slate-400 hover:text-white transition"
+                      className="text-xs text-slate-500 hover:text-slate-800 font-medium transition hover:underline"
                     >
                       Return to Sign In
                     </button>
@@ -736,28 +742,28 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onOpenLegal }) => {
       </main>
 
       {/* Corporate Compliance & Legal Footer */}
-      <footer className="px-6 sm:px-12 py-4 border-t border-slate-800 bg-slate-950/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+      <footer className="px-6 sm:px-12 py-4 border-t border-slate-200/80 bg-white/80 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 shadow-2xs">
         <div>
           <span>© 2026 FleetIQ Technologies Inc. Multi-OEM Telematics & Fleet Intelligence.</span>
         </div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => onOpenLegal && onOpenLegal('terms')}
-            className="hover:text-slate-200 transition"
+            className="hover:text-blue-600 font-medium transition cursor-pointer"
           >
             Terms of Service
           </button>
           <span>•</span>
           <button
             onClick={() => onOpenLegal && onOpenLegal('privacy')}
-            className="hover:text-slate-200 transition"
+            className="hover:text-blue-600 font-medium transition cursor-pointer"
           >
             Privacy Policy
           </button>
           <span>•</span>
           <button
             onClick={() => onOpenLegal && onOpenLegal('security')}
-            className="hover:text-slate-200 transition"
+            className="hover:text-blue-600 font-medium transition cursor-pointer"
           >
             Security Compliance
           </button>
