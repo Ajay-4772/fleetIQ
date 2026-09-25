@@ -14,6 +14,9 @@ import java.util.List;
 @Repository
 public interface CanonicalVehicleEventRepository extends JpaRepository<CanonicalVehicleEvent, String> {
     List<CanonicalVehicleEvent> findByVehicleIdOrderByTimestampDesc(String vehicleId);
+    default List<CanonicalVehicleEvent> findRecentByVehicleId(String vehicleId) {
+        return findByVehicleIdOrderByTimestampDesc(vehicleId);
+    }
     List<CanonicalVehicleEvent> findTop50ByOrderByTimestampDesc();
     Page<CanonicalVehicleEvent> findAllByOrderByTimestampDesc(Pageable pageable);
 

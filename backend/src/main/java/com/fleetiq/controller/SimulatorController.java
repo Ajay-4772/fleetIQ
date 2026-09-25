@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/simulator")
+@RequestMapping({"/api/v1/simulator", "/api/simulator"})
 public class SimulatorController {
 
     private final FleetSimulatorService simulatorService;

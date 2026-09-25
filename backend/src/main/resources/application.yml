@@ -45,6 +45,11 @@ fleetiq:
     default-seed: ${SIMULATOR_DEFAULT_SEED:20260925}
     default-vehicle-count: ${SIMULATOR_DEFAULT_VEHICLE_COUNT:60}
     default-event-count: ${SIMULATOR_DEFAULT_EVENT_COUNT:100}
+  security:
+    jwt:
+      secret: ${JWT_SECRET:FleetIQSecretKeyForJWTSigningMustBeAtLeast256BitsLongForHMACSHA256Secure}
+      expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    ingestion-api-key: ${FLEETIQ_INGESTION_API_KEY:fleetiq-ingest-secure-key-2026}
 
 ---
 spring:

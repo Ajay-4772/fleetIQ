@@ -15,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/dashboard")
+@RequestMapping({"/api/v1/dashboard", "/api/dashboard"})
 public class DashboardController {
 
     private final DashboardAggregationService dashboardAggregationService;

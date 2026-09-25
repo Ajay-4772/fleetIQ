@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Wrench,
   AlertOctagon,
@@ -6,27 +6,48 @@ import {
   Gauge,
   Clock,
   ArrowDownRight,
-  TrendingUp,
-  ShieldCheck,
-  CheckCircle2,
-  AlertTriangle
+  TrendingUp
 } from 'lucide-react';
 import { FleetHealth } from '../../types';
 
 interface FleetHealthSectionProps {
   health: FleetHealth | null;
+  onSelectCategory?: (category: string) => void;
 }
 
-export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health }) => {
-  const [hoveredPoint, setHoveredPoint] = useState<{
-    date: string;
-    healthPct: number;
-    volume: number;
-  } | null>({
-    date: 'Jan 18, 2025',
-    healthPct: 96.4,
-    volume: 1420
-  });
+export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health, onSelectCategory }) => {
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic interactive scrubber points
+  const points = [
+    { x: 50, y: 130, date: '1 Jan', healthPct: 88.5, volume: 1120 },
+    { x: 150, y: 125, date: '8 Jan', healthPct: 89.2, volume: 1240 },
+    { x: 260, y: 105, date: '15 Jan', healthPct: 91.0, volume: 1310 },
+    { x: 380, y: 75, date: '20 Jan', healthPct: 94.5, volume: 1480 },
+    { x: 490, y: 65, date: '25 Jan', healthPct: 93.8, volume: 1560 },
+    { x: 600, y: 55, date: '28 Jan', healthPct: 95.2, volume: 1620 },
+    { x: 680, y: 60, date: 'Today', healthPct: health?.healthyPercentage || 93.0, volume: 1690 }
+  ];
+
+  const [activePointIndex, setActivePointIndex] = useState<number>(3);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!chartRef.current) return;
+    const rect = chartRef.current.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width * 700;
+
+    // Find nearest point
+    let closestIdx = 0;
+    let minDiff = 9999;
+    points.forEach((p, idx) => {
+      const diff = Math.abs(p.x - relX);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIdx = idx;
+      }
+    });
+    setActivePointIndex(closestIdx);
+  };
 
   if (!health) {
     return (
@@ -34,13 +55,15 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health }
     );
   }
 
+  const activePoint = points[activePointIndex];
+
   const issueCategories = [
-    { label: 'Maintenance Due', count: health.maintenanceDueCount, icon: Wrench, color: 'text-amber-600 bg-amber-50 border-amber-200/60' },
-    { label: 'Engine Faults', count: health.engineFaultCount, icon: AlertOctagon, color: 'text-rose-600 bg-rose-50 border-rose-200/60' },
-    { label: 'Battery Warnings', count: health.batteryWarningCount, icon: BatteryWarning, color: 'text-blue-600 bg-blue-50 border-blue-200/60' },
-    { label: 'TPMS Low', count: health.tirePressureWarningCount, icon: Gauge, color: 'text-yellow-600 bg-yellow-50 border-yellow-200/60' },
-    { label: 'Excessive Idling', count: health.excessiveIdleCount, icon: Clock, color: 'text-indigo-600 bg-indigo-50 border-indigo-200/60' },
-    { label: 'Low Utilization', count: health.lowUtilizationCount, icon: ArrowDownRight, color: 'text-slate-600 bg-slate-50 border-slate-200/60' }
+    { label: 'Maintenance Due', type: 'MAINTENANCE_DUE', count: health.maintenanceDueCount, icon: Wrench, color: 'text-amber-600 bg-amber-50 hover:bg-amber-100/80 border-amber-200/60' },
+    { label: 'Engine Faults', type: 'ENGINE_FAULT', count: health.engineFaultCount, icon: AlertOctagon, color: 'text-rose-600 bg-rose-50 hover:bg-rose-100/80 border-rose-200/60' },
+    { label: 'Battery Warnings', type: 'BATTERY_WARNING', count: health.batteryWarningCount, icon: BatteryWarning, color: 'text-blue-600 bg-blue-50 hover:bg-blue-100/80 border-blue-200/60' },
+    { label: 'TPMS Low', type: 'TIRE_PRESSURE_LOW', count: health.tirePressureWarningCount, icon: Gauge, color: 'text-yellow-600 bg-yellow-50 hover:bg-yellow-100/80 border-yellow-200/60' },
+    { label: 'Excessive Idling', type: 'EXCESSIVE_IDLE', count: health.excessiveIdleCount, icon: Clock, color: 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100/80 border-indigo-200/60' },
+    { label: 'Low Utilization', type: 'LOW_UTILIZATION', count: health.lowUtilizationCount, icon: ArrowDownRight, color: 'text-slate-600 bg-slate-50 hover:bg-slate-100/80 border-slate-200/60' }
   ];
 
   return (
@@ -77,9 +100,9 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health }
         </div>
       </div>
 
-      {/* Shopeers-style Interactive Smooth Area Chart */}
-      <div className="relative pt-2">
-        <div className="h-48 w-full relative">
+      {/* Dynamic Interactive Smooth Area Chart */}
+      <div className="relative pt-2" ref={chartRef} onMouseMove={handleMouseMove}>
+        <div className="h-48 w-full relative cursor-crosshair">
           <svg className="w-full h-full overflow-visible" viewBox="0 0 700 160" preserveAspectRatio="none">
             <defs>
               <linearGradient id="blueGradient" x1="0" y1="0" x2="0" y2="1">
@@ -108,26 +131,44 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health }
               strokeLinecap="round"
             />
 
-            {/* Scrubber vertical line at Jan 18 */}
-            <line x1="420" y1="10" x2="420" y2="160" stroke="#93c5fd" strokeWidth="1.5" strokeDasharray="3 3" />
+            {/* Dynamic Scrubber vertical line */}
+            <line
+              x1={activePoint.x}
+              y1="10"
+              x2={activePoint.x}
+              y2="160"
+              stroke="#3b82f6"
+              strokeWidth="1.5"
+              strokeDasharray="3 3"
+              className="transition-all duration-75"
+            />
 
-            {/* Peak Active Dot */}
-            <circle cx="420" cy="70" r="5" fill="#2563eb" stroke="#ffffff" strokeWidth="2.5" className="filter drop-shadow-sm" />
+            {/* Dynamic Scrubber Dot */}
+            <circle
+              cx={activePoint.x}
+              cy={activePoint.y}
+              r="6"
+              fill="#2563eb"
+              stroke="#ffffff"
+              strokeWidth="2.5"
+              className="filter drop-shadow-md transition-all duration-75"
+            />
           </svg>
 
-          {/* Floating Scrubber Tooltip Card (Shopeers style) */}
-          {hoveredPoint && (
-            <div className="absolute left-[54%] top-[10%] -translate-x-1/2 bg-white border border-slate-200/80 rounded-xl p-2.5 shadow-lg shadow-slate-900/5 text-left pointer-events-none z-10 min-w-[140px]">
-              <div className="text-[10px] font-semibold text-slate-400">{hoveredPoint.date}</div>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                <span className="text-xs font-bold text-slate-900">{hoveredPoint.healthPct}% Health</span>
-              </div>
-              <div className="text-[10px] text-slate-500 font-mono mt-0.5">
-                {hoveredPoint.volume} signals/min
-              </div>
+          {/* Dynamic Floating Scrubber Tooltip */}
+          <div
+            style={{ left: `${(activePoint.x / 700) * 100}%` }}
+            className="absolute top-[5%] -translate-x-1/2 bg-white border border-slate-200/90 rounded-xl p-2.5 shadow-xl text-left pointer-events-none z-10 min-w-[130px] transition-all duration-75"
+          >
+            <div className="text-[10px] font-bold text-slate-400 font-mono">{activePoint.date}</div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+              <span className="text-xs font-extrabold text-slate-900">{activePoint.healthPct}% Health</span>
             </div>
-          )}
+            <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+              {activePoint.volume} signals/min
+            </div>
+          </div>
         </div>
 
         {/* X-Axis Date Labels */}
@@ -136,11 +177,11 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health }
           <span>8 Jan</span>
           <span>15 Jan</span>
           <span>22 Jan</span>
-          <span>29 Jan</span>
+          <span>Today</span>
         </div>
       </div>
 
-      {/* Shopeers-style 3 Sub-Segmented Metric Boxes */}
+      {/* 3 Sub-Segmented Metric Boxes */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -176,17 +217,18 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health }
         </div>
       </div>
 
-      {/* Diagnostic Badges Grid */}
+      {/* Clickable Diagnostic Badges Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
         {issueCategories.map((item, idx) => {
           const Icon = item.icon;
           return (
             <div
               key={idx}
-              className={`p-3 rounded-xl border flex flex-col justify-between ${item.color} transition hover:shadow-xs`}
+              onClick={() => onSelectCategory && onSelectCategory(item.type)}
+              className={`p-3 rounded-xl border flex flex-col justify-between cursor-pointer ${item.color} transition hover:shadow-xs group`}
             >
               <div className="flex items-center justify-between mb-1">
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 group-hover:scale-110 transition" />
                 <span className="text-base font-extrabold font-mono">{item.count}</span>
               </div>
               <span className="text-[11px] font-semibold leading-tight">{item.label}</span>

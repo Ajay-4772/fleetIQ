@@ -1,6 +1,12 @@
 package com.fleetiq.dto;
 
+import java.time.Instant;
+import java.util.UUID;
+
 public class DashboardEventDto {
+    private String eventId;
+    private String correlationId;
+    private String entityId;
     private String eventType;
     private String timestamp;
     private String vehicleId;
@@ -12,13 +18,19 @@ public class DashboardEventDto {
     private String status;
     private Object data;
 
-    public DashboardEventDto() {}
+    public DashboardEventDto() {
+        this.eventId = UUID.randomUUID().toString();
+        this.timestamp = Instant.now().toString();
+    }
 
     public DashboardEventDto(String eventType, String timestamp, String vehicleId, String make,
                              String severity, String source, String recommendedAction,
                              Double estimatedImpact, String status, Object data) {
+        this.eventId = UUID.randomUUID().toString();
+        this.correlationId = UUID.randomUUID().toString();
+        this.entityId = vehicleId;
         this.eventType = eventType;
-        this.timestamp = timestamp;
+        this.timestamp = timestamp != null ? timestamp : Instant.now().toString();
         this.vehicleId = vehicleId;
         this.make = make;
         this.severity = severity;
@@ -28,6 +40,34 @@ public class DashboardEventDto {
         this.status = status;
         this.data = data;
     }
+
+    public DashboardEventDto(String eventId, String correlationId, String entityId, String eventType,
+                             String timestamp, String vehicleId, String make, String severity,
+                             String source, String recommendedAction, Double estimatedImpact,
+                             String status, Object data) {
+        this.eventId = eventId != null ? eventId : UUID.randomUUID().toString();
+        this.correlationId = correlationId != null ? correlationId : UUID.randomUUID().toString();
+        this.entityId = entityId;
+        this.eventType = eventType;
+        this.timestamp = timestamp != null ? timestamp : Instant.now().toString();
+        this.vehicleId = vehicleId;
+        this.make = make;
+        this.severity = severity;
+        this.source = source;
+        this.recommendedAction = recommendedAction;
+        this.estimatedImpact = estimatedImpact;
+        this.status = status;
+        this.data = data;
+    }
+
+    public String getEventId() { return eventId; }
+    public void setEventId(String eventId) { this.eventId = eventId; }
+
+    public String getCorrelationId() { return correlationId; }
+    public void setCorrelationId(String correlationId) { this.correlationId = correlationId; }
+
+    public String getEntityId() { return entityId; }
+    public void setEntityId(String entityId) { this.entityId = entityId; }
 
     public String getEventType() { return eventType; }
     public void setEventType(String eventType) { this.eventType = eventType; }

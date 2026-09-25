@@ -5,40 +5,40 @@ import {
   AlertTriangle,
   Car,
   BrainCircuit,
-  Search,
   Server,
-  Sliders,
   Sparkles,
-  ShieldCheck,
-  ChevronRight
+  Zap,
+  Bot
 } from 'lucide-react';
 
 export type NavTab =
   | 'overview'
   | 'live'
-  | 'actions'
   | 'vehicles'
+  | 'actions'
   | 'intelligence'
-  | 'queries'
-  | 'system'
-  | 'simulator';
+  | 'system';
 
 interface SidebarProps {
   activeTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
   openActionCount?: number;
   criticalActionCount?: number;
+  onOpenSimulator: () => void;
+  onOpenAssistant: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onSelectTab,
   openActionCount = 0,
-  criticalActionCount = 0
+  criticalActionCount = 0,
+  onOpenSimulator,
+  onOpenAssistant
 }) => {
   const sections = [
     {
-      group: 'MAIN MENU',
+      group: 'OPERATIONS',
       items: [
         { id: 'overview' as NavTab, label: 'Overview', icon: LayoutDashboard },
         {
@@ -49,8 +49,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           badgeColor: 'bg-emerald-50 text-emerald-600 border border-emerald-200'
         },
         {
+          id: 'vehicles' as NavTab,
+          label: 'Vehicles',
+          icon: Car
+        },
+        {
           id: 'actions' as NavTab,
-          label: 'Priority Actions',
+          label: 'Actions',
           icon: AlertTriangle,
           badge: openActionCount > 0 ? `${openActionCount}` : undefined,
           badgeColor: criticalActionCount > 0 ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-amber-50 text-amber-600 border border-amber-200'
@@ -58,24 +63,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ]
     },
     {
-      group: 'FLEET INTELLIGENCE',
+      group: 'INTELLIGENCE & SYSTEM',
       items: [
-        { id: 'vehicles' as NavTab, label: 'Fleet Assets', icon: Car },
-        { id: 'intelligence' as NavTab, label: 'Intelligence Hub', icon: BrainCircuit },
-        { id: 'queries' as NavTab, label: 'Fleet Queries', icon: Search },
-      ]
-    },
-    {
-      group: 'SYSTEM & CONTROLS',
-      items: [
-        { id: 'system' as NavTab, label: 'System Health', icon: Server },
-        { id: 'simulator' as NavTab, label: 'Simulator Control', icon: Sliders }
+        { id: 'intelligence' as NavTab, label: 'Intelligence', icon: BrainCircuit },
+        { id: 'system' as NavTab, label: 'System', icon: Server }
       ]
     }
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between p-4 shrink-0 shadow-[1px_0_4px_rgba(0,0,0,0.01)] overflow-y-auto">
+    <aside className="w-60 bg-white border-r border-slate-200/80 flex flex-col justify-between p-4 shrink-0 shadow-[1px_0_4px_rgba(0,0,0,0.01)] overflow-y-auto">
       <div className="space-y-6">
         {sections.map((section, idx) => (
           <div key={idx} className="space-y-1.5">
@@ -111,35 +108,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
             })}
           </div>
         ))}
-      </div>
 
-      {/* Bottom Gradient Card (Shopeers Promo / Simulator Card) */}
-      <div className="space-y-3 pt-4">
-        <div className="rounded-2xl p-4 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white shadow-lg shadow-blue-500/15 relative overflow-hidden">
-          <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-xl pointer-events-none" />
-          <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-3">
-            <Sparkles className="w-4 h-4 text-white" />
+        {/* Secondary Operational Tools */}
+        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+          <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            OPERATIONAL TOOLS
           </div>
-          <h4 className="font-bold text-sm leading-tight text-white">Fault Simulator</h4>
-          <p className="text-[11px] text-blue-100/90 mt-1 leading-relaxed">
-            Test multi-OEM telemetry triggers, DTCs, and decision automation.
-          </p>
           <button
-            onClick={() => onSelectTab('simulator')}
-            className="mt-3.5 w-full py-2 px-3 rounded-xl bg-white hover:bg-blue-50 text-blue-700 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition hover:shadow"
+            onClick={onOpenAssistant}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition"
           >
-            <span>Launch Controls</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <Bot className="w-4 h-4 text-blue-500" />
+            <span>AI Assistant Copilot</span>
+          </button>
+          <button
+            onClick={onOpenSimulator}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-amber-50 hover:text-amber-700 transition"
+          >
+            <Zap className="w-4 h-4 text-amber-500" />
+            <span>Scenario Simulator</span>
           </button>
         </div>
+      </div>
 
-        {/* Engine status footer */}
-        <div className="px-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Multi-OEM Engine</span>
+      {/* Engine Status Card */}
+      <div className="pt-4">
+        <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-left space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-slate-800">Pipeline Active</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           </div>
-          <span className="font-mono text-slate-500 text-[10px]">v1.0-LIVE</span>
+          <p className="text-[10px] text-slate-500 leading-tight">
+            Multi-OEM ingestion (Toyota, Ford, BMW, Tesla) normalized in real-time.
+          </p>
         </div>
       </div>
     </aside>

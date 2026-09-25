@@ -193,3 +193,38 @@ export interface LoadTestResponse {
   fallbackDecisions: number;
   actionsCreated: number;
 }
+
+export interface User {
+  username: string;
+  fullName: string;
+  role: 'ROLE_ADMIN' | 'ROLE_OPERATIONS_LEAD' | 'ROLE_OPERATOR' | 'ROLE_VIEWER' | string;
+}
+
+export interface LoginResponse {
+  token: string;
+  type: string;
+  username: string;
+  fullName: string;
+  role: string;
+  expiresInMs: number;
+}
+
+export interface AssistantResponse {
+  answer: string;
+  queryType: 'LIVE_DATA' | 'KNOWLEDGE_RAG' | 'HYBRID' | string;
+  sources: string[];
+  supportingData?: any;
+  recommendedAction?: string;
+  confidence: number;
+  aiProviderStatus: string;
+  timestamp: string;
+}
+
+export interface SearchResult {
+  query: string;
+  totalMatches: number;
+  vehicles: Vehicle[];
+  actions: ActionItem[];
+  events: CanonicalVehicleEvent[];
+}
+

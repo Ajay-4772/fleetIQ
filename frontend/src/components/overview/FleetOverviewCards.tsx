@@ -1,12 +1,13 @@
 import React from 'react';
-import { Car, ShieldCheck, Zap, AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Car, ShieldCheck, Zap, AlertTriangle, ArrowUpRight } from 'lucide-react';
 import { DashboardSummary } from '../../types';
 
 interface FleetOverviewCardsProps {
   summary: DashboardSummary | null;
+  onNavigateTab?: (tab: 'vehicles' | 'actions' | 'intelligence') => void;
 }
 
-export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary }) => {
+export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary, onNavigateTab }) => {
   if (!summary) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -18,11 +19,7 @@ export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary 
   }
 
   const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(val);
+    return '$' + Math.round(val).toLocaleString();
   };
 
   const cards = [
@@ -31,10 +28,11 @@ export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary 
       value: summary.totalVehicles.toString(),
       trend: '+12.5%',
       trendUp: true,
-      period: 'vs. last month',
+      period: 'monitored vehicles',
       icon: Car,
       iconColor: 'text-blue-600 bg-blue-50',
-      subtitle: `${summary.activeVehicles} Active · ${summary.maintenanceVehicles} Service · ${summary.inactiveVehicles} Idle`
+      subtitle: `${summary.activeVehicles} Active · ${summary.maintenanceVehicles} Service · ${summary.inactiveVehicles} Idle`,
+      targetTab: 'vehicles' as const
     },
     {
       title: 'Fleet Health Index',
@@ -44,7 +42,8 @@ export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary 
       period: 'Operational Integrity',
       icon: ShieldCheck,
       iconColor: 'text-emerald-600 bg-emerald-50',
-      subtitle: `${summary.healthyVehicles} Healthy · ${summary.atRiskVehicles} Warning · ${summary.criticalVehicles} Critical`
+      subtitle: `${summary.healthyVehicles} Healthy · ${summary.atRiskVehicles} Warning · ${summary.criticalVehicles} Critical`,
+      targetTab: 'actions' as const
     },
     {
       title: 'Active Utilization',
@@ -54,17 +53,19 @@ export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary 
       period: 'Operating Duty',
       icon: Zap,
       iconColor: 'text-indigo-600 bg-indigo-50',
-      subtitle: `${summary.openActionCount} Open Actions · ${summary.criticalActionCount} High Priority`
+      subtitle: `${summary.openActionCount} Open Actions · ${summary.criticalActionCount} High Priority`,
+      targetTab: 'vehicles' as const
     },
     {
       title: 'Est. Operational Risk',
       value: formatCurrency(summary.estimatedTotalImpact),
       trend: '-14.8%',
-      trendUp: false, // Risk reduction is positive
-      period: 'Active Unresolved',
+      trendUp: false,
+      period: 'Active Unresolved Risk',
       icon: AlertTriangle,
       iconColor: 'text-rose-600 bg-rose-50',
-      subtitle: `Calculated from real-time fault telemetry & DTCs`
+      subtitle: `${summary.criticalActionCount} critical action work orders open`,
+      targetTab: 'actions' as const
     }
   ];
 
@@ -75,33 +76,30 @@ export const FleetOverviewCards: React.FC<FleetOverviewCardsProps> = ({ summary 
         return (
           <div
             key={idx}
-            className="bg-white border border-slate-100 rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between"
+            onClick={() => onNavigateTab && onNavigateTab(card.targetTab)}
+            className="cursor-pointer bg-white border border-slate-100 hover:border-blue-200 rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group"
           >
             <div>
-              {/* Card Header: Title & Icon */}
+              {/* Card Header */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 tracking-wide">{card.title}</span>
-                <div className={`p-2.5 rounded-xl ${card.iconColor} transition`}>
+                <span className="text-xs font-semibold text-slate-500 tracking-wide group-hover:text-blue-600 transition">
+                  {card.title}
+                </span>
+                <div className={`p-2.5 rounded-xl ${card.iconColor} group-hover:scale-105 transition`}>
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
 
-              {/* Big Bold Metric */}
+              {/* Metric Value */}
               <div className="mt-3 flex items-baseline gap-2">
                 <span className="text-3xl font-extrabold text-slate-900 tracking-tight">{card.value}</span>
               </div>
             </div>
 
-            {/* Bottom Trend & Comparison (Shopeers badge style) */}
+            {/* Bottom Trend & Subtitle */}
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <span
-                  className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${
-                    card.trendUp
-                      ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                      : 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                  }`}
-                >
+                <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
                   <ArrowUpRight className="w-3 h-3" />
                   <span>{card.trend}</span>
                 </span>

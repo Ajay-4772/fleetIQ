@@ -13,7 +13,10 @@ import java.util.List;
 @Repository
 public interface ActionItemRepository extends JpaRepository<ActionItem, String> {
     List<ActionItem> findByVehicleIdOrderByCreatedAtDesc(String vehicleId);
+    List<ActionItem> findByVehicleId(String vehicleId);
     List<ActionItem> findByStatusOrderByCreatedAtDesc(String status);
+    List<ActionItem> findByStatus(String status);
+    List<ActionItem> findByRequiresHumanReviewTrue();
     List<ActionItem> findTop50ByOrderByCreatedAtDesc();
 
     long countByStatus(String status);

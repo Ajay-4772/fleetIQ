@@ -41,6 +41,7 @@ public class EventProcessingService {
     private long duplicateEvents = 0;
     private long unsupportedSources = 0;
     private long processingFailed = 0;
+    private final java.util.Set<String> processedIdempotencyKeys = java.util.concurrent.ConcurrentHashMap.newKeySet();
 
     public EventProcessingService(NormalizationService normalizationService,
                                   IssueDetectionService issueDetectionService,
@@ -69,6 +70,23 @@ public class EventProcessingService {
     @Transactional
     public IngestionResponse processEvent(IngestionRequest request) {
         totalReceived++;
+        String correlationId = request.getCorrelationId() != null ? request.getCorrelationId() : java.util.UUID.randomUUID().toString();
+
+        // Check idempotency key if provided
+        if (request.getIdempotencyKey() != null && !request.getIdempotencyKey().isBlank()) {
+            if (processedIdempotencyKeys.contains(request.getIdempotencyKey())) {
+                duplicateEvents++;
+                return IngestionResponse.duplicate(request.getEventId(), correlationId, "Event with idempotency key already processed: " + request.getIdempotencyKey());
+            }
+            processedIdempotencyKeys.add(request.getIdempotencyKey());
+        }
+
+        // Check if event ID already exists
+        if (request.getEventId() != null && eventRepository.findById(request.getEventId()).isPresent()) {
+            duplicateEvents++;
+            return IngestionResponse.duplicate(request.getEventId(), correlationId, "Event ID already processed: " + request.getEventId());
+        }
+
         String source = request.getSource();
         String rawJson;
 
@@ -82,6 +100,9 @@ public class EventProcessingService {
         CanonicalVehicleEvent event;
         try {
             event = normalizationService.normalize(source, request.getPayload());
+            if (request.getEventId() != null && !request.getEventId().isBlank()) {
+                event.setEventId(request.getEventId());
+            }
             successfullyNormalized++;
         } catch (IllegalArgumentException e) {
             normalizationFailed++;
@@ -136,8 +157,11 @@ public class EventProcessingService {
         // 6. Create Action Item if actionable
         ActionItem action = actionService.createActionFromDecision(decision, event.getSeverity());
 
-        // 7. Publish to Real-Time SSE Stream
+        // 7. Publish to Real-Time SSE Stream with correlation and entity envelopes
         DashboardEventDto sseEvent = new DashboardEventDto(
+                event.getEventId(),
+                correlationId,
+                event.getVehicleId(),
                 event.getEventType(),
                 event.getTimestamp().toString(),
                 event.getVehicleId(),
@@ -153,14 +177,18 @@ public class EventProcessingService {
 
         return new IngestionResponse(
                 event.getEventId(),
+                correlationId,
                 event.getVehicleId(),
                 event.getEventType(),
                 event.getSeverity(),
                 "PROCESSED",
+                "NORMALIZED",
+                "PROCESSED",
                 action != null ? action.getActionId() : null,
                 decision.getPriority(),
                 decision.getDecisionSource(),
-                "Telemetry event ingested and processed successfully"
+                "Telemetry event ingested and processed successfully",
+                null
         );
     }
 

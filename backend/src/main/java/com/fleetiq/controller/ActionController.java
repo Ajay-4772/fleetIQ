@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/actions")
+@RequestMapping({"/api/v1/actions", "/api/actions"})
 public class ActionController {
 
     private final ActionService actionService;

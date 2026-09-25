@@ -11,10 +11,36 @@ import {
   ActionItem,
   FleetQueryResponse,
   SimulatorResponse,
-  LoadTestResponse
+  LoadTestResponse,
+  User,
+  LoginResponse,
+  AssistantResponse,
+  SearchResult
 } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+// Token management in localStorage
+let currentToken: string | null = localStorage.getItem('fleetiq_auth_token') || null;
+
+export const setAuthToken = (token: string | null) => {
+  currentToken = token;
+  if (token) {
+    localStorage.setItem('fleetiq_auth_token', token);
+  } else {
+    localStorage.removeItem('fleetiq_auth_token');
+  }
+};
+
+export const getAuthToken = (): string | null => currentToken;
+
+function authHeaders(extra: Record<string, string> = {}): Record<string, string> {
+  const headers: Record<string, string> = { ...extra };
+  if (currentToken) {
+    headers['Authorization'] = `Bearer ${currentToken}`;
+  }
+  return headers;
+}
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -25,31 +51,92 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 export const api = {
+  // Authentication
+  login: (username: string, password: string): Promise<LoginResponse> =>
+    fetch(`${BASE_URL}/api/v1/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    })
+      .then(handleResponse<LoginResponse>)
+      .then((res) => {
+        setAuthToken(res.token);
+        return res;
+      }),
+
+  getCurrentUser: (): Promise<User> =>
+    fetch(`${BASE_URL}/api/v1/auth/me`, {
+      headers: authHeaders()
+    }).then(handleResponse<User>),
+
+  // Grounded AI Assistant
+  queryAssistant: (question: string): Promise<AssistantResponse> =>
+    fetch(`${BASE_URL}/api/v1/assistant/query`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ question })
+    }).then(handleResponse<AssistantResponse>),
+
+  // Global Search
+  search: (query: string): Promise<SearchResult> =>
+    fetch(`${BASE_URL}/api/v1/search?q=${encodeURIComponent(query)}`, {
+      headers: authHeaders()
+    }).then(handleResponse<SearchResult>),
+
+  // Real Data Export Helper
+  getExportUrl: (type: 'vehicles' | 'actions' | 'events', format: 'csv' | 'json' = 'csv'): string => {
+    const tokenParam = currentToken ? `&token=${encodeURIComponent(currentToken)}` : '';
+    return `${BASE_URL}/api/v1/export/${type}?format=${format}${tokenParam}`;
+  },
+
+  downloadExport: async (type: 'vehicles' | 'actions' | 'events', format: 'csv' | 'json' = 'csv'): Promise<void> => {
+    const res = await fetch(`${BASE_URL}/api/v1/export/${type}?format=${format}`, {
+      headers: authHeaders()
+    });
+    if (!res.ok) throw new Error(`Export failed: ${res.statusText}`);
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fleetiq-${type}-${Date.now()}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  },
+
   // Dashboard Aggregations
   getSummary: (): Promise<DashboardSummary> =>
-    fetch(`${BASE_URL}/api/dashboard/summary`).then(handleResponse<DashboardSummary>),
+    fetch(`${BASE_URL}/api/v1/dashboard/summary`, { headers: authHeaders() })
+      .then(handleResponse<DashboardSummary>),
 
   getHealth: (): Promise<FleetHealth> =>
-    fetch(`${BASE_URL}/api/dashboard/health`).then(handleResponse<FleetHealth>),
+    fetch(`${BASE_URL}/api/v1/dashboard/health`, { headers: authHeaders() })
+      .then(handleResponse<FleetHealth>),
 
   getEvents: (page = 0, size = 50, severity?: string, eventType?: string): Promise<{ content: CanonicalVehicleEvent[], totalElements: number }> => {
     const params = new URLSearchParams({ page: page.toString(), size: size.toString() });
     if (severity) params.append('severity', severity);
     if (eventType) params.append('eventType', eventType);
-    return fetch(`${BASE_URL}/api/dashboard/events?${params}`).then(handleResponse<{ content: CanonicalVehicleEvent[], totalElements: number }>);
+    return fetch(`${BASE_URL}/api/v1/dashboard/events?${params}`, { headers: authHeaders() })
+      .then(handleResponse<{ content: CanonicalVehicleEvent[], totalElements: number }>);
   },
 
   getTrends: (range = '24H'): Promise<TrendDataPoint[]> =>
-    fetch(`${BASE_URL}/api/dashboard/trends?range=${range}`).then(handleResponse<TrendDataPoint[]>),
+    fetch(`${BASE_URL}/api/v1/dashboard/trends?range=${range}`, { headers: authHeaders() })
+      .then(handleResponse<TrendDataPoint[]>),
 
   getDataQuality: (): Promise<DataQuality> =>
-    fetch(`${BASE_URL}/api/dashboard/data-quality`).then(handleResponse<DataQuality>),
+    fetch(`${BASE_URL}/api/v1/dashboard/data-quality`, { headers: authHeaders() })
+      .then(handleResponse<DataQuality>),
 
   getDecisionMetrics: (): Promise<DecisionMetrics> =>
-    fetch(`${BASE_URL}/api/dashboard/decision-metrics`).then(handleResponse<DecisionMetrics>),
+    fetch(`${BASE_URL}/api/v1/dashboard/decision-metrics`, { headers: authHeaders() })
+      .then(handleResponse<DecisionMetrics>),
 
   getImpact: (): Promise<ImpactMetrics> =>
-    fetch(`${BASE_URL}/api/dashboard/impact`).then(handleResponse<ImpactMetrics>),
+    fetch(`${BASE_URL}/api/v1/dashboard/impact`, { headers: authHeaders() })
+      .then(handleResponse<ImpactMetrics>),
 
   // Vehicles
   getVehicles: (status?: string, make?: string, fuelType?: string): Promise<Vehicle[]> => {
@@ -57,11 +144,13 @@ export const api = {
     if (status) params.append('status', status);
     if (make) params.append('make', make);
     if (fuelType) params.append('fuelType', fuelType);
-    return fetch(`${BASE_URL}/api/vehicles?${params}`).then(handleResponse<Vehicle[]>);
+    return fetch(`${BASE_URL}/api/v1/vehicles?${params}`, { headers: authHeaders() })
+      .then(handleResponse<Vehicle[]>);
   },
 
   getVehicleProfile: (id: string): Promise<VehicleProfile> =>
-    fetch(`${BASE_URL}/api/vehicles/${id}/profile`).then(handleResponse<VehicleProfile>),
+    fetch(`${BASE_URL}/api/v1/vehicles/${id}/profile`, { headers: authHeaders() })
+      .then(handleResponse<VehicleProfile>),
 
   // Actions
   getActions: (status?: string, priority?: string, humanReview?: boolean, page = 0, size = 50): Promise<{ content: ActionItem[], totalElements: number }> => {
@@ -69,36 +158,40 @@ export const api = {
     if (status) params.append('status', status);
     if (priority) params.append('priority', priority);
     if (humanReview !== undefined) params.append('requiresHumanReview', humanReview.toString());
-    return fetch(`${BASE_URL}/api/actions?${params}`).then(handleResponse<{ content: ActionItem[], totalElements: number }>);
+    return fetch(`${BASE_URL}/api/v1/actions?${params}`, { headers: authHeaders() })
+      .then(handleResponse<{ content: ActionItem[], totalElements: number }>);
   },
 
   updateActionStatus: (actionId: string, status: string, notes?: string): Promise<ActionItem> =>
-    fetch(`${BASE_URL}/api/actions/${actionId}/status`, {
+    fetch(`${BASE_URL}/api/v1/actions/${actionId}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ status, notes })
     }).then(handleResponse<ActionItem>),
 
   // Controlled Fleet Query
   runFleetQuery: (intent: string, parameters: Record<string, any> = {}): Promise<FleetQueryResponse> =>
-    fetch(`${BASE_URL}/api/fleet/query`, {
+    fetch(`${BASE_URL}/api/v1/fleet/query`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ intent, parameters })
     }).then(handleResponse<FleetQueryResponse>),
 
   // Simulator
   runScenario: (scenario: string, config: any = {}): Promise<SimulatorResponse> =>
-    fetch(`${BASE_URL}/api/simulator/scenario/${scenario}`, {
+    fetch(`${BASE_URL}/api/v1/simulator/scenario/${scenario}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(config)
     }).then(handleResponse<SimulatorResponse>),
 
   runLoadTest: (level: number, seed?: number): Promise<LoadTestResponse> => {
     const params = new URLSearchParams({ level: level.toString() });
     if (seed) params.append('seed', seed.toString());
-    return fetch(`${BASE_URL}/api/simulator/load-test?${params}`, { method: 'POST' }).then(handleResponse<LoadTestResponse>);
+    return fetch(`${BASE_URL}/api/v1/simulator/load-test?${params}`, {
+      method: 'POST',
+      headers: authHeaders()
+    }).then(handleResponse<LoadTestResponse>);
   },
 
   // Actuator Health

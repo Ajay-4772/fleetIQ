@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Calendar, Download, Plus, Zap, ArrowUpRight } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Calendar, Download, Plus, ChevronDown, FileSpreadsheet, FileJson, CheckCircle2 } from 'lucide-react';
 import { Header } from './components/layout/Header';
 import { Sidebar, NavTab } from './components/layout/Sidebar';
 import { FleetOverviewCards } from './components/overview/FleetOverviewCards';
@@ -11,16 +11,28 @@ import { PriorityActionCenter } from './components/actions/PriorityActionCenter'
 import { VehicleTable } from './components/vehicles/VehicleTable';
 import { VehicleProfileModal } from './components/vehicles/VehicleProfileModal';
 import { IntelligenceHub } from './components/intelligence/IntelligenceHub';
-import { FleetQueryPanel } from './components/queries/FleetQueryPanel';
 import { SystemHealthPanel } from './components/system/SystemHealthPanel';
-import { SimulatorControlPanel } from './components/simulator/SimulatorControlPanel';
+import { SimulatorModal } from './components/simulator/SimulatorModal';
+import { AiAssistantModal } from './components/assistant/AiAssistantModal';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useSSE } from './hooks/useSSE';
 import { api } from './services/api';
 
-export const App: React.FC = () => {
+const FleetIQDashboard: React.FC = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<NavTab>('overview');
   const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
+
+  // Operational Tools Modals
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
+  const [assistantInitialQuery, setAssistantInitialQuery] = useState('');
+
+  // Export dropdown state
+  const [isExportMenuOpen, setIsExportMenuOpen] = useState(false);
+  const [exportMessage, setExportMessage] = useState<string | null>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   const {
     summary,
@@ -46,26 +58,57 @@ export const App: React.FC = () => {
     await refreshData();
   };
 
-  // Keyboard shortcut listener: Cmd+K / Ctrl+K opens queries
+  // Keyboard shortcut listener: Cmd+K / Ctrl+K opens AI Assistant Copilot
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        setActiveTab('queries');
+        setAssistantInitialQuery('');
+        setIsAssistantOpen(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Close export dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setIsExportMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleTriggerExport = async (type: 'vehicles' | 'actions' | 'events', format: 'csv' | 'json' = 'csv') => {
+    setIsExportMenuOpen(false);
+    try {
+      setExportMessage(`Exporting ${type} as ${format.toUpperCase()}...`);
+      await api.downloadExport(type, format);
+      setExportMessage(`Export complete!`);
+      setTimeout(() => setExportMessage(null), 3000);
+    } catch (err: any) {
+      setExportMessage(`Export error: ${err.message}`);
+      setTimeout(() => setExportMessage(null), 4000);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[#f4f5f9] text-slate-900 font-sans antialiased">
       <Header
         sseStatus={sseStatus}
         summary={summary}
+        actions={actions}
         onRefresh={refreshData}
-        onOpenSimulator={() => setActiveTab('simulator')}
-        onSearchFocus={() => setActiveTab('queries')}
+        onOpenSimulator={() => setIsSimulatorOpen(true)}
+        onOpenAssistant={(q) => {
+          setAssistantInitialQuery(q || '');
+          setIsAssistantOpen(true);
+        }}
+        onSelectVehicle={(vId) => setSelectedVehicleId(vId)}
+        onSelectAction={(action) => setSelectedVehicleId(action.vehicleId)}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -74,6 +117,11 @@ export const App: React.FC = () => {
           onSelectTab={setActiveTab}
           openActionCount={summary?.openActionCount}
           criticalActionCount={summary?.criticalActionCount}
+          onOpenSimulator={() => setIsSimulatorOpen(true)}
+          onOpenAssistant={() => {
+            setAssistantInitialQuery('');
+            setIsAssistantOpen(true);
+          }}
         />
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6">
@@ -89,13 +137,20 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* OVERVIEW TAB (Shopeers / Logip 2-Column Dashboard Layout) */}
+          {exportMessage && (
+            <div className="p-3 rounded-2xl bg-blue-50 border border-blue-200 text-xs text-blue-700 shadow-sm flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-blue-600" />
+              <span className="font-semibold">{exportMessage}</span>
+            </div>
+          )}
+
+          {/* 1. OVERVIEW TAB */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* Dashboard Action Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Dashboard</h1>
+                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Fleet Intelligence Overview</h1>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
                     Real-time connected vehicle telemetry, health diagnostics & operations dispatch
                   </p>
@@ -104,29 +159,70 @@ export const App: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-2.5">
                   <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-slate-200/80 text-xs font-semibold text-slate-600 shadow-2xs">
                     <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Jan 1, 2025 - Feb 1, 2025</span>
+                    <span>Live Telemetry Window</span>
                   </div>
 
                   <button
-                    onClick={() => setActiveTab('simulator')}
+                    onClick={() => setIsSimulatorOpen(true)}
                     className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200/80 shadow-2xs transition"
                   >
                     <Plus className="w-3.5 h-3.5 text-blue-600" />
                     <span>Scenario Simulator</span>
                   </button>
 
-                  <button
-                    onClick={() => window.print()}
-                    className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Export</span>
-                  </button>
+                  {/* Real Export Dropdown */}
+                  <div className="relative" ref={exportRef}>
+                    <button
+                      onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
+                      className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Export Data</span>
+                      <ChevronDown className="w-3 h-3 ml-0.5 opacity-80" />
+                    </button>
+
+                    {isExportMenuOpen && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-40 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                          Production Datasets
+                        </div>
+                        <button
+                          onClick={() => handleTriggerExport('vehicles', 'csv')}
+                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
+                        >
+                          <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                          <span>Vehicles Registry (CSV)</span>
+                        </button>
+                        <button
+                          onClick={() => handleTriggerExport('actions', 'csv')}
+                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
+                        >
+                          <FileSpreadsheet className="w-4 h-4 text-blue-600" />
+                          <span>Priority Actions (CSV)</span>
+                        </button>
+                        <button
+                          onClick={() => handleTriggerExport('events', 'csv')}
+                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
+                        >
+                          <FileSpreadsheet className="w-4 h-4 text-indigo-600" />
+                          <span>Telemetry Events (CSV)</span>
+                        </button>
+                        <div className="border-t border-slate-100 my-1"></div>
+                        <button
+                          onClick={() => handleTriggerExport('vehicles', 'json')}
+                          className="w-full text-left px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition"
+                        >
+                          <FileJson className="w-4 h-4 text-amber-600" />
+                          <span>Vehicles Raw JSON</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* 4 KPI Top Cards */}
-              <FleetOverviewCards summary={summary} />
+              <FleetOverviewCards summary={summary} onNavigateTab={(tab) => setActiveTab(tab)} />
 
               {/* Critical Alerts Banner */}
               <CriticalAlertsBanner
@@ -134,7 +230,7 @@ export const App: React.FC = () => {
                 onSelectAction={(a) => setSelectedVehicleId(a.vehicleId)}
               />
 
-              {/* Shopeers Main 2-Column Split */}
+              {/* Main 2-Column Split */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 {/* Left Column (8 cols): Fleet Health Chart + Action Queue + Live Stream */}
                 <div className="lg:col-span-8 space-y-6">
@@ -151,11 +247,12 @@ export const App: React.FC = () => {
                   />
                 </div>
 
-                {/* Right Column (4 cols): Most Day Active + Radial Gauge + AI Assistant */}
+                {/* Right Column (4 cols): Most Day Active + Radial Gauge + AI Assistant Widget */}
                 <div className="lg:col-span-4 space-y-6">
                   <RightSidebarWidgets
                     onAskAi={(q) => {
-                      setActiveTab('queries');
+                      setAssistantInitialQuery(q);
+                      setIsAssistantOpen(true);
                     }}
                     onViewDetails={() => setActiveTab('intelligence')}
                   />
@@ -164,7 +261,7 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* LIVE OPERATIONS TAB */}
+          {/* 2. LIVE OPERATIONS TAB */}
           {activeTab === 'live' && (
             <div className="space-y-6">
               <div>
@@ -185,14 +282,45 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* PRIORITY ACTIONS TAB */}
+          {/* 3. VEHICLES TAB */}
+          {activeTab === 'vehicles' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Fleet Asset Registry</h1>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Monitored multi-OEM connected vehicles with telemetry health scores, diagnostics, and service states
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleTriggerExport('vehicles', 'csv')}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/80 shadow-2xs transition"
+                >
+                  <Download className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Download Vehicles CSV</span>
+                </button>
+              </div>
+              <VehicleTable />
+            </div>
+          )}
+
+          {/* 4. ACTIONS TAB */}
           {activeTab === 'actions' && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Priority Operational Actions</h1>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Authoritative decision engine queue with human operator review workflows
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Priority Operational Actions</h1>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Authoritative decision engine queue with human operator review workflows & role-based mutation
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleTriggerExport('actions', 'csv')}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200/80 shadow-2xs transition"
+                >
+                  <Download className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Download Actions CSV</span>
+                </button>
               </div>
               <PriorityActionCenter
                 actions={actions}
@@ -202,20 +330,7 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* VEHICLES TAB */}
-          {activeTab === 'vehicles' && (
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Fleet Asset Registry</h1>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Monitored multi-OEM connected vehicles with telemetry health scores and diagnostics
-                </p>
-              </div>
-              <VehicleTable />
-            </div>
-          )}
-
-          {/* INTELLIGENCE HUB TAB */}
+          {/* 5. INTELLIGENCE TAB */}
           {activeTab === 'intelligence' && (
             <div className="space-y-6">
               <div>
@@ -234,26 +349,13 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* FLEET QUERIES TAB */}
-          {activeTab === 'queries' && (
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Controlled Fleet Queries</h1>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Deterministic intent-based queries across fleet health, DTCs, maintenance, and asset utilization
-                </p>
-              </div>
-              <FleetQueryPanel />
-            </div>
-          )}
-
-          {/* SYSTEM HEALTH & DATA QUALITY TAB */}
+          {/* 6. SYSTEM TAB */}
           {activeTab === 'system' && (
             <div className="space-y-6">
               <div>
                 <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">System Health & Data Quality</h1>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Backend service health checks, multi-OEM normalizer metrics, schema pass rates, and SSE connection
+                  Backend service health checks, multi-OEM normalizer metrics, schema pass rates, and SSE stream health
                 </p>
               </div>
               <SystemHealthPanel
@@ -262,29 +364,44 @@ export const App: React.FC = () => {
               />
             </div>
           )}
-
-          {/* SIMULATOR TAB */}
-          {activeTab === 'simulator' && (
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Multi-OEM Scenario Simulator</h1>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Inject deterministic test scenarios and high-volume load benchmarks to validate real-time operational response
-                </p>
-              </div>
-              <SimulatorControlPanel onScenarioExecuted={refreshData} />
-            </div>
-          )}
         </main>
       </div>
 
+      {/* Global Vehicle Profile Modal */}
       {selectedVehicleId && (
         <VehicleProfileModal
           vehicleId={selectedVehicleId}
           onClose={() => setSelectedVehicleId(null)}
         />
       )}
+
+      {/* Global AI Assistant Copilot Modal */}
+      <AiAssistantModal
+        isOpen={isAssistantOpen}
+        onClose={() => setIsAssistantOpen(false)}
+        initialQuery={assistantInitialQuery}
+        onSelectVehicle={(vId) => {
+          setIsAssistantOpen(false);
+          setSelectedVehicleId(vId);
+        }}
+      />
+
+      {/* Global Multi-OEM Simulator Tool Modal */}
+      <SimulatorModal
+        isOpen={isSimulatorOpen}
+        onClose={() => setIsSimulatorOpen(false)}
+        onScenarioExecuted={refreshData}
+      />
     </div>
   );
 };
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <FleetIQDashboard />
+    </AuthProvider>
+  );
+};
+
 export default App;

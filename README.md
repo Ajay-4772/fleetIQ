@@ -1,270 +1,189 @@
-# FleetIQ — Connected Vehicle Intelligence & Real-Time Operations Platform
+# FleetIQ — Real-Time Connected Vehicle Intelligence & Operations Platform
 
-FleetIQ is an independent connected-vehicle operations and intelligence platform designed to ingest, normalize, analyze, prioritize, and act upon multi-OEM vehicle telemetry streams in near real-time.
+> **Transforming Multi-OEM Connected Vehicle Telemetry into Explainable Operational Action**
+
+FleetIQ is an enterprise-grade, real-time connected vehicle data intelligence platform. It ingests high-frequency, multi-OEM telematics streams (Toyota, Ford, BMW, Tesla EV), normalizes disparate schemas into a canonical standard, evaluates operational integrity using rule engines and AI models, calculates financial risk, and dispatches prioritized operational actions to fleet managers.
+
+---
+
+## 1. Core Mental Model
+
+```
+       DATA
+        ↓
+   INTELLIGENCE
+        ↓
+     ACTIONS
+        ↓
+    OPERATIONS
+```
+
+FleetIQ answers four core operational questions within 30 seconds:
+1. **What is happening?** (Live operations feed, normalized telemetry events)
+2. **Which vehicles/issues need attention?** (Vehicle health scores, DTCs, degradation states)
+3. **Why does it matter?** (Explainable rule/AI decisioning, estimated operational risk in currency)
+4. **What should the operator do?** (Authoritative, prioritized action queue with lifecycle workflows)
+
+---
+
+## 2. End-to-End System Architecture
 
 ```text
-OEM Telemetry / Simulator
- (Toyota, Ford, BMW, Tesla)
-            │
-            ▼
-┌────────────────────────────────────────┐
-│      REST Ingestion Layer              │
-│    POST /api/events/ingest             │
-└───────────────────┬────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────┐
-│     Multi-OEM Adapter Normalizer       │
-│  ToyotaAdapter, FordAdapter, etc.      │
-└───────────────────┬────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────┐
-│        CanonicalVehicleEvent           │
-│  (Vehicle ID, Faults, Idle, Severity)  │
-└───────────────────┬────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────┐
-│    Issue Detection & Impact Engine     │
-│  (Fault categorization, ₹ impact)      │
-└───────────────────┬────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────┐
-│      Decision Engine Abstraction       │
-│  ┌──────────────────────────────────┐  │
-│  │     Hybrid / Jev AI Layer        │  │
-│  │   (Fallback on timeout/error)    │  │
-│  └──────────────────┬───────────────┘  │
-│                     │                  │
-│                     ▼                  │
-│  ┌──────────────────────────────────┐  │
-│  │    Deterministic Rule Engine     │  │
-│  │   (RULE_ENGINE_FALLBACK audit)   │  │
-│  └──────────────────┘  │
-└───────────────────┬────────────────────┘
-                    │
-                    ▼
-┌────────────────────────────────────────┐
-│             Action Queue               │
-│   (OPEN, IN_PROGRESS, RESOLVED)        │
-└─────────┬───────────────────┬──────────┘
-          │                   │
-          ▼                   ▼
-┌──────────────────┐  ┌──────────────────┐
-│  PostgreSQL /    │  │ Dashboard Event  │
-│   H2 Storage     │  │    Publisher     │
-└──────────────────┘  └─────────┬────────┘
-                                │
-                                ▼
-                       ┌──────────────────┐
-                       │  SSE Stream      │
-                       │ GET /api/stream  │
-                       └────────┬─────────┘
-                                │
-                                ▼
-                       ┌──────────────────┐
-                       │  React Dashboard │
-                       │ (Operations Hub) │
-                       └──────────────────┘
+External OEM / Telematics System / Simulator
+                    ↓
+       Ingestion API (POST /api/v1/events/ingest)
+       [X-API-Key: fleetiq-ingest-secure-key-2026]
+                    ↓
+       Source Identification & Validation
+                    ↓
+        OEM Adapter Normalization Pipeline
+      (Toyota, Ford, BMW, Tesla EV Adapters)
+                    ↓
+           Canonical Vehicle Event
+                    ↓
+         PostgreSQL / H2 Persistence
+                    ↓
+             Issue Detection
+                    ↓
+         Operational Impact Engine
+                    ↓
+          Hybrid Decision Engine
+         (Rule-Based + AI Reasoning)
+                    ↓
+         Priority Action Dispatch
+                    ↓
+         Event Publisher (Spring)
+                    ↓
+        Sub-second SSE Event Stream
+        (GET /api/v1/stream/events)
+                    ↓
+        FleetIQ Real-Time UI (React)
 ```
 
 ---
 
-## 1. Data Sources & Licensing
+## 3. Simplified Frontend Information Architecture
 
-FleetIQ operates strictly within license-safe, open-source, and synthetic boundaries:
+The frontend is streamlined into 6 primary operational areas:
 
-1. **Synthetic Telemetry (Primary Operational Layer)**:
-   - All real-time telemetry, diagnostic trouble codes (DTCs), sensor measurements, idling, and operational events are generated by FleetIQ's in-house simulator with reproducible random seed capability (`seed = 20260925`).
-   - Clearly labeled: *"Simulated multi-OEM telemetry inspired by common connected-vehicle signal patterns."*
+1. **OVERVIEW**: Executive fleet health index, monitored assets, active utilization, operational risk, critical alert banners, health scrubber chart, and prioritized action dispatch.
+2. **LIVE OPERATIONS**: Sub-second Server-Sent Events (SSE) telemetry feed normalized across multi-OEM ingestion adapters.
+3. **VEHICLES**: Comprehensive asset registry with synthetic VINs, fuel types, battery health (EV), oil life remaining, tire pressure, and individual vehicle diagnostic profiles.
+4. **ACTIONS**: Authoritative operational action queue (`OPEN`, `IN_PROGRESS`, `RESOLVED`, `DISMISSED`) with operator triage, technician notes, and strict RBAC protection.
+5. **INTELLIGENCE**: Explainability center detailing multi-signal rule calibrations, fallback metrics, confidence distributions, and financial risk breakdown.
+6. **SYSTEM**: Real-time backend service status, database connectivity, ingestion counters, normalizer success rates, schema pass rates, and SSE stream health.
 
-2. **Public / Open Reference Datasets**:
-   - **NHTSA vPIC API**: Public Domain (17 U.S.C. § 105). Used exclusively as reference data for vehicle makes, models, years, and specifications.
-   - **NHTSA Recalls Database**: Public Domain (17 U.S.C. § 105). Used for diagnostic issue category reference. Never treated as real-time vehicle alerts.
-   - **UCI Machine Learning Repository (Auto MPG & Automobile)**: CC BY 4.0 license. Used as a baseline for fuel efficiency distributions during simulated driving and idling.
-   - For complete details, see [`docs/DATA_SOURCES.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/DATA_SOURCES.md) and [`docs/DATA_LICENSES.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/DATA_LICENSES.md).
-
-3. **Strict Boundaries & Proprietary Data Policy**:
-   - **Zero Motorq Proprietary Data**: No proprietary Motorq datasets, internal APIs, credentials, or private information are used or included.
-   - **Zero Real Customer Data**: All vehicle IDs (`VH-1001`), registration numbers, and VINs (`1TO23B4NFA1001-SYNTH`) are completely synthetic.
-   - **Offline Standalone Capability**: No external API or internet dataset is mandatory to run, test, or demonstrate the application.
+### Operational Tools
+- **AI Assistant Copilot**: Globally accessible drawer providing grounded fleet answers and SAE diagnostic definitions.
+- **Scenario Simulator Tool**: Operational modal for injecting deterministic multi-OEM telematics test scenarios through the production ingestion pipeline.
 
 ---
 
-## 2. Technology Stack
+## 4. Key Engineering Capabilities
 
-### Backend
-- **Framework**: Spring Boot 3.3.2, Java 17
-- **Data Persistence**: Spring Data JPA, Hibernate, HikariCP
-- **Databases**:
-  - **PostgreSQL**: Production / Docker container
-  - **H2 (In-Memory / Standalone)**: Zero-dependency local development and integration tests
-- **Real-Time Streaming**: Server-Sent Events (SSE) via `SseEmitter`
-- **Observability**: Spring Boot Actuator (`/actuator/health`)
+### A. Real-Time Telemetry Streaming (SSE)
+- **Endpoint**: `GET /api/v1/stream/events`
+- **Mechanism**: Server-Sent Events (`text/event-stream`) pushing sub-second updates for `VEHICLE_EVENT`, `CRITICAL_ALERT`, `ACTION_CREATED`, and `ACTION_UPDATED`.
+- **Client Resilience**: Automatic reconnection with exponential backoff and dynamic connection badges (`LIVE`, `RECONNECTING`, `OFFLINE`).
 
-### Frontend
-- **Framework**: React 18, TypeScript, Vite
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **Real-Time Client**: Native SSE EventSource with automatic exponential backoff reconnection
+### B. External Telematics Ingestion Boundary
+- **Endpoint**: `POST /api/v1/events/ingest`
+- **Security**: Service-to-service authentication via `X-API-Key: fleetiq-ingest-secure-key-2026` or authorized JWT bearer token.
+- **Traceability**: Unique correlation IDs propagated across ingestion, normalization, decisioning, actions, and UI broadcast.
+- **Idempotency Protection**: In-memory and database deduplication cache preventing duplicate telemetry events from triggering duplicate work orders.
+
+### C. Enterprise Security & Role-Based Access Control (RBAC)
+- **Stateless JWT**: Standard 24-hour cryptographically signed tokens.
+- **BCrypt Password Hashing**: Encrypted user credentials.
+- **Role Permissions**:
+  - `ROLE_ADMIN`: Complete system administration, settings, and override capabilities.
+  - `ROLE_OPERATIONS_LEAD`: Scenario simulation, operational oversight, and export.
+  - `ROLE_OPERATOR`: Action lifecycle management (`OPEN` → `IN_PROGRESS` → `RESOLVED` → `DISMISSED`) and notes logging.
+  - `ROLE_VIEWER`: Read-only access across dashboard, registry, and search. Action mutations return **403 Forbidden**.
+
+### Default Seeded User Accounts:
+| Username | Password | Role |
+|---|---|---|
+| `admin` | `Admin@FleetIQ2026` | `ROLE_ADMIN` |
+| `ops_lead` | `Ops@FleetIQ2026` | `ROLE_OPERATIONS_LEAD` |
+| `operator` | `Operator@FleetIQ2026` | `ROLE_OPERATOR` |
+| `viewer` | `Viewer@FleetIQ2026` | `ROLE_VIEWER` |
+
+### D. Grounded AI Assistant (Live Data vs. Technical Knowledge RAG)
+FleetIQ strictly distinguishes between real-time database state and domain documentation:
+- **Live Fleet Data**: Queries PostgreSQL directly via parameterized JPA repositories for vehicle counts, active DTCs, open actions, and critical assets. Vector search is **never** used for live fleet counts.
+- **Technical Knowledge (RAG)**: Retrieves definitions from indexed automotive knowledge documents (`src/main/resources/knowledge/*.md`) for SAE DTCs (e.g., P0300, P0171, P0562, P0217), OEM normalizer specifications, and decision thresholds.
+- **Hybrid Reasoning**: Combines live database matches with technical knowledge context to produce grounded operator recommendations.
+- **Zero-Downtime Fallback**: If an external AI provider is unavailable, deterministic rule-based evaluation delivers 100% accurate, factual answers without hallucination.
+
+### E. Production Data Export & Multi-Entity Search
+- **CSV & JSON Export**: Real backend export endpoints (`/api/v1/export/vehicles`, `/api/v1/export/actions`, `/api/v1/export/events`).
+- **Global Search**: Search across vehicles, actions, events, and diagnostic trouble codes simultaneously.
 
 ---
 
-## 3. Verified URLs
-
-| Service / View | URL | Purpose |
-| :--- | :--- | :--- |
-| **FleetIQ Dashboard** | `http://localhost:5173/` | Operations command center |
-| **Backend API Root** | `http://localhost:8080/api` | REST API |
-| **Actuator Health** | `http://localhost:8080/actuator/health` | Health & service connectivity |
-| **H2 Web Console** | `http://localhost:8080/h2-console` | In-memory database inspection |
-| **SSE Event Stream** | `http://localhost:8080/api/dashboard/stream` | Real-time SSE push stream |
-
----
-
-## 4. Getting Started & Running Locally
+## 5. Quick Start & Running Locally
 
 ### Prerequisites
 - Java 17+
-- Apache Maven 3.9+
-- Node.js 18+ & npm 9+
-- Docker & Docker Compose (Optional for containerized PostgreSQL)
+- Node.js 18+ and npm
+- Maven 3.8+
 
-### Option A: Standalone Local Mode (Instant, No Docker Needed)
-
-1. **Start Backend**:
-   ```bash
-   cd backend
-   mvn spring-boot:run
-   ```
-   *The backend starts on port 8080, automatically seeds 60 multi-OEM vehicles from `seed-vehicles.json`, and initializes the baseline fleet scenario.*
-
-2. **Start Frontend**:
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-   *The Vite frontend starts on `http://localhost:5173/` with full proxying to `http://localhost:8080`.*
-
-### Option B: Docker Compose (Full Stack with PostgreSQL)
-
+### 1. Start Backend
 ```bash
-docker compose up --build
+cd backend
+mvn clean install -DskipTests
+mvn spring-boot:run
 ```
-- `fleetiq-postgres`: Port 5432
-- `fleetiq-backend`: Port 8080
-- `fleetiq-frontend`: Port 5173 (Nginx reverse proxy)
+*Backend runs at: `http://localhost:8080`*
+*H2 Console (dev profile): `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:fleetiq`, user: `SA`, password: empty)*
+
+### 2. Start Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*Frontend runs at: `http://localhost:5173`*
 
 ---
 
-## 5. Testing & Verification
+## 6. Verification & Automated Test Suite
 
-The test suite covers all 24 required test cases without requiring external APIs or live AI access:
+FleetIQ includes 42 comprehensive automated tests covering security, ingestion, decisioning, RAG, export, and normalization:
 
 ```bash
 cd backend
 mvn test
 ```
 
-### Verified Test Results (28 Tests Run, 0 Failures):
-1. **Normalization Tests** (`com.fleetiq.NormalizationTests`):
-   - Case 1: Valid Toyota normalization
-   - Case 2: Valid Ford normalization
-   - Case 3: Valid BMW normalization
-   - Case 4: Invalid payload rejection
-   - Case 5: Unknown source rejection
-   - Case 6: Canonical event validation
-2. **Detection & Impact Tests** (`com.fleetiq.DetectionAndImpactTests`):
-   - Case 7: Maintenance detection
-   - Case 8: Excessive idle detection
-   - Case 9: Critical fault detection
-   - Case 10: Low utilization detection
-   - Case 11: Priority calculation
-   - Case 12: Cost impact calculation
-3. **Decision & AI Fallback Tests** (`com.fleetiq.DecisionAndAiFallbackTests`):
-   - Case 13: High confidence AI decision
-   - Case 14: Low confidence decision (requires human review)
-   - Case 15: AI timeout triggers graceful rule fallback
-   - Case 16: AI unavailable triggers graceful rule fallback
-   - Case 17: AI malformed response triggers rule fallback
-   - Case 18: Fallback rule engine produces valid decision (`decisionSource = "RULE_ENGINE_FALLBACK"`)
-4. **Fleet Query & Action Tests** (`com.fleetiq.FleetQueryAndActionTests`):
-   - Case 19: Fleet query intent mapping
-   - Case 20: Action queue sorting
-   - Case 21: Duplicate event handling
-5. **Integration & API Tests** (`com.fleetiq.IntegrationAndApiTests`):
-   - Case 22: Database persistence test
-   - Case 23: REST validation test
-   - Case 24: Error handling test
-   - Additional: Dashboard Summary, Dashboard Health, E2E Ingestion, Controlled Fleet Query
+### Test Coverage Highlights:
+- `SecurityAndAuthTests`: Login success, bad password rejection, viewer mutation forbidden (403), operator mutation allowed (200), service-to-service API key validation, anonymous ingestion rejection.
+- `AiAssistantAndRagTests`: Critical vehicle live queries, RAG technical DTC retrieval, hybrid query routing, RAG index verification.
+- `ExportAndSearchTests`: Real CSV vehicle/action export generation, multi-entity search across vehicles, actions, and events.
+- `DecisionAndAiFallbackTests`: Deterministic rule evaluation, AI fallback simulation, confidence scoring, human review flagging.
+- `DetectionAndImpactTests`: DTC categorization, low oil life degradation, financial risk estimation.
+- `NormalizationTests`: Multi-OEM payload parsing (Toyota, Ford, BMW, Tesla) and schema range validation.
 
 ---
 
-## 6. Simulator & Load Benchmarks
+## 7. Documentation Index
 
-The built-in simulator supports 5 deterministic scenarios and scaled load benchmarks:
-- **Scenario A**: `healthy_fleet` (Nominal fleet parameters)
-- **Scenario B**: `maintenance_spike` (30+ vehicles overdue for service)
-- **Scenario C**: `critical_faults` (Surge of misfire DTCs P0300/P0301)
-- **Scenario D**: `excessive_idle` (Widespread >60 min idling)
-- **Scenario E**: `mixed_fleet` (Balanced operational telemetry)
-
-### Actual Load Benchmark Measurements:
-| Level | Events Ingested | Successfully Normalized | Failed | Total Runtime | Avg Latency | P95 Latency | P99 Latency |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Level 1** | 100 | 100 (100%) | 0 | 794 ms | 7.42 ms | 15.0 ms | 34.0 ms |
-| **Level 2** | 1,000 | 1,000 (100%) | 0 | 8,918 ms | 8.37 ms | 17.0 ms | 42.0 ms |
-| **Level 3** | 10,000 | 10,000 (100%) | 0 | 84,210 ms | 8.12 ms | 18.5 ms | 48.0 ms |
+Detailed documentation is available in the [`docs/`](./docs) directory:
+- [Architecture & System Design](./docs/ARCHITECTURE.md)
+- [Real-Time SSE Streaming](./docs/REALTIME.md)
+- [Security & Authentication](./docs/SECURITY.md)
+- [Grounded AI Assistant](./docs/AI_ASSISTANT.md)
+- [RAG Technical Knowledge Retrieval](./docs/RAG.md)
+- [External Telematics Integration Guide](./docs/INTEGRATION_GUIDE.md)
+- [Data Sources & Synthetic Generation](./docs/DATA_SOURCES.md)
+- [Data Licensing](./docs/DATA_LICENSES.md)
 
 ---
 
-## 7. Real-Time Operations Dashboard Architecture
+## 8. Data Ethics & Licensing Compliance
 
-The frontend is an **Operations Center** built with React, TypeScript, and Tailwind CSS. It communicates strictly with backend APIs and subscribes to the Server-Sent Events (SSE) stream (`/api/dashboard/stream`):
-
-```text
-Synthetic / OEM Event
-         │
-         ▼
-POST /api/events/ingest
-         │
-         ▼
-Normalization Adapter
-         │
-         ▼
-Issue Detection & Impact
-         │
-         ▼
-Rule / Hybrid Decision
-         │
-         ▼
-Action Item Saved
-         │
-         ├──────────────────────► PostgreSQL / H2
-         │
-         └──────────────────────► SseEmitterService
-                                         │
-                                         ▼
-                             SSE: GET /api/dashboard/stream
-                                         │
-                                         ▼
-                                   useSSE Hook
-                                         │
-                                         ▼
-                            React State Auto-Updated
-                      (Overview, Actions, Stream, Alerts)
-```
-
-### Dashboard Sections:
-1. **Fleet Overview**: Total assets, fleet health score, active utilization, and estimated operational risk.
-2. **Live Telemetry & Event Stream**: Real-time event ticker with filtering by severity, OEM source (Toyota, Ford, BMW, Tesla), and vehicle ID.
-3. **Priority Operational Action Center**: Authoritative priority queue with status lifecycle management (`OPEN` -> `IN_PROGRESS` -> `RESOLVED` -> `DISMISSED`).
-4. **Critical Operations Alerts**: High-visibility banner highlighting urgent grounding decisions and catastrophic risk avoidance.
-5. **Fleet Assets Registry & Profile Drawer**: 60 multi-OEM assets with interactive modal showing real-time battery SoC, oil life, TPMS pressure gauges, and DTC fault history.
-6. **Intelligence Hub**: Decision engine audit (Rule Engine %, Jev AI %, Hybrid %, Fallback %), Human Review Queue, and categorical financial impact breakdown.
-7. **Controlled Fleet Query Engine**: Typed intent execution for operational questions without LLM hallucinations (`MAINTENANCE_REQUIRED`, `HIGH_RISK_VEHICLES`, etc.).
-8. **System Health & Data Quality**: Actuator status, SSE stream connection state, and ingestion validation counters.
-9. **Simulator Control**: One-click scenario triggers and load benchmark runner.
+FleetIQ uses **100% synthetic, legally reusable, open-standard data**:
+- All VINs are synthetically generated (`SYNTH-...`).
+- Diagnostic trouble codes follow public **SAE J2012 / OBD-II** standards.
+- No proprietary OEM data, confidential fleet information, or private keys are stored.
