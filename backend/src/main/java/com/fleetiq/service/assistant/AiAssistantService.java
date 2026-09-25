@@ -154,8 +154,9 @@ public class AiAssistantService {
         List<Decision> decisions = decisionRepository.findByVehicleIdOrderByCreatedAtDesc(vehicleId);
         if (!decisions.isEmpty()) {
             Decision latest = decisions.get(0);
+            double conf = latest.getConfidenceScore() != null ? latest.getConfidenceScore() * 100 : 95.0;
             sb.append(String.format("- **Latest Decision Engine**: %s (Confidence: %.0f%%)\n",
-                    latest.getDecisionSource(), latest.getConfidence() * 100));
+                    latest.getDecisionSource(), conf));
         }
 
         if (!actions.isEmpty()) {
