@@ -27,21 +27,21 @@ Any engineer equipped with VS Code, IntelliJ IDEA, or GitHub Codespaces can clon
 
 | Document | Primary Audience | Key Topics Covered |
 | :--- | :--- | :--- |
-| [`SYSTEM_OVERVIEW.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/SYSTEM_OVERVIEW.md) | Leadership / Architects | Product capabilities, business problems solved, high-level components. |
-| [`ARCHITECTURE_OVERVIEW.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/ARCHITECTURE_OVERVIEW.md) | Architects / Tech Leads | Multi-tier architecture, data flow, canonical event models, normalization. |
-| [`DEVELOPMENT_GUIDE.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/DEVELOPMENT_GUIDE.md) | Developers | Local setup, building, running tests, devcontainer, Git branching rules. |
-| [`DEPLOYMENT_GUIDE.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/DEPLOYMENT_GUIDE.md) | DevOps / SRE | Container build pipelines, staging setup, production Kubernetes / ECS deploy. |
-| [`OPERATIONS_GUIDE.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/OPERATIONS_GUIDE.md) | Operations / SRE | Health checks, metrics scraping, log aggregation, scaling adjustments. |
-| [`SECURITY_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/SECURITY_HANDOVER.md) | Security Engineers | RBAC policies, JWT key rotation, rate-limiting tiers, vulnerability reporting. |
-| [`AI_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/AI_HANDOVER.md) | AI Engineers | AI model abstraction, deterministic fallback, factual JEV audit, RAG corpus. |
-| [`DATABASE_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/DATABASE_HANDOVER.md) | Database Admins (DBA) | PostgreSQL schema, Flyway migrations, indexing, connection pooling, backups. |
-| [`MONITORING_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/MONITORING_HANDOVER.md) | Observability / SRE | Prometheus metrics, OpenTelemetry tracing, Grafana dashboard configuration. |
-| [`INCIDENT_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/INCIDENT_HANDOVER.md) | On-Call Engineers | Sev-1 to Sev-4 taxonomy, triage runbooks, rollback procedures, postmortems. |
-| [`DISASTER_RECOVERY.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/DISASTER_RECOVERY.md) | Infrastructure Leads | RPO/RTO targets, offsite backup restoration, multi-AZ failover drills. |
-| [`THIRD_PARTY_SERVICES.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/THIRD_PARTY_SERVICES.md) | Procurement / IT | Inventory of external dependencies, billing ownership, credential locations. |
-| [`CREDENTIALS_AND_SECRETS.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/CREDENTIALS_AND_SECRETS.md) | SecOps | Secret manager integration, zero-plaintext policy, credential rotation. |
-| [`KNOWN_LIMITATIONS.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/KNOWN_LIMITATIONS.md) | Product Managers | Unimplemented external LLMs, single-node rate limiting, roadmap items. |
-| [`OWNERSHIP_TRANSFER.md`](file:///c:/Users/ajaya/Desktop/fleetiq/docs/HANDOVER/OWNERSHIP_TRANSFER.md) | Corporate IT / Legal | GitHub repo transfer, domain ownership, container registry transfer. |
+| [`SYSTEM_OVERVIEW.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/SYSTEM_OVERVIEW.md) | Leadership / Architects | Product capabilities, business problems solved, high-level components. |
+| [`ARCHITECTURE_OVERVIEW.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/ARCHITECTURE_OVERVIEW.md) | Architects / Tech Leads | Multi-tier architecture, data flow, canonical event models, normalization. |
+| [`DEVELOPMENT_GUIDE.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/DEVELOPMENT_GUIDE.md) | Developers | Local setup, building, running tests, devcontainer, Git branching rules. |
+| [`DEPLOYMENT_GUIDE.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/DEPLOYMENT_GUIDE.md) | DevOps / SRE | Container build pipelines, staging setup, production Kubernetes / ECS deploy. |
+| [`OPERATIONS_GUIDE.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/OPERATIONS_GUIDE.md) | Operations / SRE | Health checks, metrics scraping, log aggregation, scaling adjustments. |
+| [`SECURITY_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/SECURITY_HANDOVER.md) | Security Engineers | RBAC policies, JWT key rotation, rate-limiting tiers, vulnerability reporting. |
+| [`AI_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/AI_HANDOVER.md) | AI Engineers | AI model abstraction, deterministic fallback, factual JEV audit, RAG corpus. |
+| [`DATABASE_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/DATABASE_HANDOVER.md) | Database Admins (DBA) | PostgreSQL schema, Flyway migrations, indexing, connection pooling, backups. |
+| [`MONITORING_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/MONITORING_HANDOVER.md) | Observability / SRE | Prometheus metrics, OpenTelemetry tracing, Grafana dashboard configuration. |
+| [`INCIDENT_HANDOVER.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/INCIDENT_HANDOVER.md) | On-Call Engineers | Sev-1 to Sev-4 taxonomy, triage runbooks, rollback procedures, postmortems. |
+| [`DISASTER_RECOVERY.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/DISASTER_RECOVERY.md) | Infrastructure Leads | RPO/RTO targets, offsite backup restoration, multi-AZ failover drills. |
+| [`THIRD_PARTY_SERVICES.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/THIRD_PARTY_SERVICES.md) | Procurement / IT | Inventory of external dependencies, billing ownership, credential locations. |
+| [`CREDENTIALS_AND_SECRETS.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/CREDENTIALS_AND_SECRETS.md) | SecOps | Secret manager integration, zero-plaintext policy, credential rotation. |
+| [`KNOWN_LIMITATIONS.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/KNOWN_LIMITATIONS.md) | Product Managers | Unimplemented external LLMs, single-node rate limiting, roadmap items. |
+| [`OWNERSHIP_TRANSFER.md`](file:///c:/Users/ajaya/Desktop/vehyron/docs/HANDOVER/OWNERSHIP_TRANSFER.md) | Corporate IT / Legal | GitHub repo transfer, domain ownership, container registry transfer. |
 
 ---
 
@@ -50,7 +50,7 @@ Any engineer equipped with VS Code, IntelliJ IDEA, or GitHub Codespaces can clon
 1. **Clone Repository:**
    ```bash
    git clone https://github.com/[COMPANY_ORG]/vehyron.git
-   cd fleetiq
+   cd vehyron
    ```
 2. **Launch Dependent Database:**
    ```bash

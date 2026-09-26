@@ -14,7 +14,7 @@ VEHYRON maintains strict environment segregation:
 | :--- | :--- | :--- | :--- |
 | **Spring Profile** | `dev` / `postgres` | `staging` | `prod` |
 | **Database** | Docker PostgreSQL 15 | Managed RDS PostgreSQL (Multi-AZ) | Managed RDS PostgreSQL (Multi-AZ + Read Replicas) |
-| **JWT Secret** | Dev Mock Key (`fleetiq-dev-secret-key-123456789`) | Vault Injected | AWS Secrets Manager / KMS |
+| **JWT Secret** | Dev Mock Key (`vehyron-dev-secret-key-123456789`) | Vault Injected | AWS Secrets Manager / KMS |
 | **AI Provider** | `DeterministicGroundedProvider` | `DeterministicGroundedProvider` | `JevAIProvider` / Grounded Fallback |
 | **Rate Limiting** | In-Memory Token Bucket | In-Memory / Redis Cluster | Distributed Redis Cluster |
 

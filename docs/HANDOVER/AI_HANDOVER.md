@@ -19,7 +19,7 @@ VEHYRON integrates AI as a decision support layer, not an autonomous authority f
 ## 2. Factual Audit of External Models (JEV & TypeSpace)
 
 - **TypeSpace (`typespace.ai`):** Completely absent from the codebase. No dependencies, SDKs, or API calls exist.
-- **JEV (`JevDecisionService`):** Implemented with a configuration toggle `fleetiq.jev.enabled=false`. No valid external API key is stored. At runtime, the service defaults safely to `RuleBasedDecisionService`.
+- **JEV (`JevDecisionService`):** Implemented with a configuration toggle `vehyron.jev.enabled=false`. No valid external API key is stored. At runtime, the service defaults safely to `RuleBasedDecisionService`.
 - **Verdict for Handover:** Real third-party cloud LLM inference is currently unverified locally. The company must provide an enterprise LLM API key (OpenAI, Anthropic Claude, or JEV) and set `AI_PROVIDER=jev` to activate external cloud models.
 
 ---
@@ -27,15 +27,15 @@ VEHYRON integrates AI as a decision support layer, not an autonomous authority f
 ## 3. Switching or Upgrading AI Providers
 
 To connect a new model provider (e.g. Anthropic Claude, OpenAI, or local vLLM):
-1. Implement the `AIModelProvider` interface in `com.fleetiq.service.ai`:
+1. Implement the `AIModelProvider` interface in `com.vehyron.service.ai`:
    ```java
    @Component
-   @ConditionalOnProperty(name = "fleetiq.ai.provider", havingValue = "custom-llm")
+   @ConditionalOnProperty(name = "vehyron.ai.provider", havingValue = "custom-llm")
    public class CustomLlmProvider implements AIModelProvider { ... }
    ```
 2. Configure environment variables in production:
    ```bash
-   FLEETIQ_AI_PROVIDER=custom-llm
+   vehyron_AI_PROVIDER=custom-llm
    CUSTOM_LLM_API_KEY=sk-prod-...
    CUSTOM_LLM_ENDPOINT=https://api.company.internal/v1/chat/completions
    ```

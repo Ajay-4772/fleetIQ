@@ -1,7 +1,7 @@
-# FleetIQ Decision & Prioritization Rules
+# vehyron Decision & Prioritization Rules
 
 ## Hybrid Decision Architecture
-FleetIQ employs a resilient Hybrid Decision Pattern:
+vehyron employs a resilient Hybrid Decision Pattern:
 1. **Jev AI Engine**: Analyzes multi-sensor telemetry, fault codes, historical mileage, and fleet context to generate probabilistic recommendations and confidence scores.
 2. **Deterministic Fallback Engine**: If Jev AI fails, times out, or has no internet connection, the deterministic rule engine immediately evaluates the issue with zero latency penalty.
 3. **Human Review Threshold**: Any decision with AI confidence < 0.85 or involving safety-critical systems (braking, airbag, severe misfire) is flagged with `requiresHumanReview = true`.

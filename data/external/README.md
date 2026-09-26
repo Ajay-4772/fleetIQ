@@ -1,6 +1,6 @@
 # External Datasets Notice
 
-FleetIQ DOES NOT store proprietary or unverified external datasets in this directory.
+vehyron DOES NOT store proprietary or unverified external datasets in this directory.
 
 External reference sources (such as NHTSA vPIC vehicle catalogs and UCI Auto MPG reference tables) are documented in:
 - docs/DATA_SOURCES.md

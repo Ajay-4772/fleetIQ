@@ -19,7 +19,7 @@ VEHYRON provides pluggable `DataSourceConnector` adapters for enterprise telemet
 
 ## Connector Lifecycle Contract
 
-Every connector implements `com.fleetiq.service.ingestion.DataSourceConnector`:
+Every connector implements `com.vehyron.service.ingestion.DataSourceConnector`:
 
 ```java
 public interface DataSourceConnector {

@@ -1,4 +1,4 @@
-# FleetIQ Operational & Technical Glossary
+# vehyron Operational & Technical Glossary
 
 ## Glossary of Terms
 
@@ -8,7 +8,7 @@
 - **SAE J1939**: Diagnostic protocol standard used in heavy-duty commercial trucks, buses, and vocational vehicles.
 - **SoC (State of Charge)**: The level of charge of an electric vehicle battery relative to its capacity, expressed as a percentage.
 - **SoH (State of Health)**: Measure of the battery condition compared to its ideal conditions, reflecting permanent capacity degradation.
-- **SSE (Server-Sent Events)**: One-way HTTP streaming protocol where the FleetIQ backend pushes real-time events to connected browser clients over persistent connections.
+- **SSE (Server-Sent Events)**: One-way HTTP streaming protocol where the vehyron backend pushes real-time events to connected browser clients over persistent connections.
 - **Idempotency Key**: Unique token sent with an ingestion request that allows safe retries without creating duplicate events or double-counting financial risks.
-- **Jev Decisioning**: FleetIQ's integrated probabilistic machine intelligence layer that analyzes cross-telemetry correlations to recommend operational work orders.
+- **Jev Decisioning**: vehyron's integrated probabilistic machine intelligence layer that analyzes cross-telemetry correlations to recommend operational work orders.
 - **Fallback Mode**: Deterministic safety mode that executes pre-compiled business rules if the external AI service is unreachable.

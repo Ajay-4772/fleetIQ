@@ -26,7 +26,7 @@ VEHYRON is designed to operate as an authoritative multi-OEM telematics ingestio
 | **Ingestion Pipeline** | Synchronous REST Controller (`/api/v1/telemetry/ingest`) | ~350 req/sec per JVM | Thread pool saturation on burst; HTTP connection blocking. | Introduce asynchronous buffering via Redis Streams or Apache Kafka; decoupling ingestion from persistence. |
 | **Database Pool** | HikariCP (maximum 10 connections) | ~800 queries/sec | Connection pool exhaustion under heavy concurrent analytics queries. | Increase pool size to 50; configure PostgreSQL Read-Replicas for queries; write-master for ingest. |
 | **Rate Limiter** | In-memory `ConcurrentHashMap` bucket | Single JVM instance only | State is lost on container restart; limits cannot be shared across multiple horizontal pods. | Migrate rate limiter backend to Redis via Redisson atomic token buckets. |
-| **Real-time SSE** | In-memory `CopyOnWriteArrayList<SseEmitter>` | 500 connections per pod | Emitter instances cannot receive events dispatched on different API replicas. | Implement Redis Pub/Sub backplane (`fleetiq:events:telemetry`) to broadcast to all connected emitters. |
+| **Real-time SSE** | In-memory `CopyOnWriteArrayList<SseEmitter>` | 500 connections per pod | Emitter instances cannot receive events dispatched on different API replicas. | Implement Redis Pub/Sub backplane (`vehyron:events:telemetry`) to broadcast to all connected emitters. |
 | **AI Copilot** | In-JVM `AiAssistantService` regex + RAG | ~25 req/sec | Regex compilation and synchronous database lookups in same thread. | Thread pool isolation for AI Copilot queries; response caching for identical fleet status prompts. |
 
 ---

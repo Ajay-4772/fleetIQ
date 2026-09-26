@@ -54,7 +54,7 @@ export const options = {
 };
 
 export default function () {
-  const token = __ENV.FLEETIQ_JWT_TOKEN;
+  const token = __ENV.vehyron_JWT_TOKEN;
   const params = {
     headers: {
       'Authorization': `Bearer ${token}`,

@@ -23,7 +23,7 @@
    ```bash
    openssl rand -base64 32
    ```
-2. Store the new key in corporate AWS Secrets Manager / HashiCorp Vault under key `FLEETIQ_JWT_SECRET`.
+2. Store the new key in corporate AWS Secrets Manager / HashiCorp Vault under key `vehyron_JWT_SECRET`.
 3. Update the container runtime environment variable `JWT_SECRET`.
 4. Trigger a rolling restart of backend pods. Existing client sessions will be prompted to re-authenticate at `/api/v1/auth/login`.
 

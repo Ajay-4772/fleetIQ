@@ -1,4 +1,4 @@
-# FleetIQ System Architecture & End-to-End Pipeline
+# vehyron System Architecture & End-to-End Pipeline
 
 ## Core Architecture
 ```
@@ -26,7 +26,7 @@ External OEM / Telematics System
              ↓
         SSE Stream (GET /api/v1/stream/events)
              ↓
-       FleetIQ Real-Time Operations UI
+       vehyron Real-Time Operations UI
 ```
 
 ## Security Model

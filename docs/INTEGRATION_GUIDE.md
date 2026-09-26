@@ -15,7 +15,7 @@ POST /api/v1/events/ingest
 ### Headers
 ```http
 Content-Type: application/json
-X-API-Key: fleetiq-ingest-secure-key-2026
+X-API-Key: vehyron-ingest-secure-key-2026
 ```
 *(Or `Authorization: Bearer <jwt_token>` for human operations leads)*
 
@@ -158,7 +158,7 @@ X-API-Key: fleetiq-ingest-secure-key-2026
 ```bash
 curl -X POST http://localhost:8080/api/v1/events/ingest \
   -H "Content-Type: application/json" \
-  -H "X-API-Key: fleetiq-ingest-secure-key-2026" \
+  -H "X-API-Key: vehyron-ingest-secure-key-2026" \
   -d '{
     "source": "SIMULATED_TOYOTA",
     "eventId": "EV-TEST-001",

@@ -1,4 +1,4 @@
-# FleetIQ Multi-OEM Ingestion & Normalization Specification
+# vehyron Multi-OEM Ingestion & Normalization Specification
 
 ## Problem Statement
 Automotive manufacturers and third-party telematics providers output vehicle telemetry using incompatible proprietary JSON payloads, varying key names, and diverse timestamp formats.

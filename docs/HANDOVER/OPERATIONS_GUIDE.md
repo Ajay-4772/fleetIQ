@@ -22,9 +22,9 @@ VEHYRON exposes Spring Boot Actuator endpoints for container orchestrators and s
 Exposed at `/actuator/prometheus` for scraping:
 1. `http_server_requests_seconds_count`: Total request throughput per route.
 2. `http_server_requests_seconds_max`: Maximum endpoint latency.
-3. `fleetiq_telemetry_ingest_total`: Ingested telematics event count partitioned by OEM tag (`toyota`, `ford`, `bmw`, `tesla`).
-4. `fleetiq_decision_actions_created_total`: Priority action orders generated.
-5. `fleetiq_rate_limit_exceeded_total`: Throttled requests (HTTP 429).
+3. `vehyron_telemetry_ingest_total`: Ingested telematics event count partitioned by OEM tag (`toyota`, `ford`, `bmw`, `tesla`).
+4. `vehyron_decision_actions_created_total`: Priority action orders generated.
+5. `vehyron_rate_limit_exceeded_total`: Throttled requests (HTTP 429).
 6. `hikaricp_connections_active`: Active PostgreSQL database connection count.
 
 ---
@@ -37,7 +37,7 @@ All log statements conform to structured JSON logging:
   "timestamp": "2026-09-25T14:45:00.123Z",
   "level": "INFO",
   "thread": "http-nio-8080-exec-4",
-  "logger": "com.fleetiq.service.telemetry.TelemetryIngestionService",
+  "logger": "com.vehyron.service.telemetry.TelemetryIngestionService",
   "message": "Normalized telematics event processed",
   "vehicleId": "VH-TOY-101",
   "oem": "TOYOTA",

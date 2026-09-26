@@ -27,8 +27,8 @@ import {
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 // Token management in localStorage with backward-compatible migration
-let currentToken: string | null = localStorage.getItem('vehyron_auth_token') || localStorage.getItem('fleetiq_auth_token') || null;
-let currentRefreshToken: string | null = localStorage.getItem('vehyron_refresh_token') || localStorage.getItem('fleetiq_refresh_token') || null;
+let currentToken: string | null = localStorage.getItem('vehyron_auth_token') || null;
+let currentRefreshToken: string | null = localStorage.getItem('vehyron_refresh_token') || null;
 
 export const setAuthToken = (token: string | null, refreshToken?: string | null) => {
   currentToken = token;
@@ -36,7 +36,6 @@ export const setAuthToken = (token: string | null, refreshToken?: string | null)
     localStorage.setItem('vehyron_auth_token', token);
   } else {
     localStorage.removeItem('vehyron_auth_token');
-    localStorage.removeItem('fleetiq_auth_token');
   }
 
   if (refreshToken !== undefined) {
@@ -45,7 +44,6 @@ export const setAuthToken = (token: string | null, refreshToken?: string | null)
       localStorage.setItem('vehyron_refresh_token', refreshToken);
     } else {
       localStorage.removeItem('vehyron_refresh_token');
-      localStorage.removeItem('fleetiq_refresh_token');
     }
   }
 };
@@ -186,7 +184,7 @@ export const api = {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `fleetiq-${type}-${Date.now()}.${format}`;
+    a.download = `vehyron-${type}-${Date.now()}.${format}`;
     document.body.appendChild(a);
     a.click();
     a.remove();

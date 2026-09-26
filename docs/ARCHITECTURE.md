@@ -34,7 +34,7 @@ VEHYRON answers four core operational questions:
 +---------------------------------------------------------------------------------------------------+
                                                   │
                                       POST /api/v1/events/ingest
-                                      (X-API-Key: fleetiq-ingest-secure-key-2026)
+                                      (X-API-Key: vehyron-ingest-secure-key-2026)
                                                   │
                                                   ▼
 +---------------------------------------------------------------------------------------------------+

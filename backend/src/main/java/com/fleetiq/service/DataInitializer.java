@@ -37,7 +37,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final Environment environment;
 
-    @Value("${vehyron.seed.enabled:${fleetiq.seed.enabled:false}}")
+    @Value("${vehyron.seed.enabled:false}")
     private boolean seedEnabled;
 
     @Value("${vehyron.bootstrap.admin-password:${BOOTSTRAP_ADMIN_PASSWORD:}}")

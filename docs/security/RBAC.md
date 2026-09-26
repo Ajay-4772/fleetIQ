@@ -80,7 +80,7 @@ public ResponseEntity<ActionResponse> updateActionStatus(@PathVariable String id
 
 ## 4. Permission Mapping Matrix
 
-VEHYRON maps high-level business permissions to explicit enterprise roles. For the exhaustive permission-to-endpoint matrix, see [RBAC_MATRIX.md](file:///c:/Users/ajaya/Desktop/fleetiq/docs/security/RBAC_MATRIX.md).
+VEHYRON maps high-level business permissions to explicit enterprise roles. For the exhaustive permission-to-endpoint matrix, see [RBAC_MATRIX.md](file:///c:/Users/ajaya/Desktop/vehyron/docs/security/RBAC_MATRIX.md).
 
 | Permission String | Description | `ROLE_ADMIN` | `ROLE_OPERATIONS_LEAD` | `ROLE_OPERATOR` | `ROLE_VIEWER` |
 | :--- | :--- | :---: | :---: | :---: | :---: |

@@ -38,12 +38,12 @@ To guarantee sub-50ms query response times under high-concurrency fleet queries:
 ## 3. Database Migration Command Execution
 ```bash
 # Verify pending migrations without executing
-mvn flyway:info -Dflyway.url=jdbc:postgresql://localhost:5432/fleetiq -f backend/pom.xml
+mvn flyway:info -Dflyway.url=jdbc:postgresql://localhost:5432/vehyron -f backend/pom.xml
 
 # Execute pending migrations
-mvn flyway:migrate -Dflyway.url=jdbc:postgresql://localhost:5432/fleetiq -f backend/pom.xml
+mvn flyway:migrate -Dflyway.url=jdbc:postgresql://localhost:5432/vehyron -f backend/pom.xml
 
 # Repair checksum mismatches (emergency hotfix)
-mvn flyway:repair -Dflyway.url=jdbc:postgresql://localhost:5432/fleetiq -f backend/pom.xml
+mvn flyway:repair -Dflyway.url=jdbc:postgresql://localhost:5432/vehyron -f backend/pom.xml
 ```
 *Note: Manual DDL schema modifications on production databases are strictly prohibited.*

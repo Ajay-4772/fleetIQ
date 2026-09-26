@@ -97,6 +97,6 @@ VEHYRON categorizes platform actors into four primary business operational roles
 
 ## 5. UI Permission Reflection Rules
 
-1. **User Directory Tab**: Displayed in the navigation sidebar exclusively for users where `user.role === 'ROLE_ADMIN'`. If a non-admin directly requests the user directory view, the system renders [`AccessDeniedPage.tsx`](file:///c:/Users/ajaya/Desktop/fleetiq/frontend/src/components/system/SystemStatusPages.tsx) with HTTP 403 feedback.
-2. **Action Item Mutation Buttons**: In [`PriorityActionCenter.tsx`](file:///c:/Users/ajaya/Desktop/fleetiq/frontend/src/components/actions/PriorityActionCenter.tsx), action resolution controls ("Acknowledge", "Mark In-Progress", "Resolve") are rendered as interactive buttons only for `ROLE_OPERATOR`, `ROLE_OPERATIONS_LEAD`, and `ROLE_ADMIN`. For `ROLE_VIEWER`, the status is displayed as a read-only tag.
+1. **User Directory Tab**: Displayed in the navigation sidebar exclusively for users where `user.role === 'ROLE_ADMIN'`. If a non-admin directly requests the user directory view, the system renders [`AccessDeniedPage.tsx`](file:///c:/Users/ajaya/Desktop/vehyron/frontend/src/components/system/SystemStatusPages.tsx) with HTTP 403 feedback.
+2. **Action Item Mutation Buttons**: In [`PriorityActionCenter.tsx`](file:///c:/Users/ajaya/Desktop/vehyron/frontend/src/components/actions/PriorityActionCenter.tsx), action resolution controls ("Acknowledge", "Mark In-Progress", "Resolve") are rendered as interactive buttons only for `ROLE_OPERATOR`, `ROLE_OPERATIONS_LEAD`, and `ROLE_ADMIN`. For `ROLE_VIEWER`, the status is displayed as a read-only tag.
 3. **Simulator Controls**: The "Simulator (Dev)" trigger is available in the sidebar only for `ROLE_OPERATIONS_LEAD` and `ROLE_ADMIN`.

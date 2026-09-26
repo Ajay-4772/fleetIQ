@@ -37,7 +37,7 @@ VEHYRON implements a defense-in-depth architecture designed for zero-trust multi
 ## 2. Authentication & JWT Token Lifecycle
 
 - **Stateless Bearer Tokens:** Authentication is mediated via HMAC-SHA256 or RSA-256 signed JSON Web Tokens.
-- **Expiration Policy:** Access tokens have an expiration window of 60 minutes (`fleetiq.jwt.expiration-ms=3600000`).
+- **Expiration Policy:** Access tokens have an expiration window of 60 minutes (`vehyron.jwt.expiration-ms=3600000`).
 - **Cryptographic Secret Isolation:** JWT secrets are injected strictly via environment variable `JWT_SECRET`. No hardcoded fallback keys exist in production.
 - **Password Storage:** Corporate user credentials are encrypted using BCrypt (`BCryptPasswordEncoder` with strength factor 12). Plaintext passwords are never persisted or logged.
 

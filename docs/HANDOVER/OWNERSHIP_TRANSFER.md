@@ -11,10 +11,10 @@
 Production operations must not depend on any individual developer's personal accounts, laptops, or API keys. The receiving enterprise must take sole legal and administrative ownership of all digital assets.
 
 ### Digital Asset Transfer Checklist
-- [ ] **GitHub Organization:** Transfer the `fleetiq` repository to the company's enterprise GitHub organization (e.g. `github.com/[COMPANY_ENTERPRISE]/fleetiq`).
+- [ ] **GitHub Organization:** Transfer the `vehyron` repository to the company's enterprise GitHub organization (e.g. `github.com/[COMPANY_ENTERPRISE]/vehyron`).
 - [ ] **Cloud Provider Account:** Migrate infrastructure workloads to corporate AWS / GCP / Azure root accounts with IAM role delegation.
 - [ ] **Container Registry:** Configure private container repository (`ghcr.io/[COMPANY]` or Amazon ECR) and update CI publish secrets.
-- [ ] **Domain & DNS:** Point domain names (e.g. `fleetiq.company.internal`) to corporate Cloudflare or Route 53 zones.
+- [ ] **Domain & DNS:** Point domain names (e.g. `vehyron.company.internal`) to corporate Cloudflare or Route 53 zones.
 - [ ] **Database Master Account:** Re-key production PostgreSQL database credentials and transfer billing ownership.
 - [ ] **AI Model Accounts:** Procure enterprise LLM seats (OpenAI, Anthropic Claude, or JEV) billed directly to the corporate account.
 - [ ] **Monitoring & SRE:** Create corporate Datadog, New Relic, or Prometheus Cloud workspaces.

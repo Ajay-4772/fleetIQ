@@ -19,7 +19,7 @@ VEHYRON is observable across the entire request and telemetry lifecycle:
 
 ```yaml
 groups:
-  - name: fleetiq-production-alerts
+  - name: vehyron-production-alerts
     rules:
       - alert: VEHYRONHighErrorRate
         expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.02

@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableAsync
-public class FleetIqApplication {
+public class VehyronApplication {
     public static void main(String[] args) {
-        SpringApplication.run(FleetIqApplication.class, args);
+        SpringApplication.run(VehyronApplication.class, args);
     }
 }

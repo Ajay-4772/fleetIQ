@@ -47,7 +47,7 @@ In adherence with strict anti-fabrication standards, the VEHYRON codebase has be
 | Provider / Claim | Audit Findings & Code Evidence | Runtime Status |
 | :--- | :--- | :--- |
 | **TypeSpace AI (`typespace.ai`)** | 0 references exist in `backend/` or `frontend/`. Not implemented. | **MISSING / NON-EXISTENT** |
-| **JEV AI (`JevDecisionService`)** | Exists in `com.fleetiq.service.decision.JevDecisionService`. Property `fleetiq.jev.enabled` defaults to `false`. No valid external API key is provided in source or development configuration. | **DETERMINISTIC FALLBACK ACTIVE** |
+| **JEV AI (`JevDecisionService`)** | Exists in `com.vehyron.service.decision.JevDecisionService`. Property `vehyron.jev.enabled` defaults to `false`. No valid external API key is provided in source or development configuration. | **DETERMINISTIC FALLBACK ACTIVE** |
 | **Inference Reality** | Because no valid JEV API credential exists, the system automatically falls back to `RuleBasedDecisionService`. Real external JEV inference cannot be verified locally without company credentials. | **UNVERIFIED LOCALLY / FALLBACK** |
 
 ---
@@ -57,7 +57,7 @@ In adherence with strict anti-fabrication standards, the VEHYRON codebase has be
 To prevent vendor lock-in, all AI operations depend upon the `AIModelProvider` contract:
 
 ```java
-package com.fleetiq.service.ai;
+package com.vehyron.service.ai;
 
 public interface AIModelProvider {
     String getProviderName();

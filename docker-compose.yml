@@ -1,4 +1,4 @@
-version: '3.8'
+name: vehyron
 
 services:
   postgres:
@@ -22,9 +22,11 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: vehyron-backend:latest
     container_name: vehyron-backend
     environment:
-      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_PROFILES_ACTIVE: postgres,dev
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-VehyronRootAdmin@2026!}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: vehyron
@@ -41,6 +43,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    image: vehyron-frontend:latest
     container_name: vehyron-frontend
     ports:
       - "5173:80"

@@ -50,7 +50,7 @@
      ```bash
      docker compose restart postgres
      ```
-  5. If database storage is corrupted, execute point-in-time recovery using [disaster-recovery.md](file:///c:/Users/ajaya/Desktop/fleetiq/docs/operations/disaster-recovery.md).
+  5. If database storage is corrupted, execute point-in-time recovery using [disaster-recovery.md](file:///c:/Users/ajaya/Desktop/vehyron/docs/operations/disaster-recovery.md).
 
 ### Scenario B: Security Credential Leak or Token Compromise (SEV-1)
 - **Symptoms:** Unauthorized administrator logins detected in audit trail; API key observed in external logs.

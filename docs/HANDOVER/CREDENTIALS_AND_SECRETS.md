@@ -21,8 +21,8 @@ VEHYRON strictly enforces a **Zero-Hardcoded-Secret Policy**:
 | :--- | :--- | :--- | :--- |
 | `SPRING_DATASOURCE_PASSWORD` | PostgreSQL Connection | AWS Secrets Manager / Vault | High-entropy 32-character alphanumeric password. |
 | `JWT_SECRET` | Spring Security JWT Signing | AWS Secrets Manager / Vault | 256-bit cryptographically random base64 string (`openssl rand -base64 32`). |
-| `FLEETIQ_AI_API_KEY` | Optional External LLM | AWS Secrets Manager / Vault | Issued enterprise provider API key. |
-| `FLEETIQ_INGEST_API_KEY` | OEM Ingestion Webhook | AWS Secrets Manager / Vault | High-entropy pre-shared key for telematics gateway. |
+| `vehyron_AI_API_KEY` | Optional External LLM | AWS Secrets Manager / Vault | Issued enterprise provider API key. |
+| `vehyron_INGEST_API_KEY` | OEM Ingestion Webhook | AWS Secrets Manager / Vault | High-entropy pre-shared key for telematics gateway. |
 
 ---
 
@@ -34,12 +34,12 @@ env:
   - name: SPRING_DATASOURCE_PASSWORD
     valueFrom:
       secretKeyRef:
-        name: fleetiq-db-secret
+        name: vehyron-db-secret
         key: password
   - name: JWT_SECRET
     valueFrom:
       secretKeyRef:
-        name: fleetiq-auth-secret
+        name: vehyron-auth-secret
         key: jwt-secret
 ```
 Plaintext injection via plain configmaps or Dockerfile `ENV` is strictly prohibited.

@@ -28,7 +28,7 @@
 - **Finding ID:** SEC-01
 - **Category:** A05:2021 – Security Misconfiguration
 - **Severity:** **MEDIUM**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/security/SecurityConfig.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/security/SecurityConfig.java`
 - **Description:** Previously, `corsConfigurationSource()` configured `config.setAllowedOriginPatterns(List.of("*"))` alongside `config.setAllowCredentials(true)`. In production environments, allowing wildcard origin patterns with credentials permits cross-origin requests from arbitrary third-party websites.
 - **Impact:** Potential CSRF / credential exposure if an operator browses an untrusted site while authenticated.
 - **Evidence:** `SecurityConfig.java:138`: `config.setAllowedOriginPatterns(List.of("*"));`
@@ -42,7 +42,7 @@
 - **Finding ID:** SEC-02
 - **Category:** A05:2021 – Security Misconfiguration
 - **Severity:** **LOW**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/security/SecurityConfig.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/security/SecurityConfig.java`
 - **Description:** The HTTP response headers did not explicitly set `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, or `Referrer-Policy`.
 - **Impact:** Vulnerability to clickjacking, MIME-sniffing attacks, and referrer leakage in older or strict enterprise browsers.
 - **Evidence:** `SecurityConfig.java` only disabled frameOptions for H2 console.
@@ -61,7 +61,7 @@
 - **Finding ID:** SEC-03
 - **Category:** A04:2021 – Insecure Design / Denial of Service
 - **Severity:** **MEDIUM**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/controller/ActionController.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/controller/ActionController.java`
 - **Description:** Endpoint `GET /api/v1/actions` accepted user-supplied `page` and `size` parameters directly into `PageRequest.of(page, size)` without upper bounds enforcement. A request specifying `size=1000000` could trigger significant heap allocation and GC pause.
 - **Impact:** Denial of service / JVM heap starvation under malicious load.
 - **Evidence:** `ActionController.java:29`: `PageRequest.of(page, size)`
@@ -75,7 +75,7 @@
 - **Finding ID:** SEC-04
 - **Category:** Data Integrity / Concurrency
 - **Severity:** **HIGH**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/service/EventProcessingService.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/service/EventProcessingService.java`
 - **Description:** Vehicle snapshot attributes (oil life, battery health, tire pressure) were overwritten directly by incoming event attributes without validating if the event was generated prior to the vehicle's currently recorded latest telemetry timestamp. Stale delayed events could revert critical diagnostic states.
 - **Impact:** Silent suppression of critical maintenance alarms; corrupted operational telemetry overview.
 - **Evidence:** `EventProcessingService.java:176`: `if (event.getOilLifePct() != null) v.setOilLifePct(...)` without timestamp comparison.
@@ -89,7 +89,7 @@
 - **Finding ID:** SEC-05
 - **Category:** A01:2021 – Broken Access Control / Path Traversal
 - **Severity:** **HIGH**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/service/ingestion/ExcelCsvIngestionService.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/service/ingestion/ExcelCsvIngestionService.java`
 - **Description:** Uploaded file names were accepted without stripping directory traversal sequences (`..`, `/`, `\`), and unsupported file types were not rejected with explicit security exceptions prior to processing.
 - **Impact:** Potential file upload traversal or resource exhaustion via unauthorized file types.
 - **Evidence:** `ExcelCsvIngestionService.java:66`: `String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "dataset.csv";`
@@ -106,7 +106,7 @@
 - **Finding ID:** SEC-06
 - **Category:** Data Integrity / Input Validation
 - **Severity:** **MEDIUM**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/service/normalization/CanonicalVehyronAdapter.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/service/normalization/CanonicalVehyronAdapter.java`
 - **Description:** Absurd negative or extreme sensor metrics (e.g. oil life `-500%`, tire pressure `999999 PSI`) were silently clamped rather than rejected as malformed/corrupted telematics.
 - **Impact:** Unreliable analytics and distorted health index calculations.
 - **Evidence:** `CanonicalVehyronAdapter.java:41`: `oilLife = Math.max(0.0, Math.min(100.0, oilLife));`
@@ -120,7 +120,7 @@
 - **Finding ID:** SEC-07
 - **Category:** Business Logic Security / Access Control
 - **Severity:** **LOW**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/service/user/UserService.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/service/user/UserService.java`
 - **Description:** While self-deactivation was blocked, an administrator could update their own role from `ROLE_ADMIN` to `ROLE_OPERATOR`, potentially leaving the system without an accessible active administrator.
 - **Impact:** Administrative lockout requiring direct SQL intervention.
 - **Evidence:** `UserService.java:101`: `updateUserRole` lacked self-demotion check.
@@ -134,7 +134,7 @@
 - **Finding ID:** SEC-08
 - **Category:** A04:2021 – Insecure Design / Rate Limiting
 - **Severity:** **LOW**
-- **Affected Component:** `backend/src/main/java/com/fleetiq/security/RateLimitingFilter.java`
+- **Affected Component:** `backend/src/main/java/com/vehyron/security/RateLimitingFilter.java`
 - **Description:** Rate limit responses returned HTTP 429 Too Many Requests but omitted standard RFC 6585 headers `Retry-After: 60` and `X-RateLimit-Remaining: 0`.
 - **Impact:** Automated clients had no standard machine-readable guidance on backoff duration.
 - **Evidence:** `RateLimitingFilter.java:80` only wrote JSON body without headers.

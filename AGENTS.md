@@ -1,4 +1,4 @@
-# FleetIQ — Agent Guide
+# VEHYRON — Agent Guide
 
 This project follows the shared **agent-compass** contract.
 
@@ -13,7 +13,7 @@ Add project-specific conventions below this line; they take precedence over the 
 
 ## 1. AI Startup & Session Workflow
 
-Every new FleetIQ engineering session must follow this targeted retrieval sequence:
+Every new VEHYRON engineering session must follow this targeted retrieval sequence:
 
 1. **Read AGENTS.md**: Understand mandatory guardrails, safety protocols, and quality gates.
 2. **Read Project Context**: Inspect `.agent/PROJECT_CONTEXT.md` for foundational domain goals.

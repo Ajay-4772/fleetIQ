@@ -19,17 +19,17 @@
 ### Continuous WAL Archiving & Daily Snapshots
 1. **Automated Daily Snapshots:** Executed every 24 hours at 02:00 UTC using `pg_dump`:
    ```bash
-   pg_dump -Fc -h $DB_HOST -U $DB_USER -d $DB_NAME -f /backups/fleetiq_$(date +%Y%m%d).dump
+   pg_dump -Fc -h $DB_HOST -U $DB_USER -d $DB_NAME -f /backups/vehyron_$(date +%Y%m%d).dump
    ```
 2. **Offsite Replication:** Encrypted snapshot archives (`AES-256`) are replicated to secondary geographic object storage buckets with 30-day retention policies.
 3. **Database Restore Procedure:**
    ```bash
    # 1. Create fresh database instance
-   createdb -h $RESTORE_HOST -U $DB_USER fleetiq_restored
+   createdb -h $RESTORE_HOST -U $DB_USER vehyron_restored
    # 2. Restore schema and data from custom format archive
-   pg_restore -h $RESTORE_HOST -U $DB_USER -d fleetiq_restored /backups/fleetiq_latest.dump
+   pg_restore -h $RESTORE_HOST -U $DB_USER -d vehyron_restored /backups/vehyron_latest.dump
    # 3. Execute Flyway migration verification
-   mvn flyway:migrate -Dflyway.url=jdbc:postgresql://$RESTORE_HOST:5432/fleetiq_restored
+   mvn flyway:migrate -Dflyway.url=jdbc:postgresql://$RESTORE_HOST:5432/vehyron_restored
    ```
 
 ---

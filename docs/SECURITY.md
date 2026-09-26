@@ -43,9 +43,9 @@ Four default accounts are seeded by `DataInitializer.java` on application bootst
 
 External telemetry pipelines authenticate using the HTTP header:
 ```http
-X-API-Key: fleetiq-ingest-secure-key-2026
+X-API-Key: vehyron-ingest-secure-key-2026
 ```
-- Configured via environment variable: `FLEETIQ_INGESTION_API_KEY`.
+- Configured via environment variable: `vehyron_INGESTION_API_KEY`.
 - If an invalid key or missing credentials are submitted, the backend rejects the request with **403 Forbidden**.
 - Prevents unauthenticated external systems from injecting malicious or spurious telemetry events.
 

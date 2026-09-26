@@ -33,6 +33,6 @@ kubectl rollout status deployment/vehyron-backend -n production
 kubectl rollout undo deployment/vehyron-frontend -n production
 
 # 4. Verify Actuator health endpoint
-curl -s https://api.fleetiq.company.com/actuator/health | jq .status
+curl -s https://api.vehyron.company.com/actuator/health | jq .status
 ```
 *Database backward compatibility invariant: All Flyway migrations must be backward-compatible with N-1 backend jar releases.*
