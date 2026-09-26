@@ -11,7 +11,12 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password: ""
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: validate
     show-sql: false
@@ -40,6 +45,8 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
 
 logging:
   pattern:
@@ -64,6 +71,8 @@ vehyron:
       secret: ${JWT_SECRET:VehyronSecretKeyForJWTSigningMustBeAtLeast256BitsLongForHMACSHA256Secure}
       expiration-ms: ${JWT_EXPIRATION_MS:86400000}
     ingestion-api-key: ${VEHYRON_INGESTION_API_KEY:${FLEETIQ_INGESTION_API_KEY:vehyron-ingest-secure-key-2026}}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173}
 
 # Backward compatibility alias
 fleetiq:
@@ -82,6 +91,13 @@ spring:
     username: ${DB_USER:vehyron_user}
     password: ${DB_PASSWORD:vehyron_secret}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:20000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:300000}
+      max-lifetime: ${DB_MAX_LIFETIME:1200000}
+      leak-detection-threshold: 30000
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:

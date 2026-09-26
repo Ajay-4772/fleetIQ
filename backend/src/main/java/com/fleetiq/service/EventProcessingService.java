@@ -173,20 +173,32 @@ public class EventProcessingService {
         });
 
         String make = v.getMake() != null ? v.getMake() : "Multi-OEM";
-        if (event.getOilLifePct() != null) v.setOilLifePct(event.getOilLifePct().doubleValue());
-        if (event.getBatteryHealthPct() != null) v.setBatteryHealthPct(event.getBatteryHealthPct().doubleValue());
-        if (event.getTirePressurePsi() != null) v.setTirePressurePsi(event.getTirePressurePsi().doubleValue());
-        if (event.getOdometerKm() != null) {
-            long currentMileage = v.getMileageKm() != null ? v.getMileageKm().longValue() : 0L;
-            if (event.getOdometerKm().longValue() > currentMileage) {
-                v.setMileageKm(event.getOdometerKm().longValue());
+        
+        boolean isNewVehicle = vOpt.isEmpty();
+
+        // Out-of-order event protection:
+        // Do not regress vehicle live snapshot attributes if event timestamp is older than current updatedAt
+        boolean isStaleEvent = !isNewVehicle
+                && v.getUpdatedAt() != null
+                && event.getTimestamp() != null
+                && event.getTimestamp().isBefore(v.getUpdatedAt());
+
+        if (isNewVehicle || !isStaleEvent) {
+            if (event.getOilLifePct() != null) v.setOilLifePct(event.getOilLifePct().doubleValue());
+            if (event.getBatteryHealthPct() != null) v.setBatteryHealthPct(event.getBatteryHealthPct().doubleValue());
+            if (event.getTirePressurePsi() != null) v.setTirePressurePsi(event.getTirePressurePsi().doubleValue());
+            if (event.getOdometerKm() != null) {
+                long currentMileage = v.getMileageKm() != null ? v.getMileageKm().longValue() : 0L;
+                if (event.getOdometerKm().longValue() > currentMileage) {
+                    v.setMileageKm(event.getOdometerKm().longValue());
+                }
             }
+            if ("CRITICAL".equalsIgnoreCase(event.getSeverity())) {
+                v.setStatus("MAINTENANCE");
+            }
+            v.setUpdatedAt(event.getTimestamp() != null ? event.getTimestamp() : Instant.now());
+            vehicleRepository.save(v);
         }
-        if ("CRITICAL".equalsIgnoreCase(event.getSeverity())) {
-            v.setStatus("MAINTENANCE");
-        }
-        v.setUpdatedAt(Instant.now());
-        vehicleRepository.save(v);
 
         // 6. Create Action Item if actionable
         ActionItem action = actionService.createActionFromDecision(decision, event.getSeverity());

@@ -51,10 +51,12 @@
 ---
 
 ## 4. Verification & Quality Status
-- **Backend Test Suite**: **73/73 tests passing across 12 test suites with 0 failures and 0 errors**.
+- **Backend Test Suite**: **87/87 tests passing across 14 test suites with 0 failures and 0 errors**.
+  - `VehyronProductionHardeningTests` (9 tests verifying defensive headers, SQL injection neutralization, path traversal/extension rejection, out-of-order event preservation, physical boundary enforcement, admin self-demotion blocks, pagination limits, and structured error responses).
   - `AuthenticationAndSessionTests` (13 tests verifying login, logout, lockout, dual tokens, single-use reset tokens, deactivation, and real-time RBAC).
   - `AdminUserAndRbacTests` (5 tests).
   - `SecurityAndAuthTests` (6 tests).
+  - `VehyronIngestionPipelineTests` (5 tests).
   - `CopilotChatPersistenceTests` (2 tests).
   - `DecisionAndAiFallbackTests` (6 tests).
   - `DetectionAndImpactTests` (6 tests).
@@ -64,23 +66,17 @@
   - `FleetQueryAndActionTests` (3 tests).
   - `IntegrationAndApiTests` (7 tests).
   - `NormalizationTests` (6 tests).
-- **Frontend Production Bundle**: `npm run build` completes with 0 errors.
-- **Browser Visual Verification**: Screenshots captured and verified in `outputs/`:
-  - `outputs/fleetiq_original_login.png`
-  - `outputs/fleetiq_original_register.png`
-  - `outputs/fleetiq_original_forgot_password.png`
-  - `outputs/fleetiq_forgot_success.png`
+- **Frontend Production Bundle**: `npm run build` completes with 0 errors (`dist/` assets compiled with junction support).
+- **Local Multi-Container Stack**: Docker Desktop healthy running `vehyron-backend`, `vehyron-frontend`, and `vehyron-postgres`.
 
 ---
 
-## 5. Documentation Deliverables
-- `docs/security/AUTHENTICATION.md`: Complete identity & dual-token architecture specification.
-- `docs/security/RBAC.md`: Enterprise authorization, roles, and method-level security.
-- `docs/security/RBAC_MATRIX.md`: Detailed role-to-permission mapping and prohibited actions matrix.
-- `docs/security/SESSION_MANAGEMENT.md`: Token lifecycle, rotation, revocation, and concurrent governance.
-- `docs/security/PASSWORD_POLICY.md`: BCrypt cost 12, complexity enforcement, brute-force defense, reset tokens.
-- `docs/security/ACCOUNT_LIFECYCLE.md`: Provisioning, state machine, transitions, and deactivation.
-- `docs/security/AUDIT_LOGGING.md`: Security event taxonomy, zero-sensitive-data invariants, admin inspection.
-- `.agent/AUTHENTICATION_AUDIT.md`: Baseline audit of pre-existing vulnerabilities and required fixes.
-- `.agent/AUTH_SESSION_ARCHITECTURE.md`: Technical architectural decision record for the dual-token model.
-- `.agent/AUTHENTICATION_RBAC_COMPLETION_REPORT.md`: Comprehensive final milestone delivery report.
+## 5. Production Hardening Documentation Deliverables
+- `docs/security/threat-model.md`: Comprehensive 14-threat STRIDE analysis across all 20 subsystems.
+- `docs/security/authorization-matrix.md`: Master role-by-role endpoint authorization matrix.
+- `docs/operations/disaster-recovery.md`: RPO (≤5m), RTO (≤15m), PITR, database restore SOPs, and recovery drills.
+- `docs/operations/incident-response.md`: SEV-1 to SEV-4 taxonomy, 6-phase handling lifecycle, and 6 failure scenario SOPs.
+- `docs/production-readiness-checklist.md`: 16-domain readiness scorecard with granular criteria.
+- `docs/security/security-audit.md`: SEC-01 through SEC-08 findings with CWE/OWASP mapping, evidence, remediation, and status.
+- `docs/architecture/production-architecture.md`: Multi-AZ VPC topology, failure boundaries, and defense-in-depth matrix.
+

@@ -189,33 +189,27 @@ public class IngestionController {
 
     @PostMapping(value = "/upload/preview", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> previewDataset(@RequestParam("file") MultipartFile file) {
-        try {
-            Map<String, Object> preview = excelCsvIngestionService.previewFile(file);
-            return ResponseEntity.ok(preview);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Failed to parse file preview: " + e.getMessage()));
-        }
+    public ResponseEntity<?> previewDataset(@RequestParam("file") MultipartFile file) throws Exception {
+        Map<String, Object> preview = excelCsvIngestionService.previewFile(file);
+        return ResponseEntity.ok(preview);
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> uploadDataset(@RequestParam("file") MultipartFile file,
                                           @RequestParam(value = "mapping", required = false) String mappingJson,
-                                          Authentication auth) {
-        try {
-            Map<String, String> mapping = new HashMap<>();
-            if (mappingJson != null && !mappingJson.isBlank()) {
+                                          Authentication auth) throws Exception {
+        Map<String, String> mapping = new HashMap<>();
+        if (mappingJson != null && !mappingJson.isBlank()) {
+            try {
                 mapping = objectMapper.readValue(mappingJson, new TypeReference<Map<String, String>>() {});
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid mapping JSON: " + e.getMessage());
             }
-            String uploadedBy = auth != null ? auth.getName() : "admin";
-            IngestionJob job = excelCsvIngestionService.processFile(file, mapping, uploadedBy);
-            return ResponseEntity.status(HttpStatus.CREATED).body(job);
-        } catch (Exception e) {
-            log.error("Failed to process dataset file: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Ingestion processing error: " + e.getMessage()));
         }
+        String uploadedBy = auth != null ? auth.getName() : "admin";
+        IngestionJob job = excelCsvIngestionService.processFile(file, mapping, uploadedBy);
+        return ResponseEntity.status(HttpStatus.CREATED).body(job);
     }
 
     // ==========================================

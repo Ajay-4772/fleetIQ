@@ -26,7 +26,9 @@ public class ActionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
 
-        Page<ActionItem> result = actionService.getActions(status, priority, requiresHumanReview, PageRequest.of(page, size));
+        int boundedPage = Math.max(0, page);
+        int boundedSize = Math.max(1, Math.min(100, size));
+        Page<ActionItem> result = actionService.getActions(status, priority, requiresHumanReview, PageRequest.of(boundedPage, boundedSize));
         return ResponseEntity.ok(result);
     }
 

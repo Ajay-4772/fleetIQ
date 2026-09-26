@@ -31,6 +31,9 @@ public class SecurityConfig {
     private final RateLimitingFilter rateLimitingFilter;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Value("${vehyron.security.cors.allowed-origins:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173}")
+    private String allowedOrigins;
+
     public SecurityConfig(JwtAuthenticationFilter jwtFilter,
                           ApiKeyAuthenticationFilter apiKeyFilter,
                           RateLimitingFilter rateLimitingFilter,
@@ -56,7 +59,11 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers.frameOptions(frame -> frame.disable())) // For H2 console
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin())
+                        .contentTypeOptions(org.springframework.security.config.Customizer.withDefaults())
+                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -135,7 +142,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*"));
+        if (allowedOrigins != null && (allowedOrigins.contains("*") || allowedOrigins.isBlank())) {
+            config.setAllowedOriginPatterns(List.of("*"));
+        } else if (allowedOrigins != null) {
+            List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+            config.setAllowedOrigins(origins);
+        }
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-API-Key", "X-Requested-With", "Accept", "traceparent", "tracestate", "X-Trace-Id"));
         config.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition", "X-Trace-Id", "X-RateLimit-Limit", "X-RateLimit-Remaining", "Retry-After"));

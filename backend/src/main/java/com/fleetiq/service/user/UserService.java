@@ -102,6 +102,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with ID " + userId + " not found"));
 
+        if (user.getUsername().equals(actorUsername) && newRole != Role.ROLE_ADMIN) {
+            throw new IllegalArgumentException("Administrators cannot demote their own account role");
+        }
+
         Role oldRole = user.getRole();
         user.setRole(newRole);
         User updated = userRepository.save(user);

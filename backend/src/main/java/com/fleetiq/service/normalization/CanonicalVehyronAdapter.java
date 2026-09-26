@@ -36,12 +36,18 @@ public class CanonicalVehyronAdapter implements OemAdapter {
         String faultCode = extractString(payload, "fault_code", "faultCode", "dtc", "diagnostic_code", "fault");
         Integer idleMinutes = extractInteger(payload, "idle_minutes", "idleMinutes", "idlingTimeMinutes");
 
-        // Validate physical ranges
+        // Validate physical ranges & reject physically impossible values
         if (oilLife != null && (oilLife < 0 || oilLife > 100)) {
-            oilLife = Math.max(0.0, Math.min(100.0, oilLife));
+            throw new IllegalArgumentException("Invalid oil life metric: " + oilLife + "%. Must be between 0% and 100%.");
         }
-        if (battery != null && battery < 0) {
-            battery = 0.0;
+        if (battery != null && (battery < 0 || battery > 1000)) {
+            throw new IllegalArgumentException("Physically impossible battery reading: " + battery + ". Must be between 0 and 1000.");
+        }
+        if (tirePressure != null && (tirePressure < 0 || tirePressure > 150)) {
+            throw new IllegalArgumentException("Physically impossible tire pressure: " + tirePressure + " PSI. Must be between 0 and 150 PSI.");
+        }
+        if (odometer != null && odometer < 0) {
+            throw new IllegalArgumentException("Odometer reading cannot be negative: " + odometer + " km.");
         }
 
         // Determine event type and severity

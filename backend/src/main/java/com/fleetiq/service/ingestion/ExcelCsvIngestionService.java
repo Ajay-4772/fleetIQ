@@ -55,11 +55,34 @@ public class ExcelCsvIngestionService {
         this.jobRepository = jobRepository;
     }
 
+    private String validateAndSanitizeFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Uploaded file cannot be empty");
+        }
+        if (file.getSize() > 25 * 1024 * 1024L) { // 25 MB limit
+            throw new IllegalArgumentException("File size exceeds maximum permitted limit (25MB)");
+        }
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || originalFilename.isBlank()) {
+            throw new IllegalArgumentException("Uploaded file must have a valid filename");
+        }
+        // Path traversal defense: strip any path characters
+        String cleanName = new java.io.File(originalFilename).getName().replaceAll("[\\\\/:*?\"<>|]", "_");
+        if (cleanName.contains("..")) {
+            throw new IllegalArgumentException("Invalid filename containing path traversal sequences");
+        }
+        String lower = cleanName.toLowerCase();
+        if (!lower.endsWith(".csv") && !lower.endsWith(".xlsx") && !lower.endsWith(".xls")) {
+            throw new IllegalArgumentException("Unsupported file format. Only .csv, .xlsx, and .xls files are allowed.");
+        }
+        return cleanName;
+    }
+
     /**
      * Inspect file headers, detect candidate column mappings, and return sample preview rows.
      */
     public Map<String, Object> previewFile(MultipartFile file) throws Exception {
-        String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "dataset.csv";
+        String filename = validateAndSanitizeFile(file);
         boolean isCsv = filename.toLowerCase().endsWith(".csv");
 
         List<String> headers = new ArrayList<>();
@@ -123,7 +146,7 @@ public class ExcelCsvIngestionService {
      * Process entire file using confirmed or detected column mappings.
      */
     public IngestionJob processFile(MultipartFile file, Map<String, String> columnMapping, String uploadedBy) throws Exception {
-        String filename = file.getOriginalFilename() != null ? file.getOriginalFilename() : "dataset.csv";
+        String filename = validateAndSanitizeFile(file);
         boolean isCsv = filename.toLowerCase().endsWith(".csv");
         String sourceType = isCsv ? "CSV_IMPORT" : "EXCEL_IMPORT";
 
