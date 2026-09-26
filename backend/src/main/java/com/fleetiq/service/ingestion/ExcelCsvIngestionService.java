@@ -1,6 +1,5 @@
 package com.fleetiq.service.ingestion;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fleetiq.dto.IngestionRequest;
 import com.fleetiq.dto.IngestionResponse;
 import com.fleetiq.model.IngestionJob;
@@ -29,7 +28,6 @@ public class ExcelCsvIngestionService {
 
     private final EventProcessingService eventProcessingService;
     private final IngestionJobRepository jobRepository;
-    private final ObjectMapper objectMapper;
 
     // Standard Canonical Target Fields
     public static final Set<String> CANONICAL_FIELDS = Set.of(
@@ -52,11 +50,9 @@ public class ExcelCsvIngestionService {
     );
 
     public ExcelCsvIngestionService(EventProcessingService eventProcessingService,
-                                   IngestionJobRepository jobRepository,
-                                   ObjectMapper objectMapper) {
+                                   IngestionJobRepository jobRepository) {
         this.eventProcessingService = eventProcessingService;
         this.jobRepository = jobRepository;
-        this.objectMapper = objectMapper;
     }
 
     /**

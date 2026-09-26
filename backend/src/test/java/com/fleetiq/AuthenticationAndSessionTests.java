@@ -21,12 +21,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -75,7 +74,7 @@ public class AuthenticationAndSessionTests {
                 .andExpect(jsonPath("$.role").value("ROLE_ADMIN"))
                 .andReturn();
 
-        Map<String, Object> resp = objectMapper.readValue(result.getResponse().getContentAsString(), Map.class);
+        Map<String, Object> resp = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Map<String, Object>>() {});
         String refreshToken = (String) resp.get("refreshToken");
 
         var tokenOpt = refreshTokenRepository.findByTokenHash(refreshToken);
@@ -295,7 +294,7 @@ public class AuthenticationAndSessionTests {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Map<String, Object> map = objectMapper.readValue(res.getResponse().getContentAsString(), Map.class);
+        Map<String, Object> map = objectMapper.readValue(res.getResponse().getContentAsString(), new TypeReference<Map<String, Object>>() {});
         String oldRefreshToken = (String) map.get("refreshToken");
 
         // Call /api/v1/auth/refresh
@@ -308,7 +307,7 @@ public class AuthenticationAndSessionTests {
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty())
                 .andReturn();
 
-        Map<String, Object> refreshMap = objectMapper.readValue(refreshRes.getResponse().getContentAsString(), Map.class);
+        Map<String, Object> refreshMap = objectMapper.readValue(refreshRes.getResponse().getContentAsString(), new TypeReference<Map<String, Object>>() {});
         String newRefreshToken = (String) refreshMap.get("refreshToken");
 
         assertNotEquals(oldRefreshToken, newRefreshToken, "Refresh token must rotate upon use");

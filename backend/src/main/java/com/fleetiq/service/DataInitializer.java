@@ -6,7 +6,6 @@ import com.fleetiq.model.User;
 import com.fleetiq.model.Vehicle;
 import com.fleetiq.repository.UserRepository;
 import com.fleetiq.repository.VehicleRepository;
-import com.fleetiq.service.simulator.FleetSimulatorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -25,7 +24,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
-    private final FleetSimulatorService simulatorService;
     private final ObjectMapper objectMapper;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
@@ -34,12 +32,10 @@ public class DataInitializer implements CommandLineRunner {
 
     public DataInitializer(VehicleRepository vehicleRepository,
                            UserRepository userRepository,
-                           FleetSimulatorService simulatorService,
                            ObjectMapper objectMapper,
                            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.vehicleRepository = vehicleRepository;
         this.userRepository = userRepository;
-        this.simulatorService = simulatorService;
         this.objectMapper = objectMapper;
         this.passwordEncoder = passwordEncoder;
     }

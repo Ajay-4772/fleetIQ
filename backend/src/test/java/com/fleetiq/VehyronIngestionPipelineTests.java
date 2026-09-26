@@ -2,15 +2,11 @@ package com.fleetiq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fleetiq.model.DataSource;
-import com.fleetiq.model.IngestionJob;
 import com.fleetiq.model.RawIngestionRecord;
-import com.fleetiq.model.Vehicle;
 import com.fleetiq.repository.DataSourceRepository;
-import com.fleetiq.repository.IngestionJobRepository;
 import com.fleetiq.repository.RawIngestionRecordRepository;
 import com.fleetiq.repository.VehicleRepository;
 import com.fleetiq.security.JwtTokenProvider;
-import com.fleetiq.service.ingestion.ExcelCsvIngestionService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +17,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -44,16 +39,10 @@ public class VehyronIngestionPipelineTests {
     private DataSourceRepository dataSourceRepository;
 
     @Autowired
-    private IngestionJobRepository ingestionJobRepository;
-
-    @Autowired
     private VehicleRepository vehicleRepository;
 
     @Autowired
     private RawIngestionRecordRepository rawRecordRepository;
-
-    @Autowired
-    private ExcelCsvIngestionService excelCsvIngestionService;
 
     @Test
     @DisplayName("Ingestion-01: Admin creates, tests handshake, and starts a Kafka telemetry connector")
