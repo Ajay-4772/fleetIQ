@@ -1,6 +1,5 @@
 package com.fleetiq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fleetiq.dto.IngestionRequest;
 import com.fleetiq.model.Role;
 import com.fleetiq.model.Vehicle;

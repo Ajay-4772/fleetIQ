@@ -324,7 +324,6 @@ public class DashboardAggregationService {
 
         Instant now = Instant.now();
         List<DayUtilizationDto> days = new ArrayList<>();
-        String[] dayNames = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         long peakKm = 0;
         String peakDay = null;
         long totalKm = 0;
