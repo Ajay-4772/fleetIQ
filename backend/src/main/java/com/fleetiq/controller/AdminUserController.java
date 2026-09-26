@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin/users")
@@ -26,9 +27,59 @@ public class AdminUserController {
         this.userService = userService;
     }
 
+    private String getClientIp(HttpServletRequest request) {
+        String xf = request.getHeader("X-Forwarded-For");
+        if (xf != null && !xf.isBlank()) {
+            return xf.split(",")[0].trim();
+        }
+        return request.getRemoteAddr() != null ? request.getRemoteAddr() : "127.0.0.1";
+    }
+
     @GetMapping
     public ResponseEntity<List<UserAdminDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/access-requests")
+    public ResponseEntity<List<UserAdminDto>> getAccessRequests() {
+        return ResponseEntity.ok(userService.getAccessRequests());
+    }
+
+    @PostMapping("/access-requests/{id}/approve")
+    public ResponseEntity<UserAdminDto> approveAccessRequest(@PathVariable Long id,
+                                                             @RequestParam(required = false, defaultValue = "ROLE_OPERATOR") Role role,
+                                                             Authentication authentication,
+                                                             HttpServletRequest servletRequest) {
+        String actor = authentication != null ? authentication.getName() : "system";
+        String ip = getClientIp(servletRequest);
+        return ResponseEntity.ok(userService.approveAccessRequest(id, role, actor, ip));
+    }
+
+    @PostMapping("/access-requests/{id}/reject")
+    public ResponseEntity<UserAdminDto> rejectAccessRequest(@PathVariable Long id,
+                                                            @RequestBody(required = false) Map<String, String> body,
+                                                            Authentication authentication,
+                                                            HttpServletRequest servletRequest) {
+        String actor = authentication != null ? authentication.getName() : "system";
+        String ip = getClientIp(servletRequest);
+        String reason = body != null ? body.get("reason") : "Administrative rejection";
+        return ResponseEntity.ok(userService.rejectAccessRequest(id, reason, actor, ip));
+    }
+
+    @GetMapping("/policy")
+    public ResponseEntity<Map<String, String>> getRegistrationPolicy() {
+        return ResponseEntity.ok(Map.of("policy", userService.getRegistrationPolicy()));
+    }
+
+    @PutMapping("/policy")
+    public ResponseEntity<Map<String, String>> updateRegistrationPolicy(@RequestBody Map<String, String> body,
+                                                                        Authentication authentication,
+                                                                        HttpServletRequest servletRequest) {
+        String actor = authentication != null ? authentication.getName() : "system";
+        String ip = getClientIp(servletRequest);
+        String policy = body.getOrDefault("policy", "APPROVAL_REQUIRED");
+        String updated = userService.updateRegistrationPolicy(policy, actor, ip);
+        return ResponseEntity.ok(Map.of("policy", updated));
     }
 
     @GetMapping("/search")
@@ -41,7 +92,7 @@ public class AdminUserController {
                                                    Authentication authentication,
                                                    HttpServletRequest servletRequest) {
         String actor = authentication != null ? authentication.getName() : "system";
-        String ip = servletRequest.getRemoteAddr();
+        String ip = getClientIp(servletRequest);
         UserAdminDto created = userService.createUser(request, actor, ip);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -52,7 +103,7 @@ public class AdminUserController {
                                                          Authentication authentication,
                                                          HttpServletRequest servletRequest) {
         String actor = authentication != null ? authentication.getName() : "system";
-        String ip = servletRequest.getRemoteAddr();
+        String ip = getClientIp(servletRequest);
         return ResponseEntity.ok(userService.updateUserStatus(id, enabled, actor, ip));
     }
 
@@ -62,7 +113,7 @@ public class AdminUserController {
                                                        Authentication authentication,
                                                        HttpServletRequest servletRequest) {
         String actor = authentication != null ? authentication.getName() : "system";
-        String ip = servletRequest.getRemoteAddr();
+        String ip = getClientIp(servletRequest);
         return ResponseEntity.ok(userService.updateUserRole(id, role, actor, ip));
     }
 

@@ -1,7 +1,7 @@
 # VEHYRON — Current State
 
-**Last Updated**: September 25, 2026  
-**Milestone**: Complete Authentication, Authorization, RBAC, and Login/Signup UX Rebuild (COMPLETED & VERIFIED)
+**Last Updated**: September 26, 2026  
+**Milestone**: Data-Driven Operational Analytics & First Root Admin Bootstrap (COMPLETED & VERIFIED)
 
 ---
 
@@ -13,6 +13,8 @@
   - `V1__initial_schema.sql`: Core vehicles, vehicle events, and priority actions.
   - `V2__user_audit_and_copilot_chat.sql`: Platform users, security audit logs, chat conversations, and messages.
   - `V3__auth_tokens_and_user_lifecycle.sql`: User lifecycle fields (`email`, `email_verified`, `last_login_at`, `failed_attempts`, `locked_until`, `organization`), `refresh_tokens`, and `password_reset_tokens`.
+  - `V4__enterprise_data_ingestion_center.sql`: Ingestion sources and raw records schema.
+  - `V5__user_registration_approval_and_policy.sql`: Registration approval lifecycle, request tracking (`status`, `requested_role`, `approved_by`, `approved_at`), and `platform_settings`.
 
 ---
 

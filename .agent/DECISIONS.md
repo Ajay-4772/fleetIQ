@@ -17,6 +17,7 @@ This registry tracks verified architectural choices and proposed future decision
 | **[ADR-008](file:///c:/Users/ajaya/Desktop/fleetiq/docs/decisions/008-distributed-tracing-opentelemetry-proposal.md)** | Distributed Tracing with OpenTelemetry | **ACCEPTED** | Observability | Implement W3C trace context propagation via Micrometer Tracing Otel bridge, `X-Trace-Id` response header, and MDC logging correlation. |
 | **ADR-009** | VEHYRON Product Brand Identity & Strict Dual-Role RBAC Model | **ACCEPTED** | Identity / Governance | Migrate brand from VEHYRON to VEHYRON while preserving automotive domain concepts (`fleet`, `vehicle`). Enforce exactly two roles: `ROLE_ADMIN` and `ROLE_OPERATOR`. |
 | **ADR-010** | Enterprise Ingestion Gateway & Zero-Demo Dynamic Baseline | **ACCEPTED** | Ingestion / Scalability | Implement pluggable connectors (Kafka, MQTT, REST, Webhooks, Cloud streams, POI/CSV streaming) with zero synthetic vehicles, dynamically hydrating the registry from real data. |
+| **ADR-011** | Data-Driven Operational Analytics & Secure First-Admin Bootstrap Lifecycle | **ACCEPTED** | Analytics / Security | Eliminate all static/fake dashboard chart arrays, enforce typed backend analytics APIs with explicit empty states (differentiating NO DATA from ACTUAL ZERO), implement development-only auth reset, bootstrap root administrator Ajay via external secret without code exposure, and enforce public registration approval workflows. |
 
 ---
 

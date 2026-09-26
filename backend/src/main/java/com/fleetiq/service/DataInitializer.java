@@ -2,17 +2,23 @@ package com.fleetiq.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fleetiq.model.Role;
 import com.fleetiq.model.User;
+import com.fleetiq.model.UserAuditLog;
 import com.fleetiq.model.Vehicle;
-import com.fleetiq.repository.UserRepository;
-import com.fleetiq.repository.VehicleRepository;
+import com.fleetiq.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -24,50 +30,46 @@ public class DataInitializer implements CommandLineRunner {
 
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final UserAuditLogRepository auditLogRepository;
     private final ObjectMapper objectMapper;
-    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final Environment environment;
 
-    @org.springframework.beans.factory.annotation.Value("${vehyron.seed.enabled:${fleetiq.seed.enabled:false}}")
+    @Value("${vehyron.seed.enabled:${fleetiq.seed.enabled:false}}")
     private boolean seedEnabled;
+
+    @Value("${vehyron.bootstrap.admin-password:${BOOTSTRAP_ADMIN_PASSWORD:}}")
+    private String configuredBootstrapPassword;
 
     public DataInitializer(VehicleRepository vehicleRepository,
                            UserRepository userRepository,
+                           RefreshTokenRepository refreshTokenRepository,
+                           PasswordResetTokenRepository passwordResetTokenRepository,
+                           UserAuditLogRepository auditLogRepository,
                            ObjectMapper objectMapper,
-                           org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           Environment environment) {
         this.vehicleRepository = vehicleRepository;
         this.userRepository = userRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.auditLogRepository = auditLogRepository;
         this.objectMapper = objectMapper;
         this.passwordEncoder = passwordEncoder;
+        this.environment = environment;
     }
 
     @Override
+    @Transactional
     public void run(String... args) {
-        // Seed initial platform governance accounts if empty
-        if (userRepository.count() == 0) {
-            log.info("Users table is empty. Initializing VEHYRON dual-role baseline accounts...");
-            User admin = new com.fleetiq.model.User(
-                    "admin",
-                    passwordEncoder.encode("Admin@Vehyron2026"),
-                    "VEHYRON Administrator",
-                    "admin@vehyron.internal",
-                    com.fleetiq.model.Role.ROLE_ADMIN,
-                    "VEHYRON Platform Operations"
-            );
-            admin.setEmailVerified(true);
-            userRepository.save(admin);
+        boolean isDev = isDevelopmentEnvironment();
 
-            User operator = new com.fleetiq.model.User(
-                    "operator",
-                    passwordEncoder.encode("Operator@Vehyron2026"),
-                    "Fleet Operations Controller",
-                    "operator@vehyron.internal",
-                    com.fleetiq.model.Role.ROLE_OPERATOR,
-                    "VEHYRON Connected Dispatch"
-            );
-            operator.setEmailVerified(true);
-            userRepository.save(operator);
-
-            log.info("Initialized 2 core role accounts: admin (ROLE_ADMIN) and operator (ROLE_OPERATOR).");
+        if (isDev) {
+            resetAuthDevIfNecessary();
+        } else {
+            ensureAdminExists();
         }
 
         // Vehicle Data: Only seed if explicitly enabled via vehyron.seed.enabled=true (isolated dev/test profile)
@@ -108,5 +110,119 @@ public class DataInitializer implements CommandLineRunner {
         } else {
             log.info("VEHYRON production zero-static-data mode active: Database contains {} live vehicles.", vehicleRepository.count());
         }
+    }
+
+    public boolean isDevelopmentEnvironment() {
+        String[] profiles = environment.getActiveProfiles();
+        if (profiles == null || profiles.length == 0) {
+            String defaultProfile = environment.getProperty("spring.profiles.default", "dev");
+            return "dev".equalsIgnoreCase(defaultProfile) || "test".equalsIgnoreCase(defaultProfile);
+        }
+        for (String p : profiles) {
+            if ("prod".equalsIgnoreCase(p) || "production".equalsIgnoreCase(p) || "staging".equalsIgnoreCase(p)) {
+                return false;
+            }
+        }
+        for (String p : profiles) {
+            if ("dev".equalsIgnoreCase(p) || "development".equalsIgnoreCase(p) || "test".equalsIgnoreCase(p) || "local".equalsIgnoreCase(p)) {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    public void resetAuthDevIfNecessary() {
+        boolean ajayExists = userRepository.findByUsername("Ajay").isPresent() ||
+                             userRepository.findByEmail("ajayalpha4772@vehryon.com").isPresent();
+
+        List<String> legacyUsernames = List.of("admin", "operator", "viewer", "ops_lead");
+        boolean hasLegacy = legacyUsernames.stream().anyMatch(u -> userRepository.findByUsername(u).isPresent());
+
+        if (hasLegacy || !ajayExists) {
+            log.info("Executing controlled development authentication reset...");
+
+            // 1. Clear tokens
+            try {
+                refreshTokenRepository.deleteAll();
+                passwordResetTokenRepository.deleteAll();
+            } catch (Exception e) {
+                log.warn("Token wipe encountered non-critical error: {}", e.getMessage());
+            }
+
+            // 2. Clear old demo accounts
+            for (String legacy : legacyUsernames) {
+                userRepository.findByUsername(legacy).ifPresent(userRepository::delete);
+            }
+
+            // 3. Create or update root admin Ajay
+            String rawPassword = getBootstrapPassword();
+            User rootAdmin = userRepository.findByUsername("Ajay")
+                    .or(() -> userRepository.findByEmail("ajayalpha4772@vehryon.com"))
+                    .orElseGet(User::new);
+
+            rootAdmin.setUsername("Ajay");
+            rootAdmin.setPassword(passwordEncoder.encode(rawPassword));
+            rootAdmin.setFullName("M Ajay");
+            rootAdmin.setEmail("ajayalpha4772@vehryon.com");
+            rootAdmin.setOrganization("Vehryon Enterprise");
+            rootAdmin.setRole(Role.ROLE_ADMIN);
+            rootAdmin.setStatus("ACTIVE");
+            rootAdmin.setEnabled(true);
+            rootAdmin.setEmailVerified(true);
+            rootAdmin.setRequestedRole("ADMIN");
+            rootAdmin.setApprovedBy("SYSTEM_BOOTSTRAP");
+            rootAdmin.setApprovedAt(Instant.now());
+            userRepository.save(rootAdmin);
+
+            auditLogRepository.save(new UserAuditLog(
+                    "SYSTEM",
+                    "RESET_AUTH_DEV",
+                    "Ajay",
+                    "Development authentication reset completed. Initial administrator bootstrapped.",
+                    "127.0.0.1"
+            ));
+
+            log.info("Development authentication reset completed.");
+            log.info("Initial administrator: {}", rootAdmin.getEmail());
+            log.info("Role: {}", rootAdmin.getRole());
+        }
+    }
+
+    private void ensureAdminExists() {
+        if (userRepository.countByRoleAndEnabled(Role.ROLE_ADMIN, true) == 0) {
+            log.warn("No active administrator detected in environment. Bootstrapping initial administrator...");
+            String rawPassword = getBootstrapPassword();
+            User rootAdmin = new User();
+            rootAdmin.setUsername("Ajay");
+            rootAdmin.setPassword(passwordEncoder.encode(rawPassword));
+            rootAdmin.setFullName("M Ajay");
+            rootAdmin.setEmail("ajayalpha4772@vehryon.com");
+            rootAdmin.setOrganization("Vehryon Enterprise");
+            rootAdmin.setRole(Role.ROLE_ADMIN);
+            rootAdmin.setStatus("ACTIVE");
+            rootAdmin.setEnabled(true);
+            rootAdmin.setEmailVerified(true);
+            rootAdmin.setRequestedRole("ADMIN");
+            rootAdmin.setApprovedBy("SYSTEM_BOOTSTRAP");
+            rootAdmin.setApprovedAt(Instant.now());
+            userRepository.save(rootAdmin);
+
+            log.info("Initial administrator bootstrapped: {}", rootAdmin.getEmail());
+        }
+    }
+
+    public String getBootstrapPassword() {
+        if (configuredBootstrapPassword != null && !configuredBootstrapPassword.isBlank()) {
+            return configuredBootstrapPassword.trim();
+        }
+        String envPass = System.getenv("BOOTSTRAP_ADMIN_PASSWORD");
+        if (envPass != null && !envPass.isBlank()) {
+            return envPass.trim();
+        }
+        String sysProp = System.getProperty("vehyron.bootstrap.admin-password");
+        if (sysProp != null && !sysProp.isBlank()) {
+            return sysProp.trim();
+        }
+        return "VehyronRootAdmin@2026!";
     }
 }

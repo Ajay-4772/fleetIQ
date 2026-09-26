@@ -1,6 +1,7 @@
 package com.fleetiq.dto;
 
 public class DashboardSummaryDto {
+    private boolean hasData;
     private long totalVehicles;
     private long activeVehicles;
     private long inactiveVehicles;
@@ -16,10 +17,11 @@ public class DashboardSummaryDto {
 
     public DashboardSummaryDto() {}
 
-    public DashboardSummaryDto(long totalVehicles, long activeVehicles, long inactiveVehicles,
+    public DashboardSummaryDto(boolean hasData, long totalVehicles, long activeVehicles, long inactiveVehicles,
                                long maintenanceVehicles, long healthyVehicles, long atRiskVehicles,
                                long criticalVehicles, double fleetHealthScore, double overallUtilizationPct,
                                long openActionCount, long criticalActionCount, double estimatedTotalImpact) {
+        this.hasData = hasData;
         this.totalVehicles = totalVehicles;
         this.activeVehicles = activeVehicles;
         this.inactiveVehicles = inactiveVehicles;
@@ -33,6 +35,9 @@ public class DashboardSummaryDto {
         this.criticalActionCount = criticalActionCount;
         this.estimatedTotalImpact = estimatedTotalImpact;
     }
+
+    public boolean isHasData() { return hasData; }
+    public void setHasData(boolean hasData) { this.hasData = hasData; }
 
     public long getTotalVehicles() { return totalVehicles; }
     public void setTotalVehicles(long totalVehicles) { this.totalVehicles = totalVehicles; }

@@ -24,10 +24,12 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final com.fleetiq.service.DataInitializer dataInitializer;
 
-    public AuthController(AuthService authService, UserRepository userRepository) {
+    public AuthController(AuthService authService, UserRepository userRepository, com.fleetiq.service.DataInitializer dataInitializer) {
         this.authService = authService;
         this.userRepository = userRepository;
+        this.dataInitializer = dataInitializer;
     }
 
     private String getClientIp(HttpServletRequest request) {
@@ -96,16 +98,19 @@ public class AuthController {
         String ip = getClientIp(httpRequest);
         try {
             AuthTokensResponse tokens = authService.register(request, ip);
-            Map<String, Object> response = Map.of(
-                    "token", tokens.getAccessToken(),
-                    "accessToken", tokens.getAccessToken(),
-                    "refreshToken", tokens.getRefreshToken(),
-                    "username", tokens.getUsername(),
-                    "fullName", tokens.getFullName(),
-                    "email", tokens.getEmail(),
-                    "role", tokens.getRole(),
-                    "message", "Registration successful. Welcome to FleetIQ."
-            );
+            java.util.Map<String, Object> response = new java.util.LinkedHashMap<>();
+            response.put("status", 201);
+            response.put("username", tokens.getUsername());
+            response.put("fullName", tokens.getFullName());
+            response.put("email", tokens.getEmail());
+            response.put("role", tokens.getRole());
+            response.put("accountStatus", tokens.getStatus());
+            response.put("message", tokens.getMessage());
+            if (tokens.getAccessToken() != null) {
+                response.put("token", tokens.getAccessToken());
+                response.put("accessToken", tokens.getAccessToken());
+                response.put("refreshToken", tokens.getRefreshToken());
+            }
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
@@ -197,5 +202,24 @@ public class AuthController {
 
         User user = userOpt.get();
         return ResponseEntity.ok(new UserProfileDto(user.getUsername(), user.getFullName(), user.getRole().name()));
+    }
+
+    @PostMapping("/dev-reset")
+    public ResponseEntity<?> devReset() {
+        if (!dataInitializer.isDevelopmentEnvironment()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "status", 403,
+                    "error", "Forbidden",
+                    "code", "DEV_ONLY_OPERATION",
+                    "message", "Database reset is strictly prohibited in non-development environments."
+            ));
+        }
+        dataInitializer.resetAuthDevIfNecessary();
+        return ResponseEntity.ok(Map.of(
+                "status", "SUCCESS",
+                "message", "Development authentication reset completed.",
+                "initialAdmin", "ajayalpha4772@vehryon.com",
+                "role", "ADMIN"
+        ));
     }
 }

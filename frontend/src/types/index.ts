@@ -70,6 +70,7 @@ export interface ActionItem {
 }
 
 export interface DashboardSummary {
+  hasData?: boolean;
   totalVehicles: number;
   activeVehicles: number;
   inactiveVehicles: number;
@@ -84,7 +85,16 @@ export interface DashboardSummary {
   estimatedTotalImpact: number;
 }
 
+export interface FleetHealthPoint {
+  timestamp: string;
+  label: string;
+  healthScore: number;
+  vehicleCount: number;
+  signalCount: number;
+}
+
 export interface FleetHealth {
+  hasData: boolean;
   healthyPercentage: number;
   atRiskPercentage: number;
   criticalPercentage: number;
@@ -94,6 +104,86 @@ export interface FleetHealth {
   tirePressureWarningCount: number;
   excessiveIdleCount: number;
   lowUtilizationCount: number;
+  previousPeriodPercentageChange?: number | null;
+  points?: FleetHealthPoint[];
+  freshnessStatus?: string;
+  lastEventTimestamp?: string | null;
+}
+
+export interface ThroughputPoint {
+  timestamp: string;
+  label: string;
+  received: number;
+  processed: number;
+  rejected: number;
+}
+
+export interface IngestionThroughput {
+  hasData: boolean;
+  eventsReceived: number;
+  eventsProcessed: number;
+  eventsRejected: number;
+  processingRate: number;
+  processingLatencyMs: number;
+  freshnessStatus: string;
+  lastEventTimestamp?: string | null;
+  points: ThroughputPoint[];
+}
+
+export interface IssueDistribution {
+  hasData: boolean;
+  totalIssues: number;
+  severityCounts: {
+    CRITICAL: number;
+    HIGH: number;
+    MEDIUM: number;
+    LOW: number;
+    [key: string]: number;
+  };
+  categoryCounts: {
+    BATTERY: number;
+    ENGINE: number;
+    MAINTENANCE: number;
+    TPMS: number;
+    UTILIZATION: number;
+    [key: string]: number;
+  };
+}
+
+export interface DayUtilization {
+  day: string;
+  distanceKm: number;
+  activeVehicles: number;
+  isPeak: boolean;
+}
+
+export interface WeeklyUtilization {
+  hasData: boolean;
+  days: DayUtilization[];
+  peakDay?: string | null;
+  peakKm?: number | null;
+  averageDailyKm?: number | null;
+}
+
+export interface SafetyScore {
+  hasData: boolean;
+  safetyScore?: number | null;
+  targetScore: number;
+  status: string;
+  harshBrakingCount: number;
+  speedViolationsCount: number;
+  criticalFaultCount: number;
+  complianceRate: number;
+}
+
+export interface StreamStatus {
+  pipelineStatus: 'LIVE' | 'CONNECTED_WAITING' | 'NO_SOURCE_CONNECTED' | 'STALE' | 'ERROR' | string;
+  statusLabel: string;
+  totalSources: number;
+  activeSources: number;
+  lastEventAt?: string | null;
+  freshnessDescription: string;
+  configuredSources: any[];
 }
 
 export interface TrendDataPoint {
@@ -301,6 +391,11 @@ export interface UserAdmin {
   email?: string;
   role: string;
   enabled: boolean;
+  organization?: string;
+  status?: string;
+  requestedRole?: string;
+  approvedBy?: string;
+  approvedAt?: string;
   createdAt: string;
 }
 

@@ -11,6 +11,8 @@ public class AuthTokensResponse {
     private String email;
     private String role;
     private String organization;
+    private String status = "ACTIVE";
+    private String message;
 
     public AuthTokensResponse() {}
 
@@ -24,6 +26,21 @@ public class AuthTokensResponse {
         this.email = email;
         this.role = role;
         this.organization = organization;
+        this.status = "ACTIVE";
+    }
+
+    public AuthTokensResponse(String accessToken, String refreshToken, long expiresInMs, String username, String fullName, String email, String role, String organization, String status, String message) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.tokenType = "Bearer";
+        this.expiresInMs = expiresInMs;
+        this.username = username;
+        this.fullName = fullName;
+        this.email = email;
+        this.role = role;
+        this.organization = organization;
+        this.status = status;
+        this.message = message;
     }
 
     public String getAccessToken() { return accessToken; }
@@ -52,4 +69,10 @@ public class AuthTokensResponse {
 
     public String getOrganization() { return organization; }
     public void setOrganization(String organization) { this.organization = organization; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
 }

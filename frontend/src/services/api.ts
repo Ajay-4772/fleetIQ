@@ -13,9 +13,15 @@ import {
   SimulatorResponse,
   LoadTestResponse,
   User,
+  UserAdmin,
   LoginResponse,
   AssistantResponse,
-  SearchResult
+  SearchResult,
+  IngestionThroughput,
+  IssueDistribution,
+  WeeklyUtilization,
+  SafetyScore,
+  StreamStatus
 } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -219,6 +225,30 @@ export const api = {
   getImpact: (): Promise<ImpactMetrics> =>
     fetch(`${BASE_URL}/api/v1/dashboard/impact`, { headers: authHeaders() })
       .then(handleResponse<ImpactMetrics>),
+
+  getIngestionThroughput: (): Promise<IngestionThroughput> =>
+    fetch(`${BASE_URL}/api/v1/dashboard/ingestion-throughput`, { headers: authHeaders() })
+      .then(handleResponse<IngestionThroughput>),
+
+  getIssueDistribution: (): Promise<IssueDistribution> =>
+    fetch(`${BASE_URL}/api/v1/dashboard/issue-distribution`, { headers: authHeaders() })
+      .then(handleResponse<IssueDistribution>),
+
+  getWeeklyUtilization: (): Promise<WeeklyUtilization> =>
+    fetch(`${BASE_URL}/api/v1/dashboard/weekly-utilization`, { headers: authHeaders() })
+      .then(handleResponse<WeeklyUtilization>),
+
+  getSafetyScore: (): Promise<SafetyScore> =>
+    fetch(`${BASE_URL}/api/v1/dashboard/safety-score`, { headers: authHeaders() })
+      .then(handleResponse<SafetyScore>),
+
+  getStreamStatus: (): Promise<StreamStatus> =>
+    fetch(`${BASE_URL}/api/v1/dashboard/stream-status`, { headers: authHeaders() })
+      .then(handleResponse<StreamStatus>),
+
+  devReset: (): Promise<any> =>
+    fetch(`${BASE_URL}/api/v1/auth/dev-reset`, { method: 'POST', headers: authHeaders() })
+      .then(handleResponse),
 
   // Vehicles
   getVehicles: (status?: string, make?: string, fuelType?: string): Promise<Vehicle[]> => {
@@ -471,5 +501,34 @@ export const api = {
   getSystemStatus: (): Promise<any> =>
     fetch(`${BASE_URL}/api/v1/system/status`, {
       headers: authHeaders()
-    }).then(handleResponse<any>)
+    }).then(handleResponse<any>),
+
+  // Admin Access Requests & Registration Policy
+  getAccessRequests: (): Promise<UserAdmin[]> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/access-requests`, { headers: authHeaders() })
+      .then(handleResponse<UserAdmin[]>),
+
+  approveAccessRequest: (id: number, role: string = 'ROLE_OPERATOR'): Promise<UserAdmin> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/access-requests/${id}/approve?role=${encodeURIComponent(role)}`, {
+      method: 'POST',
+      headers: authHeaders()
+    }).then(handleResponse<UserAdmin>),
+
+  rejectAccessRequest: (id: number, reason?: string): Promise<UserAdmin> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/access-requests/${id}/reject`, {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ reason: reason || 'Administrative rejection' })
+    }).then(handleResponse<UserAdmin>),
+
+  getRegistrationPolicy: (): Promise<{ policy: string }> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/policy`, { headers: authHeaders() })
+      .then(handleResponse<{ policy: string }>),
+
+  updateRegistrationPolicy: (policy: string): Promise<{ policy: string }> =>
+    fetch(`${BASE_URL}/api/v1/admin/users/policy`, {
+      method: 'PUT',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ policy })
+    }).then(handleResponse<{ policy: string }>)
 };

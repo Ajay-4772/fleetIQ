@@ -14,13 +14,14 @@ import {
   X
 } from 'lucide-react';
 import { SSEConnectionStatus } from '../../hooks/useSSE';
-import { DashboardSummary, ActionItem, SearchResult } from '../../types';
+import { DashboardSummary, ActionItem, SearchResult, StreamStatus } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 
 interface HeaderProps {
   sseStatus: SSEConnectionStatus;
   summary: DashboardSummary | null;
+  streamStatus?: StreamStatus | null;
   actions?: ActionItem[];
   onRefresh: () => void;
   onOpenSimulator: () => void;
@@ -32,6 +33,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   sseStatus,
   summary,
+  streamStatus,
   actions = [],
   onRefresh,
   onOpenSimulator,
@@ -254,24 +256,46 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right Controls */}
       <div className="flex items-center gap-3">
-        {/* Streamlined Live Status Indicator */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px] font-semibold text-slate-600">
+        {/* Real Stream & Ingestion Freshness Indicator */}
+        <div
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200/80 text-[11px] font-semibold text-slate-600"
+          title={streamStatus?.freshnessDescription || (sseStatus === 'LIVE' ? 'Real-time telemetry stream active' : 'Connecting stream...')}
+        >
           <span className="relative flex h-2 w-2">
-            {sseStatus === 'LIVE' && (
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" aria-hidden="true"></span>
+            {streamStatus ? (
+              streamStatus.pipelineStatus === 'LIVE' ? (
+                <>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" aria-hidden="true"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </>
+              ) : streamStatus.pipelineStatus === 'CONNECTED_WAITING' ? (
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              ) : streamStatus.pipelineStatus === 'STALE' ? (
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              ) : streamStatus.pipelineStatus === 'ERROR' ? (
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+              ) : (
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-400"></span>
+              )
+            ) : (
+              <>
+                {sseStatus === 'LIVE' && (
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" aria-hidden="true"></span>
+                )}
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    sseStatus === 'LIVE'
+                      ? 'bg-emerald-500'
+                      : sseStatus === 'RECONNECTING'
+                      ? 'bg-amber-500'
+                      : 'bg-rose-500'
+                  }`}
+                ></span>
+              </>
             )}
-            <span
-              className={`relative inline-flex rounded-full h-2 w-2 ${
-                sseStatus === 'LIVE'
-                  ? 'bg-emerald-500'
-                  : sseStatus === 'RECONNECTING'
-                  ? 'bg-amber-500'
-                  : 'bg-rose-500'
-              }`}
-            ></span>
           </span>
           <span>
-            {sseStatus === 'LIVE' ? 'Live' : sseStatus === 'RECONNECTING' ? 'Reconnecting' : 'Offline'}
+            {streamStatus ? streamStatus.statusLabel : (sseStatus === 'LIVE' ? 'Live' : sseStatus === 'RECONNECTING' ? 'Reconnecting' : 'Offline')}
           </span>
         </div>
 

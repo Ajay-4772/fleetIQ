@@ -16,6 +16,7 @@ import {
   PanelLeftOpen
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { StreamStatus } from '../../types';
 
 export type NavTab =
   | 'overview'
@@ -33,6 +34,7 @@ interface SidebarProps {
   onSelectTab: (tab: NavTab) => void;
   openActionCount?: number;
   criticalActionCount?: number;
+  streamStatus?: StreamStatus | null;
   onOpenSimulator: () => void;
   onOpenAssistant?: () => void;
   isCollapsed?: boolean;
@@ -44,6 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTab,
   openActionCount = 0,
   criticalActionCount = 0,
+  streamStatus,
   onOpenSimulator,
   isCollapsed: controlledCollapsed,
   onToggleCollapse
@@ -233,11 +236,34 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="pt-4 border-t border-slate-100">
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70 text-left space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-slate-800">Pipeline Active</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500" aria-hidden="true"></span>
+              <span className="text-[11px] font-bold text-slate-800">
+                {streamStatus?.pipelineStatus === 'LIVE'
+                  ? 'Pipeline Active'
+                  : streamStatus?.pipelineStatus === 'CONNECTED_WAITING'
+                  ? 'Pipeline Standby'
+                  : streamStatus?.pipelineStatus === 'STALE'
+                  ? 'Pipeline Stale'
+                  : streamStatus?.pipelineStatus === 'ERROR'
+                  ? 'Pipeline Error'
+                  : 'No Source Connected'}
+              </span>
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  streamStatus?.pipelineStatus === 'LIVE'
+                    ? 'bg-emerald-500'
+                    : streamStatus?.pipelineStatus === 'CONNECTED_WAITING'
+                    ? 'bg-blue-500'
+                    : streamStatus?.pipelineStatus === 'STALE'
+                    ? 'bg-amber-500'
+                    : streamStatus?.pipelineStatus === 'ERROR'
+                    ? 'bg-rose-500'
+                    : 'bg-slate-400'
+                }`}
+                aria-hidden="true"
+              ></span>
             </div>
             <p className="text-[10px] text-slate-500 leading-tight">
-              Multi-OEM telemetry normalized in real-time.
+              {streamStatus?.freshnessDescription || 'Awaiting incoming vehicle telemetry payloads.'}
             </p>
           </div>
         </div>

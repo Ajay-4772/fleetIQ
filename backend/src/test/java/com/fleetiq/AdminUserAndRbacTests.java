@@ -65,7 +65,7 @@ public class AdminUserAndRbacTests {
     void testAdminCanListUsers() throws Exception {
         mockMvc.perform(get("/api/v1/admin/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(4))))
+                .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
                 .andExpect(jsonPath("$[0].username").isNotEmpty())
                 .andExpect(jsonPath("$[0].role").isNotEmpty());
     }

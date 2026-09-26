@@ -55,6 +55,31 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardAggregationService.getTrends(range));
     }
 
+    @GetMapping("/ingestion-throughput")
+    public ResponseEntity<IngestionThroughputDto> getIngestionThroughput() {
+        return ResponseEntity.ok(dashboardAggregationService.getIngestionThroughput());
+    }
+
+    @GetMapping("/issue-distribution")
+    public ResponseEntity<IssueDistributionDto> getIssueDistribution() {
+        return ResponseEntity.ok(dashboardAggregationService.getIssueDistribution());
+    }
+
+    @GetMapping("/weekly-utilization")
+    public ResponseEntity<WeeklyUtilizationDto> getWeeklyUtilization() {
+        return ResponseEntity.ok(dashboardAggregationService.getWeeklyUtilization());
+    }
+
+    @GetMapping("/safety-score")
+    public ResponseEntity<SafetyScoreDto> getSafetyScore() {
+        return ResponseEntity.ok(dashboardAggregationService.getSafetyScore());
+    }
+
+    @GetMapping("/stream-status")
+    public ResponseEntity<StreamStatusDto> getStreamStatus() {
+        return ResponseEntity.ok(dashboardAggregationService.getStreamStatus());
+    }
+
     @GetMapping("/data-quality")
     public ResponseEntity<DataQualityDto> getDataQuality() {
         return ResponseEntity.ok(dashboardAggregationService.getDataQuality());

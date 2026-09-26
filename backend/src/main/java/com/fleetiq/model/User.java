@@ -45,6 +45,18 @@ public class User {
     @Column(length = 128)
     private String organization;
 
+    @Column(nullable = false, length = 32)
+    private String status = "ACTIVE"; // ACTIVE, PENDING_APPROVAL, REJECTED, DEACTIVATED
+
+    @Column(length = 32)
+    private String requestedRole;
+
+    @Column(length = 64)
+    private String approvedBy;
+
+    @Column
+    private Instant approvedAt;
+
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
@@ -116,6 +128,18 @@ public class User {
 
     public String getOrganization() { return organization; }
     public void setOrganization(String organization) { this.organization = organization; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getRequestedRole() { return requestedRole; }
+    public void setRequestedRole(String requestedRole) { this.requestedRole = requestedRole; }
+
+    public String getApprovedBy() { return approvedBy; }
+    public void setApprovedBy(String approvedBy) { this.approvedBy = approvedBy; }
+
+    public Instant getApprovedAt() { return approvedAt; }
+    public void setApprovedAt(Instant approvedAt) { this.approvedAt = approvedAt; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }

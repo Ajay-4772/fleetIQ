@@ -86,6 +86,7 @@ public class IngestionController {
             source.setSchemaMapping(payload.get("schemaMapping").toString());
         }
         DataSource saved = dataSourceRepository.save(source);
+        log.info("Admin created new ingestion data source: id={}, name={}, type={}", saved.getId(), saved.getName(), saved.getSourceType());
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 

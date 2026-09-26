@@ -61,7 +61,7 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-01: Login with username succeeds and issues access & rotatable refresh tokens")
     void testLoginWithUsernameSuccess() throws Exception {
-        LoginRequest req = new LoginRequest("admin", "Admin@Vehyron2026");
+        LoginRequest req = new LoginRequest("Ajay", "VehyronRootAdmin@2026!");
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -70,7 +70,7 @@ public class AuthenticationAndSessionTests {
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
-                .andExpect(jsonPath("$.username").value("admin"))
+                .andExpect(jsonPath("$.username").value("Ajay"))
                 .andExpect(jsonPath("$.role").value("ROLE_ADMIN"))
                 .andReturn();
 
@@ -86,14 +86,14 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-02: Login with corporate email succeeds")
     void testLoginWithEmailSuccess() throws Exception {
-        LoginRequest req = new LoginRequest("operator@vehyron.internal", "Operator@Vehyron2026");
+        LoginRequest req = new LoginRequest("ajayalpha4772@vehryon.com", "VehyronRootAdmin@2026!");
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("operator"))
-                .andExpect(jsonPath("$.role").value("ROLE_OPERATOR"));
+                .andExpect(jsonPath("$.username").value("Ajay"))
+                .andExpect(jsonPath("$.role").value("ROLE_ADMIN"));
     }
 
     @Test
@@ -155,7 +155,7 @@ public class AuthenticationAndSessionTests {
     }
 
     @Test
-    @DisplayName("Auth-06: Self-service registration creates user with restricted ROLE_OPERATOR and hashed password")
+    @DisplayName("Auth-06: Self-service registration creates user with restricted ROLE_OPERATOR and status PENDING_APPROVAL")
     void testSelfServiceRegistration() throws Exception {
         String testUser = "reg_user_" + System.currentTimeMillis();
         String testEmail = testUser + "@enterprise.com";
@@ -175,11 +175,11 @@ public class AuthenticationAndSessionTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value(testUser))
                 .andExpect(jsonPath("$.role").value("ROLE_OPERATOR"))
-                .andExpect(jsonPath("$.accessToken").isNotEmpty())
-                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
+                .andExpect(jsonPath("$.accountStatus").value("PENDING_APPROVAL"));
 
         var userOpt = userRepository.findByUsername(testUser);
         assertTrue(userOpt.isPresent());
+        assertEquals("PENDING_APPROVAL", userOpt.get().getStatus());
         assertEquals(Role.ROLE_OPERATOR, userOpt.get().getRole(), "Must strictly assign restricted ROLE_OPERATOR");
         assertTrue(passwordEncoder.matches("EnterpriseStrongPass2026!", userOpt.get().getPassword()));
     }
@@ -190,7 +190,7 @@ public class AuthenticationAndSessionTests {
         RegisterRequest req = new RegisterRequest(
                 "Duplicate Admin",
                 "another_admin@enterprise.com",
-                "admin", // already exists
+                "Ajay", // already exists as root admin
                 "EnterpriseStrongPass2026!",
                 "Logistics",
                 true
@@ -224,7 +224,7 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-09: Forgot password generates single-use reset token and generic response")
     void testForgotPasswordFlow() throws Exception {
-        ForgotPasswordRequest req = new ForgotPasswordRequest("admin@vehyron.internal");
+        ForgotPasswordRequest req = new ForgotPasswordRequest("ajayalpha4772@vehryon.com");
 
         mockMvc.perform(post("/api/v1/auth/forgot-password")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -232,7 +232,7 @@ public class AuthenticationAndSessionTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("SUCCESS"));
 
-        var adminUser = userRepository.findByUsername("admin").orElseThrow();
+        var adminUser = userRepository.findByUsername("Ajay").orElseThrow();
         var tokens = resetTokenRepository.findAll().stream()
                 .filter(t -> t.getUser().getId().equals(adminUser.getId()) && !t.isUsed())
                 .toList();
@@ -287,7 +287,7 @@ public class AuthenticationAndSessionTests {
     @Test
     @DisplayName("Auth-11: Refresh token rotation issues new access token and revokes old refresh token")
     void testRefreshTokenRotation() throws Exception {
-        LoginRequest login = new LoginRequest("operator", "Operator@Vehyron2026");
+        LoginRequest login = new LoginRequest("Ajay", "VehyronRootAdmin@2026!");
         MvcResult res = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(login)))

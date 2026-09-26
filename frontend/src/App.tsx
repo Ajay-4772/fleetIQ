@@ -5,6 +5,8 @@ import { Sidebar, NavTab } from './components/layout/Sidebar';
 import { FleetOverviewCards } from './components/overview/FleetOverviewCards';
 import { FleetHealthSection } from './components/overview/FleetHealthSection';
 import { RightSidebarWidgets } from './components/overview/RightSidebarWidgets';
+import { IngestionThroughputChart } from './components/overview/IngestionThroughputChart';
+import { IssueDistributionChart } from './components/overview/IssueDistributionChart';
 import { CriticalAlertsBanner } from './components/live/CriticalAlertsBanner';
 import { LiveOperationsPanel } from './components/live/LiveOperationsPanel';
 import { PriorityActionCenter } from './components/actions/PriorityActionCenter';
@@ -46,6 +48,11 @@ const VehyronDashboard: React.FC = () => {
     dataQuality,
     impact,
     actions,
+    ingestionThroughput,
+    issueDistribution,
+    weeklyUtilization,
+    safetyScore,
+    streamStatus,
     loading,
     error,
     refreshData
@@ -115,6 +122,7 @@ const VehyronDashboard: React.FC = () => {
       <Header
         sseStatus={sseStatus}
         summary={summary}
+        streamStatus={streamStatus}
         actions={actions}
         onRefresh={refreshData}
         onOpenSimulator={() => setIsSimulatorOpen(true)}
@@ -129,6 +137,7 @@ const VehyronDashboard: React.FC = () => {
           onSelectTab={setActiveTab}
           openActionCount={summary?.openActionCount}
           criticalActionCount={summary?.criticalActionCount}
+          streamStatus={streamStatus}
           onOpenSimulator={() => setIsSimulatorOpen(true)}
           onOpenAssistant={() => setActiveTab('copilot')}
           isCollapsed={isSidebarCollapsed}
@@ -190,9 +199,17 @@ const VehyronDashboard: React.FC = () => {
                 <FleetHealthSection health={health} />
               </div>
 
+              {/* Real-Time Ingestion & Issue Distribution Analytics (2 Columns) */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+                <IngestionThroughputChart throughput={ingestionThroughput} />
+                <IssueDistributionChart distribution={issueDistribution} />
+              </div>
+
               {/* Parallel Widgets Row: Most Day Active + Fleet Safety Rate (2 Columns) */}
               <div className="w-full">
                 <RightSidebarWidgets
+                  utilization={weeklyUtilization}
+                  safety={safetyScore}
                   onViewDetails={() => setIsSafetyModalOpen(true)}
                 />
               </div>
@@ -408,6 +425,8 @@ const VehyronDashboard: React.FC = () => {
       <SafetyDetailsModal
         isOpen={isSafetyModalOpen}
         onClose={() => setIsSafetyModalOpen(false)}
+        safetyScore={safetyScore}
+        actions={actions}
         onSelectVehicle={(vId) => setSelectedVehicleId(vId)}
       />
     </div>

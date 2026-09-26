@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -35,9 +34,6 @@ public class VehyronProductionHardeningTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -188,10 +184,10 @@ public class VehyronProductionHardeningTests {
     @Test
     @DisplayName("Hardening-06: Administrator Cannot Demote Their Own Account")
     void testAdminCannotDemoteSelf() {
-        var adminUser = userRepository.findByUsername("admin").orElseThrow();
+        var adminUser = userRepository.findByRole(Role.ROLE_ADMIN).stream().findFirst().orElseThrow();
 
         assertThrows(IllegalArgumentException.class, () -> {
-            userService.updateUserRole(adminUser.getId(), Role.ROLE_OPERATOR, "admin", "127.0.0.1");
+            userService.updateUserRole(adminUser.getId(), Role.ROLE_OPERATOR, adminUser.getUsername(), "127.0.0.1");
         }, "Admin must not be allowed to self-demote to prevent lockouts");
     }
 

@@ -37,7 +37,7 @@ public class SecurityAndAuthTests {
     @Test
     @DisplayName("Case S1: Login success with valid admin credentials")
     void testLoginSuccess() throws Exception {
-        LoginRequest req = new LoginRequest("admin", "Admin@Vehyron2026");
+        LoginRequest req = new LoginRequest("Ajay", "VehyronRootAdmin@2026!");
 
         MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -45,19 +45,19 @@ public class SecurityAndAuthTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty())
                 .andExpect(jsonPath("$.role").value("ROLE_ADMIN"))
-                .andExpect(jsonPath("$.username").value("admin"))
+                .andExpect(jsonPath("$.username").value("Ajay"))
                 .andReturn();
 
         LoginResponse res = objectMapper.readValue(result.getResponse().getContentAsString(), LoginResponse.class);
         assertTrue(jwtTokenProvider.validateToken(res.getToken()));
-        assertEquals("admin", jwtTokenProvider.getUsernameFromToken(res.getToken()));
+        assertEquals("Ajay", jwtTokenProvider.getUsernameFromToken(res.getToken()));
         assertEquals("ROLE_ADMIN", jwtTokenProvider.getRoleFromToken(res.getToken()));
     }
 
     @Test
     @DisplayName("Case S2: Login failure with invalid password")
     void testLoginFailure() throws Exception {
-        LoginRequest req = new LoginRequest("admin", "WrongPassword123");
+        LoginRequest req = new LoginRequest("Ajay", "WrongPassword123");
 
         mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

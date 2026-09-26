@@ -41,6 +41,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordResetTokenRepository resetTokenRepository;
     private final UserAuditLogRepository auditLogRepository;
+    private final com.fleetiq.repository.PlatformSettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final PasswordPolicyValidator passwordPolicyValidator;
@@ -50,6 +51,7 @@ public class AuthService {
                        RefreshTokenRepository refreshTokenRepository,
                        PasswordResetTokenRepository resetTokenRepository,
                        UserAuditLogRepository auditLogRepository,
+                       com.fleetiq.repository.PlatformSettingRepository settingRepository,
                        PasswordEncoder passwordEncoder,
                        JwtTokenProvider tokenProvider,
                        PasswordPolicyValidator passwordPolicyValidator) {
@@ -57,6 +59,7 @@ public class AuthService {
         this.refreshTokenRepository = refreshTokenRepository;
         this.resetTokenRepository = resetTokenRepository;
         this.auditLogRepository = auditLogRepository;
+        this.settingRepository = settingRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.passwordPolicyValidator = passwordPolicyValidator;
@@ -116,7 +119,29 @@ public class AuthService {
             throw new BadCredentialsException("Invalid credentials provided");
         }
 
-        if (!user.isEnabled()) {
+        if ("PENDING_APPROVAL".equalsIgnoreCase(user.getStatus())) {
+            auditLogRepository.save(new UserAuditLog(
+                    user.getUsername(),
+                    "LOGIN_BLOCKED",
+                    user.getUsername(),
+                    "Authentication rejected: user account is awaiting administrator approval",
+                    ip
+            ));
+            throw new DisabledException("Your account is awaiting administrator approval. Please contact your platform administrator.");
+        }
+
+        if ("REJECTED".equalsIgnoreCase(user.getStatus())) {
+            auditLogRepository.save(new UserAuditLog(
+                    user.getUsername(),
+                    "LOGIN_BLOCKED",
+                    user.getUsername(),
+                    "Authentication rejected: registration request was rejected by administrator",
+                    ip
+            ));
+            throw new DisabledException("Your registration request was rejected by an administrator.");
+        }
+
+        if (!user.isEnabled() || "DEACTIVATED".equalsIgnoreCase(user.getStatus())) {
             auditLogRepository.save(new UserAuditLog(
                     user.getUsername(),
                     "LOGIN_BLOCKED",
@@ -187,35 +212,52 @@ public class AuthService {
         // Enforce password policy
         passwordPolicyValidator.validate(request.getPassword());
 
-        String username = request.getUsername().trim().toLowerCase();
-        String email = request.getEmail().trim().toLowerCase();
+        String username = request.getUsername().trim();
+        String email = request.getEmail().trim();
 
-        if (userRepository.existsByUsername(username)) {
+        if (userRepository.existsByUsernameIgnoreCase(username) || userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username '" + username + "' is already registered in VEHYRON");
         }
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmailIgnoreCase(email) || userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Corporate email '" + email + "' is already registered");
         }
 
-        // Public registration assigns strictly ROLE_OPERATOR
-        // Requested ADMIN role requires administrative approval
-        Role assignedRole = Role.ROLE_OPERATOR;
-        String requested = request.getRequestedRole() != null ? request.getRequestedRole().trim() : "OPERATOR";
-        String auditDetail = "Self-service registration completed with default role ROLE_OPERATOR";
-        if (requested.equalsIgnoreCase("ADMIN") || requested.equalsIgnoreCase("ROLE_ADMIN")) {
-            auditDetail += " (Requested role ADMIN is pending administrator approval)";
+        String policy = settingRepository.findById("registration_policy")
+                .map(com.fleetiq.model.PlatformSetting::getValue)
+                .orElse("APPROVAL_REQUIRED");
+
+        if ("DISABLED".equalsIgnoreCase(policy)) {
+            throw new IllegalArgumentException("Public user registration is currently disabled by administrator policy.");
         }
+
+        String requested = request.getRequestedRole() != null ? request.getRequestedRole().trim() : "OPERATOR";
+        boolean isAdminRequested = requested.equalsIgnoreCase("ADMIN") || requested.equalsIgnoreCase("ROLE_ADMIN");
+
+        boolean requiresApproval = "APPROVAL_REQUIRED".equalsIgnoreCase(policy) || isAdminRequested;
 
         User user = new User(
                 username,
                 passwordEncoder.encode(request.getPassword()),
                 request.getFullName().trim(),
                 email,
-                assignedRole,
+                Role.ROLE_OPERATOR,
                 request.getOrganization() != null ? request.getOrganization().trim() : null
         );
+        user.setRequestedRole(isAdminRequested ? "ROLE_ADMIN" : "ROLE_OPERATOR");
+
+        if (requiresApproval) {
+            user.setStatus("PENDING_APPROVAL");
+            user.setEnabled(false);
+        } else {
+            user.setStatus("ACTIVE");
+            user.setEnabled(true);
+        }
 
         User saved = userRepository.save(user);
+
+        String auditDetail = requiresApproval
+                ? "Self-service registration submitted with requested role " + user.getRequestedRole() + " (Pending administrator approval)"
+                : "Self-service registration completed with auto-approved role ROLE_OPERATOR";
 
         auditLogRepository.save(new UserAuditLog(
                 saved.getUsername(),
@@ -225,7 +267,22 @@ public class AuthService {
                 ip
         ));
 
-        // Generate immediate session for onboarding
+        if (requiresApproval) {
+            return new AuthTokensResponse(
+                    null,
+                    null,
+                    0L,
+                    saved.getUsername(),
+                    saved.getFullName(),
+                    saved.getEmail(),
+                    user.getRequestedRole(),
+                    saved.getOrganization(),
+                    "PENDING_APPROVAL",
+                    "Registration submitted successfully. Your account is awaiting administrator approval before access is granted."
+            );
+        }
+
+        // Auto-approved case: Generate immediate session
         String accessToken = tokenProvider.generateToken(saved.getUsername(), saved.getRole().name());
         String refreshTokenStr = generateSecureHexToken(32);
         RefreshToken refreshToken = new RefreshToken(
@@ -245,7 +302,9 @@ public class AuthService {
                 saved.getFullName(),
                 saved.getEmail(),
                 saved.getRole().name(),
-                saved.getOrganization()
+                saved.getOrganization(),
+                "ACTIVE",
+                "Registration successful. Welcome to VEHYRON."
         );
     }
 

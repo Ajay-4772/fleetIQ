@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CanonicalVehicleEventRepository extends JpaRepository<CanonicalVehicleEvent, String> {
@@ -19,11 +20,15 @@ public interface CanonicalVehicleEventRepository extends JpaRepository<Canonical
     }
     List<CanonicalVehicleEvent> findTop50ByOrderByTimestampDesc();
     Page<CanonicalVehicleEvent> findAllByOrderByTimestampDesc(Pageable pageable);
+    Optional<CanonicalVehicleEvent> findFirstByOrderByTimestampDesc();
+    List<CanonicalVehicleEvent> findByTimestampBetweenOrderByTimestampAsc(Instant start, Instant end);
+    List<CanonicalVehicleEvent> findByTimestampAfterOrderByTimestampAsc(Instant after);
 
     long countByEventType(String eventType);
     long countBySeverity(String severity);
     long countByStatus(String status);
     long countByTimestampAfter(Instant time);
+    long countByTimestampBetween(Instant start, Instant end);
 
     @Query("SELECT COUNT(e) FROM CanonicalVehicleEvent e WHERE e.timestamp >= :since AND e.severity = :severity")
     long countRecentBySeverity(@Param("since") Instant since, @Param("severity") String severity);

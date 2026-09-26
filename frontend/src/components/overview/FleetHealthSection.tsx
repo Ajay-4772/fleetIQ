@@ -18,29 +18,59 @@ interface FleetHealthSectionProps {
 
 export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health, onSelectCategory }) => {
   const chartRef = useRef<HTMLDivElement>(null);
+  const [activePointIndex, setActivePointIndex] = useState<number>(0);
 
-  // Dynamic interactive scrubber points
-  const points = [
-    { x: 50, y: 130, date: '1 Jan', healthPct: 88.5, volume: 1120 },
-    { x: 150, y: 125, date: '8 Jan', healthPct: 89.2, volume: 1240 },
-    { x: 260, y: 105, date: '15 Jan', healthPct: 91.0, volume: 1310 },
-    { x: 380, y: 75, date: '20 Jan', healthPct: 94.5, volume: 1480 },
-    { x: 490, y: 65, date: '25 Jan', healthPct: 93.8, volume: 1560 },
-    { x: 600, y: 55, date: '28 Jan', healthPct: 95.2, volume: 1620 },
-    { x: 680, y: 60, date: 'Today', healthPct: health?.healthyPercentage || 93.0, volume: 1690 }
-  ];
+  if (!health) {
+    return (
+      <div className="h-96 rounded-2xl bg-white border border-slate-100 p-6 shadow-card animate-pulse" />
+    );
+  }
 
-  const [activePointIndex, setActivePointIndex] = useState<number>(3);
+  const hasRealData = health.hasData && health.points && health.points.length > 0;
+
+  if (!hasRealData) {
+    return (
+      <div className="bg-white border border-slate-100 rounded-2xl p-10 shadow-card text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center mx-auto">
+          <ShieldCheck className="w-6 h-6" />
+        </div>
+        <div className="space-y-1.5 max-w-md mx-auto">
+          <h3 className="text-base font-bold text-slate-900 tracking-tight">Fleet Operational Health</h3>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            No telemetry data available yet. Connect a data source or ingest vehicle data to generate fleet health analytics.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const rawPoints = health.points || [];
+  const pointCount = rawPoints.length;
+
+  // Map real telemetry points to SVG coordinates (width: 700, height: 160)
+  const svgPoints = rawPoints.map((p, idx) => {
+    const x = pointCount > 1 ? Math.round((idx / (pointCount - 1)) * 640 + 30) : 350;
+    const y = Math.round(140 - (Math.min(100, Math.max(0, p.healthScore)) / 100.0) * 110);
+    return {
+      x,
+      y,
+      date: p.label,
+      healthPct: p.healthScore,
+      volume: p.signalCount
+    };
+  });
+
+  const activeIdx = Math.min(activePointIndex, svgPoints.length - 1);
+  const activePoint = svgPoints[activeIdx] || svgPoints[0];
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || svgPoints.length === 0) return;
     const rect = chartRef.current.getBoundingClientRect();
     const relX = (e.clientX - rect.left) / rect.width * 700;
 
-    // Find nearest point
     let closestIdx = 0;
-    let minDiff = 9999;
-    points.forEach((p, idx) => {
+    let minDiff = 99999;
+    svgPoints.forEach((p, idx) => {
       const diff = Math.abs(p.x - relX);
       if (diff < minDiff) {
         minDiff = diff;
@@ -50,34 +80,20 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health, 
     setActivePointIndex(closestIdx);
   };
 
-  if (!health) {
-    return (
-      <div className="h-96 rounded-2xl bg-white border border-slate-100 p-6 shadow-card animate-pulse" />
-    );
-  }
+  // Generate SVG path through the actual points
+  const pathD = svgPoints.reduce((acc, curr, idx, arr) => {
+    if (idx === 0) return `M ${curr.x} ${curr.y}`;
+    const prev = arr[idx - 1];
+    const cp1x = prev.x + (curr.x - prev.x) / 2;
+    const cp1y = prev.y;
+    const cp2x = prev.x + (curr.x - prev.x) / 2;
+    const cp2y = curr.y;
+    return `${acc} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
+  }, '');
 
-  const isHealthEmpty = (health.healthyPercentage === 0 || health.healthyPercentage === undefined) &&
-    (health.atRiskPercentage === 0 || health.atRiskPercentage === undefined) &&
-    (health.criticalPercentage === 0 || health.criticalPercentage === undefined) &&
-    health.maintenanceDueCount === 0 && health.engineFaultCount === 0;
-
-  if (isHealthEmpty) {
-    return (
-      <div className="bg-white border border-slate-100 rounded-2xl p-10 shadow-card text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center mx-auto">
-          <ShieldCheck className="w-6 h-6" />
-        </div>
-        <div className="space-y-1.5 max-w-md mx-auto">
-          <h3 className="text-base font-bold text-slate-900 tracking-tight">Fleet Operational Health</h3>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            No vehicle telemetry records have been ingested yet. Connect an external data source (Kafka, MQTT, REST, Webhook) or upload an Excel/CSV dataset to compute live health intelligence.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  const activePoint = points[activePointIndex];
+  const areaD = svgPoints.length > 0
+    ? `${pathD} L ${svgPoints[svgPoints.length - 1].x} 160 L ${svgPoints[0].x} 160 Z`
+    : '';
 
   const issueCategories = [
     { label: 'Maintenance Due', type: 'MAINTENANCE_DUE', count: health.maintenanceDueCount, icon: Wrench, color: 'text-amber-600 bg-amber-50 hover:bg-amber-100/80 border-amber-200/60' },
@@ -98,10 +114,22 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health, 
             <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
               {health.healthyPercentage}%
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
-              <TrendingUp className="w-3 h-3" />
-              <span>+24.4% vs last period</span>
-            </span>
+            {health.previousPeriodPercentageChange !== null && health.previousPeriodPercentageChange !== undefined ? (
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                health.previousPeriodPercentageChange >= 0
+                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                  : 'bg-rose-50 text-rose-600 border border-rose-100'
+              }`}>
+                <TrendingUp className="w-3 h-3" />
+                <span>
+                  {health.previousPeriodPercentageChange >= 0 ? `+${health.previousPeriodPercentageChange}%` : `${health.previousPeriodPercentageChange}%`} vs last period
+                </span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-500 border border-slate-200">
+                <span>Comparison unavailable</span>
+              </span>
+            )}
           </div>
         </div>
 
@@ -139,67 +167,75 @@ export const FleetHealthSection: React.FC<FleetHealthSectionProps> = ({ health, 
             <line x1="0" y1="130" x2="700" y2="130" stroke="#f1f5f9" strokeDasharray="4 4" />
 
             {/* Area fill */}
-            <path
-              d="M 0 130 C 70 120, 140 135, 210 110 C 280 85, 350 125, 420 70 C 490 60, 560 95, 630 50 L 700 65 L 700 160 L 0 160 Z"
-              fill="url(#blueGradient)"
-            />
+            {areaD && (
+              <path
+                d={areaD}
+                fill="url(#blueGradient)"
+              />
+            )}
 
             {/* Primary Blue Line */}
-            <path
-              d="M 0 130 C 70 120, 140 135, 210 110 C 280 85, 350 125, 420 70 C 490 60, 560 95, 630 50 L 700 65"
-              fill="none"
-              stroke="#2563eb"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
+            {pathD && (
+              <path
+                d={pathD}
+                fill="none"
+                stroke="#2563eb"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            )}
 
             {/* Dynamic Scrubber vertical line */}
-            <line
-              x1={activePoint.x}
-              y1="10"
-              x2={activePoint.x}
-              y2="160"
-              stroke="#3b82f6"
-              strokeWidth="1.5"
-              strokeDasharray="3 3"
-              className="transition-all duration-75"
-            />
+            {activePoint && (
+              <>
+                <line
+                  x1={activePoint.x}
+                  y1="10"
+                  x2={activePoint.x}
+                  y2="160"
+                  stroke="#3b82f6"
+                  strokeWidth="1.5"
+                  strokeDasharray="3 3"
+                  className="transition-all duration-75"
+                />
 
-            {/* Dynamic Scrubber Dot */}
-            <circle
-              cx={activePoint.x}
-              cy={activePoint.y}
-              r="6"
-              fill="#2563eb"
-              stroke="#ffffff"
-              strokeWidth="2.5"
-              className="filter drop-shadow-md transition-all duration-75"
-            />
+                {/* Dynamic Scrubber Dot */}
+                <circle
+                  cx={activePoint.x}
+                  cy={activePoint.y}
+                  r="6"
+                  fill="#2563eb"
+                  stroke="#ffffff"
+                  strokeWidth="2.5"
+                  className="filter drop-shadow-md transition-all duration-75"
+                />
+              </>
+            )}
           </svg>
 
           {/* Dynamic Floating Scrubber Tooltip */}
-          <div
-            style={{ left: `${(activePoint.x / 700) * 100}%` }}
-            className="absolute top-[5%] -translate-x-1/2 bg-white border border-slate-200/90 rounded-xl p-2.5 shadow-xl text-left pointer-events-none z-10 min-w-[130px] transition-all duration-75"
-          >
-            <div className="text-[10px] font-bold text-slate-400 font-mono">{activePoint.date}</div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-              <span className="text-xs font-extrabold text-slate-900">{activePoint.healthPct}% Health</span>
+          {activePoint && (
+            <div
+              style={{ left: `${(activePoint.x / 700) * 100}%` }}
+              className="absolute top-[5%] -translate-x-1/2 bg-white border border-slate-200/90 rounded-xl p-2.5 shadow-xl text-left pointer-events-none z-10 min-w-[130px] transition-all duration-75"
+            >
+              <div className="text-[10px] font-bold text-slate-400 font-mono">{activePoint.date}</div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                <span className="text-xs font-extrabold text-slate-900">{activePoint.healthPct}% Health</span>
+              </div>
+              <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+                {activePoint.volume} signals/window
+              </div>
             </div>
-            <div className="text-[10px] text-slate-500 font-mono mt-0.5">
-              {activePoint.volume} signals/min
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* X-Axis Date Labels */}
+        {/* X-Axis Date Labels from actual points */}
         <div className="flex justify-between text-[11px] font-semibold text-slate-400 mt-2 px-1">
-          <span>1 Jan</span>
-          <span>8 Jan</span>
-          <span>15 Jan</span>
-          <span>22 Jan</span>
-          <span>Today</span>
+          {svgPoints.map((p, idx) => (
+            <span key={idx}>{p.date}</span>
+          ))}
         </div>
       </div>
 
