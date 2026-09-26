@@ -8,6 +8,6 @@ RUN mvn clean package -DskipTests
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=builder /app/target/fleetiq-backend-1.0.0.jar app.jar
+COPY --from=builder /app/target/vehyron-backend-*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

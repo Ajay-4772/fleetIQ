@@ -1,4 +1,4 @@
-name: FleetIQ Continuous Integration
+name: VEHYRON Continuous Integration
 
 on:
   push:
@@ -74,7 +74,7 @@ jobs:
         run: docker compose config --quiet
 
       - name: Build Backend Container
-        run: docker build -t fleetiq/backend:ci -f backend/Dockerfile backend/
+        run: docker build -t vehyron/backend:ci -f backend/Dockerfile backend/
 
       - name: Build Frontend Container
-        run: docker build -t fleetiq/frontend:ci -f frontend/Dockerfile frontend/
+        run: docker build -t vehyron/frontend:ci -f frontend/Dockerfile frontend/
